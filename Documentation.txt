@@ -1,0 +1,8 @@
+
+Text: #031602
+Background: #EEFFEE
+BackgroundContrast: #E7F7E7
+Primária: #305F2C
+Secundária: #A0BF9F
+Accent: #96c584
+
