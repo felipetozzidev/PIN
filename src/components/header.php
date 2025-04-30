@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Header IFApoia</title>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md sticky" id="nav">
+    <nav class="navbar navbar-expand-md fiexd-top" id="nav">
 
         <!-- Logo à esquerda -->
         <div class="navbar-brand col-md-4">
-            <a href="#">
+            <a href="">
                 <img src="../src/assets/img/Logotipo_antiga.png" alt="" class="logo">
             </a>
         </div>
@@ -26,7 +26,7 @@
         </div>
 
         <!-- Botão mobile (substituir o actions) -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 

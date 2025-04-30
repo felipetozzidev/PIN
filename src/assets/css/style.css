@@ -6,7 +6,7 @@
 
 :root {
     --background: #EEFFEE;
-    --backgroundContrast: #E7F7E7;
+    --backgroundContrast: #e7f7e78b;
     --primary: #305F2C;
     --secondary: #A0BF9F;
     --accent: #96c584;
@@ -28,30 +28,34 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 1000px var(--primary) inset !important; /* muda o fundo */
-  box-shadow: 0 0 0px 1000px var(--primary) inset !important;
-  -webkit-text-fill-color: #fff !important; /* muda a cor do texto */
-  transition: background-color 5000s ease-in-out 0s !important; /* truque para impedir o flash amarelo */
-  color: white;
-}
-  
-  input:-webkit-autofill::first-line {
+    -webkit-box-shadow: 0 0 0px 1000px var(--primary) inset !important;
+    /* muda o fundo */
+    box-shadow: 0 0 0px 1000px var(--primary) inset !important;
+    -webkit-text-fill-color: #fff !important;
+    /* muda a cor do texto */
+    transition: background-color 5000s ease-in-out 0s !important;
+    /* truque para impedir o flash amarelo */
     color: white;
-  }
-  
-  input:-webkit-autofill:focus {
+}
+
+input:-webkit-autofill::first-line {
+    color: white;
+}
+
+input:-webkit-autofill:focus {
     background-color: var(--primary) !important;
-  }
+}
 
 [type="search"]::-webkit-search-cancel-button {
     -webkit-appearance: none;
     appearance: none;
     height: 25px;
     width: 25px;
+    margin-left: 5px;
     background-image: url("../icons/close_search_btn.svg");
     background-size: 100% 100%;
     cursor: pointer;
-  }
+}
 
 /* ========================================================================= */
 
@@ -213,7 +217,7 @@ select:-webkit-autofill:focus {
 
 .navbar-nav {
     display: flex;
-    flex-direction: row;
+    flex-direction: row !important;
     /* Mantém os itens em uma linha */
     align-items: center;
     justify-content: center;
@@ -228,51 +232,69 @@ select:-webkit-autofill:focus {
     /* Impede que o texto quebre em várias linhas */
 }
 
-form {
+.search form {
     background-color: transparent;
     border-radius: 50px;
     border: 1px solid var(--background);
     padding: 10px;
     margin-right: 5px;
-    color: white;
+    color: var(--background);
     width: 100%;
+
+    &>i {
+        margin-right: 10px;
+        margin-left: 5px;
     }
 
-input {
-    border: none;
-    background-color: inherit;
-    width: 100%;
-    color: white;
+    &>input {
+        border: none;
+        background-color: inherit;
+        width: 100%;
+        color: var(--background);
+
+        &:focus {
+            outline: none;
+        }
+
+        &::placeholder {
+            color: var(--backgroundContrast);
+        }
+    }
 }
 
 main {
     display: grid;
-    grid-template-areas: 
-    "navbar main right";
+    grid-template-areas:
+        "navbar main right";
     grid-template-columns: 10% 80% 10%;
     padding: 20px 35px;
     height: auto;
 
-    & > section{
+    &>section {
         height: 100%;
-        &.navbar_container{
+
+        &.navbar_container {
             grid-area: navbar;
             position: fixed;
             width: 10%;
             background-color: red;
         }
-        &.main_container{
+
+        &.main_container {
             grid-area: main;
             background-color: blue;
             height: 100%;
         }
-        &.publicacoes_recentes{grid-area: right;}
+
+        &.publicacoes_recentes {
+            grid-area: right;
+        }
 
         width: 100%;
 
-        & > nav.navbar_lateral{
-            
-            & > ul{
+        &>nav.navbar_lateral {
+
+            &>ul {
                 list-style: none;
                 padding-left: 0;
             }
@@ -291,22 +313,41 @@ footer {
     text-align: center;
     clear: both;
 
-    & div{
+    & div {
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0;
 
-        & p{
+        & p {
             margin: 0;
         }
     }
 
 }
 
-@media screen and (max-width: 600px) {
-    nav li {
-        display: block;
-        margin-right: 0;
+@media (max-width: 767.98px) {
+    #nav {
+        padding: 10px 35px;
     }
+
+    .collapse {
+
+    }
+
+    .search {
+
+    }
+
+    .actions {
+        
+    }
+
+    .nav-item {
+
+    }
+}
+
+@media (min-width: 768px) {
+
 }
