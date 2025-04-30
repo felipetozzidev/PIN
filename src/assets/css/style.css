@@ -213,7 +213,7 @@ select:-webkit-autofill:focus {
 
 .navbar-nav {
     display: flex;
-    flex-direction: row !important;
+    flex-direction: row;
     /* Mantém os itens em uma linha */
     align-items: center;
     justify-content: center;
