@@ -11,6 +11,7 @@
 </head>
 <body>
     <?php include("../src/components/header.php"); ?>
+
     <main>
         <section class="navbar_container">
             <nav class="navbar_lateral">
