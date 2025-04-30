@@ -21,7 +21,7 @@
         <div class="search navbar-nav col-md-4">
             <form class="d-flex" role="search" action="index.php" method="GET">
                 <i class="ri-search-line"></i>
-                <input class="me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+                <input class="me-2" type="search" name="search" placeholder="Buscar..." aria-label="Search">
             </form>
         </div>
 
