@@ -195,7 +195,7 @@ input:-webkit-autofill:focus {
     width: auto;
 }
 
-.navbar-toggler {
+style.css .navbar-toggler {
     border: 2px solid rgba(255, 255, 255, 0.8) !important;
     padding: 0.5rem !important;
     transition: all 0.3s ease !important;
@@ -237,9 +237,7 @@ input:-webkit-autofill:focus {
     border-radius: 50px;
     border: 1px solid var(--background);
     padding: 10px;
-    margin-right: 5px;
     color: var(--background);
-    width: 100%;
 
     &>i {
         margin-right: 10px;

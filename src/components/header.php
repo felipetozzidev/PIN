@@ -8,21 +8,13 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md fiexd-top" id="nav">
+    <nav class="navbar navbar-expand-sm fixed" id="nav">
 
         <!-- Logo à esquerda -->
-        <div class="navbar-brand col-md-4">
+        <div class="navbar-brand col-4">
             <a href="">
                 <img src="../src/assets/img/Logotipo_antiga.png" alt="" class="logo">
-            </a>    
-        </div>
-
-        <!-- Busca no centro -->
-        <div class="search navbar-nav col-md-4">
-            <form class="d-flex" role="search" action="index.php" method="GET">
-                <i class="ri-search-line"></i>
-                <input class="me-2" type="search" name="search" placeholder="Buscar..." aria-label="Search">
-            </form>
+            </a>
         </div>
 
         <!-- Botão mobile (substituir o actions) -->
@@ -31,9 +23,16 @@
         </button>
 
         <!-- Links do menu collapse -->
-        <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="collapse navbar-collapse col-8" id="navbarCollapse">
+            <!-- Busca no centro -->
+            <div class="search navbar-nav col-6">
+                <form class="d-flex" role="search" action="index.php" method="GET">
+                    <i class="ri-search-line"></i>
+                    <input class="me-2" type="search" name="search" placeholder="Buscar..." aria-label="Search">
+                </form>
+            </div>
             <!-- Ações à direita -->
-            <div class="actions navbar-nav col-md-4 d-flex justify-content-end">
+            <div class="actions navbar-nav col-6 d-flex justify-content-end">
                 <!-- Novo Post -->
                 <a class="nav-item" href="">
                     <img src="../src/assets/icons/add-large-line.svg" alt="" width="30px"> <!-- <span>Novo Post</span> -->
