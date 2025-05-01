@@ -195,14 +195,9 @@ input:-webkit-autofill:focus {
     width: auto;
 }
 
-style.css .navbar-toggler {
-    border: 2px solid rgba(255, 255, 255, 0.8) !important;
+.navbar-toggler {
     padding: 0.5rem !important;
-    transition: all 0.3s ease !important;
-}
-
-.navbar-toggler:hover {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.2s ease-out !important;
 }
 
 .navbar-toggler-icon {
@@ -238,17 +233,17 @@ style.css .navbar-toggler {
     border: 1px solid var(--background);
     padding: 10px;
     color: var(--background);
+    width: 100%;
 
     &>i {
         margin-right: 10px;
-        margin-left: 5px;
     }
 
     &>input {
         border: none;
         background-color: inherit;
-        width: 10%;
         color: var(--background);
+        width: 100%;
 
         &:focus {
             outline: none;
@@ -258,6 +253,10 @@ style.css .navbar-toggler {
             color: var(--backgroundContrast);
         }
     }
+}
+
+.actions {
+    justify-content: flex-end;
 }
 
 main {
@@ -323,3 +322,30 @@ footer {
     }
 
 }
+
+@media (max-width: 767.98px) {
+    .navbar-collapse {
+        background-color: var(--primary);
+    }
+
+    .search {
+        width: 100% !important;
+        margin: 10px 0px 0px 0px !important;
+        padding-top: 15px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .actions {
+        width: 100% !important;
+        justify-content: !important;
+        padding-top: 15px !important;
+    }
+
+    .nav-item {}
+
+    .nav-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+@media (min-width: 768px) {}

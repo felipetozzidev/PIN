@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-sm fixed" id="nav">
+    <nav class="navbar navbar-expand-md fixed" id="nav">
 
         <!-- Logo à esquerda -->
         <div class="navbar-brand col-4">
@@ -17,7 +17,7 @@
             </a>
         </div>
 
-        <!-- Botão mobile (substituir o actions) -->
+        <!-- Botão responsividade -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -32,7 +32,7 @@
                 </form>
             </div>
             <!-- Ações à direita -->
-            <div class="actions navbar-nav col-6 d-flex justify-content-end">
+            <div class="actions navbar-nav col-6">
                 <!-- Novo Post -->
                 <a class="nav-item" href="">
                     <img src="../src/assets/icons/add-large-line.svg" alt="" width="30px"> <!-- <span>Novo Post</span> -->
