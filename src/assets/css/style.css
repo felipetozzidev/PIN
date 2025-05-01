@@ -325,29 +325,3 @@ footer {
     }
 
 }
-
-@media (max-width: 767.98px) {
-    #nav {
-        padding: 10px 35px;
-    }
-
-    .collapse {
-
-    }
-
-    .search {
-
-    }
-
-    .actions {
-        
-    }
-
-    .nav-item {
-
-    }
-}
-
-@media (min-width: 768px) {
-
-}

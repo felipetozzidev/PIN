@@ -14,7 +14,7 @@
         <div class="navbar-brand col-md-4">
             <a href="">
                 <img src="../src/assets/img/Logotipo_antiga.png" alt="" class="logo">
-            </a>
+            </a>    
         </div>
 
         <!-- Busca no centro -->
