@@ -3,7 +3,7 @@
     $localhost = "localhost";
     $user = "root";
     $passw = "";
-    $banco = "sistema_restaurante";
+    $banco = "IFApoia";
 
     //conexão
     $conn = mysqli_connect($localhost, $user, $passw, $banco);

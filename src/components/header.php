@@ -42,7 +42,7 @@
                     <img src="../src/assets/icons/notification-line.svg" alt="" width="30px">
                 </a>
                 <!-- Usuário -->
-                <a class="nav-item" href="">
+                <a class="nav-item" href="../src/components/login.php">
                     <img src="../src/assets/icons/icon_usuario.svg" alt="" width="30px">
                 </a>
             </div>
