@@ -166,7 +166,7 @@ if (isset($_POST['signup'])) {
     }
 
     body {
-      background-image: url('../assets/img/ifcampus.png');
+      background-image: url('../assets/img/ifcampus.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -483,14 +483,6 @@ if (isset($_POST['signup'])) {
             <!-- Segunda linha -->
             <div class="row mb-3">
               <div class="col-md-4">
-                <label for="cpf" class="form-label">CPF</label>
-                <input type="text" class="form-control" id="cpf" name="cpf" required>
-              </div>
-              <div class="col-md-4">
-                <label for="rg" class="form-label">RG</label>
-                <input type="text" class="form-control" id="rg" name="rg" required>
-              </div>
-              <div class="col-md-4">
                 <label for="sexo" class="form-label">Sexo</label>
                 <select class="form-control" id="sexo" name="sexo" required>
                   <option value="" disabled selected>Clique para selecionar</option>
@@ -530,14 +522,6 @@ if (isset($_POST['signup'])) {
 
             <!-- Quinta linha -->
             <div class="row mb-3">
-              <div class="col-md-3">
-                <label for="bairro" class="form-label">Bairro</label>
-                <input type="text" class="form-control" id="bairro" name="bairro" required>
-              </div>
-              <div class="col-md-3">
-                <label for="cep" class="form-label">CEP</label>
-                <input type="text" class="form-control" id="cep" name="cep" required>
-              </div>
               <div class="col-md-3">
                 <label for="cidade" class="form-label">Cidade</label>
                 <input type="text" class="form-control" id="cidade" name="cidade" required>
@@ -580,9 +564,9 @@ if (isset($_POST['signup'])) {
             <div class="row mb-3">
               <div class="col-md-12">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="escritor" name="escritor">
-                  <label class="form-check-label" for="escritor">
-                    Sou um escritor e desejo publicar livros.
+                  <input class="form-check-input" type="checkbox" id="" name="">
+                  <label class="form-check-label" for="">
+                    Sou um servidor público atuante no câmpus.
                   </label>
                 </div>
               </div>
