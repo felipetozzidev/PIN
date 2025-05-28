@@ -1,205 +1,123 @@
--- MySQL Workbench Forward Engineering
+CREATE database pin;
+USE pin;
 
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+CREATE TABLE niveis (
+    id_nvl INT PRIMARY KEY AUTO_INCREMENT,
+    nome_nvl VARCHAR(100) NOT NULL,
+    descricao_nvl VARCHAR(255) NOT NULL
+);
 
--- -----------------------------------------------------
--- Schema sistema_restaurante
--- -----------------------------------------------------
+CREATE TABLE usuarios (
+    id_usu INT PRIMARY KEY AUTO_INCREMENT,
+    nome_usu VARCHAR(100) NOT NULL,
+    email_usu VARCHAR(100) NOT NULL UNIQUE,
+    senha_usu VARCHAR(100) NOT NULL,
+    imgcapa_usu VARCHAR(255),
+    descricao_usu VARCHAR(255),
+    datacriacao_usu DATE NOT NULL,
+    id_nvl INT,
+    FOREIGN KEY (id_nvl) REFERENCES niveis(id_nvl)
+);
 
--- -----------------------------------------------------
--- Schema sistema_restaurante
--- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `sistema_restaurante` DEFAULT CHARACTER SET utf8 ;
--- -----------------------------------------------------
--- Schema sistema_restaurante
--- -----------------------------------------------------
+CREATE TABLE posts (
+    id_post INT PRIMARY KEY AUTO_INCREMENT,
+    titulo_post VARCHAR(150) NOT NULL,
+    conteudo_post TEXT NOT NULL,
+    data_post DATE NOT NULL,
+    id_usu INT,
+    stats_post VARCHAR(100) NOT NULL,
+    FOREIGN KEY (id_usu) REFERENCES usuarios(id_usu)
+);
 
-USE `sistema_restaurante` ;
+CREATE TABLE tags (
+    id_tag INT PRIMARY KEY AUTO_INCREMENT,
+    nome_tag VARCHAR(100) NOT NULL
+);
 
--- -----------------------------------------------------
--- Table `sistema_restaurante`.`usuario`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`usuario` (
-  `id_usuario` INT NOT NULL AUTO_INCREMENT,
-  `email_usuario` VARCHAR(150) NULL,
-  `senha_usuario` CHAR(128) NULL,
-  `celular_usuario` VARCHAR(13) NULL,
-  `cpf_usuario` VARCHAR(11) NULL,
-  `nome_usuario` VARCHAR(60) NULL,
-  PRIMARY KEY (`id_usuario`))
-ENGINE = InnoDB;
+CREATE TABLE posts_tags (
+    id_post INT,
+    id_tag INT,
+    PRIMARY KEY (id_post, id_tag),
+    FOREIGN KEY (id_post) REFERENCES posts(id_post),
+    FOREIGN KEY (id_tag) REFERENCES tags(id_tag)
+);
 
+CREATE TABLE grupos (
+    id_gp INT PRIMARY KEY AUTO_INCREMENT,
+    nome_gp VARCHAR(100),
+    descricao_gp VARCHAR(255)
+);
 
--- -----------------------------------------------------
--- Table `sistema_restaurante`.`mesa`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`mesa` (
-  `id_mesa` INT NOT NULL AUTO_INCREMENT,
-  `numero_mesa` INT NULL,
-  `capacidade_mesa` INT NULL,
-  `status_mesa` ENUM('disponivel', 'ocupada', 'reservada') NULL,
-  PRIMARY KEY (`id_mesa`))
-ENGINE = InnoDB;
+CREATE TABLE comunidades (
+    id_com INT PRIMARY KEY AUTO_INCREMENT,
+    nome_com VARCHAR(100) NOT NULL,
+    descricao_com VARCHAR(255) NOT NULL
+);
 
+CREATE TABLE usuarios_grupos (
+    id_usu INT,
+    id_gp INT,
+    dataenter_gp DATE NOT NULL,
+    PRIMARY KEY (id_usu, id_gp),
+    FOREIGN KEY (id_usu) REFERENCES usuarios(id_usu),
+    FOREIGN KEY (id_gp) REFERENCES grupos(id_gp)
+);
 
--- -----------------------------------------------------
--- Table `sistema_restaurante`.`pedidos`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`pedidos` (
-  `id_pedidos` INT NOT NULL AUTO_INCREMENT,
-  `status_pedidos` VARCHAR(45) NULL,
-  `data_hora_pedidos` DATETIME NOT NULL,
-  `total_pedidos` DOUBLE NOT NULL,
-  `usuario_id_usuario` INT NOT NULL,
-  `mesa_id_mesa` INT NOT NULL,
-  PRIMARY KEY (`id_pedidos`),
-  INDEX `fk_pedidos_usuario_idx` (`usuario_id_usuario` ASC),
-  INDEX `fk_pedidos_mesa1_idx` (`mesa_id_mesa` ASC),
-  CONSTRAINT `fk_pedidos_usuario`
-    FOREIGN KEY (`usuario_id_usuario`)
-    REFERENCES `sistema_restaurante`.`usuario` (`id_usuario`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_pedidos_mesa1`
-    FOREIGN KEY (`mesa_id_mesa`)
-    REFERENCES `sistema_restaurante`.`mesa` (`id_mesa`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
+CREATE TABLE comunidades_posts (
+    id_com INT,
+    id_post INT,
+    PRIMARY KEY (id_com, id_post),
+    FOREIGN KEY (id_com) REFERENCES comunidades(id_com),
+    FOREIGN KEY (id_post) REFERENCES posts(id_post)
+);
 
+CREATE TABLE usuarios_comunidades (
+    id_usu INT,
+    id_com INT,
+    tipo_membro VARCHAR(50) NOT NULL,
+    dataenter_com DATE NOT NULL,
+    PRIMARY KEY (id_usu, id_com),
+    FOREIGN KEY (id_usu) REFERENCES usuarios(id_usu),
+    FOREIGN KEY (id_com) REFERENCES comunidades(id_com)
+);
 
--- -----------------------------------------------------
--- Table `sistema_restaurante`.`itens_pedido`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`itens_pedido` (
-  `id_itens_pedido` INT NOT NULL AUTO_INCREMENT,
-  `quantidade` INT NULL,
-  `preco_unitario` DOUBLE NULL,
-  `pedidos_id_pedidos` INT NOT NULL,
-  PRIMARY KEY (`id_itens_pedido`),
-  INDEX `fk_itens_pedido_pedidos1_idx` (`pedidos_id_pedidos` ASC),
-  CONSTRAINT `fk_itens_pedido_pedidos1`
-    FOREIGN KEY (`pedidos_id_pedidos`)
-    REFERENCES `sistema_restaurante`.`pedidos` (`id_pedidos`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
+CREATE TABLE denuncias (
+    id_den INT PRIMARY KEY AUTO_INCREMENT,
+    id_usu INT,
+    alvo_den VARCHAR(100) NOT NULL,
+    idalvo_den INT NOT NULL,
+    motivo_den VARCHAR(255) NOT NULL,
+    data_den DATE NOT NULL,
+    FOREIGN KEY (id_usu) REFERENCES usuarios(id_usu)
+);
 
+CREATE TABLE notificacoes (
+    id_not INT PRIMARY KEY AUTO_INCREMENT,
+    id_usu INT,
+    mensagem_not VARCHAR(255) NOT NULL,
+    tipo_not VARCHAR(100) NOT NULL,
+    visto_not BOOLEAN NOT NULL,
+    data_not DATE NOT NULL,
+    FOREIGN KEY (id_usu) REFERENCES usuarios(id_usu)
+);
 
--- -----------------------------------------------------
--- Table `sistema_restaurante`.`reserva`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`reserva` (
-  `id_reserva` INT NOT NULL AUTO_INCREMENT,
-  `data_hora_reserva` DATETIME NULL,
-  `status_reserva` VARCHAR(45) NULL,
-  `usuario_id_usuario` INT NOT NULL,
-  PRIMARY KEY (`id_reserva`),
-  INDEX `fk_reserva_usuario1_idx` (`usuario_id_usuario` ASC),
-  CONSTRAINT `fk_reserva_usuario1`
-    FOREIGN KEY (`usuario_id_usuario`)
-    REFERENCES `sistema_restaurante`.`usuario` (`id_usuario`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
+CREATE TABLE comentarios (
+    id_coment INT PRIMARY KEY AUTO_INCREMENT,
+    id_post INT,
+    id_usu INT,
+    conteudo_coment TEXT NOT NULL,
+    data_coment DATE NOT NULL,
+    id_coment_pai INT,
+    FOREIGN KEY (id_post) REFERENCES posts(id_post),
+    FOREIGN KEY (id_usu) REFERENCES usuarios(id_usu),
+    FOREIGN KEY (id_coment_pai) REFERENCES comentarios(id_coment)
+);
 
-
--- -----------------------------------------------------
--- Table `sistema_restaurante`.`cardapio`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`cardapio` (
-  `id_item` INT NOT NULL AUTO_INCREMENT,
-  `nome_item` VARCHAR(100) NULL,
-  `descricao_item` MEDIUMTEXT NULL,
-  `preco_item` DECIMAL(10,2) NULL,
-  PRIMARY KEY (`id_item`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `sistema_restaurante`.`categoria_itens`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`categoria_itens` (
-  `nome_categoria_itens` VARCHAR(50) NOT NULL,
-  PRIMARY KEY (`nome_categoria_itens`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `sistema_restaurante`.`categoria_itens_has_cardapio`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`categoria_itens_has_cardapio` (
-  `categoria_itens_nome_categoria_itens` VARCHAR(50) NOT NULL,
-  `cardapio_id_item` INT NOT NULL,
-  PRIMARY KEY (`categoria_itens_nome_categoria_itens`, `cardapio_id_item`),
-  INDEX `fk_categoria_itens_has_cardapio_cardapio1_idx` (`cardapio_id_item` ASC),
-  INDEX `fk_categoria_itens_has_cardapio_categoria_itens1_idx` (`categoria_itens_nome_categoria_itens` ASC) ,
-  CONSTRAINT `fk_categoria_itens_has_cardapio_categoria_itens1`
-    FOREIGN KEY (`categoria_itens_nome_categoria_itens`)
-    REFERENCES `sistema_restaurante`.`categoria_itens` (`nome_categoria_itens`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_categoria_itens_has_cardapio_cardapio1`
-    FOREIGN KEY (`cardapio_id_item`)
-    REFERENCES `sistema_restaurante`.`cardapio` (`id_item`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `sistema_restaurante`.`carrinho`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`carrinho` (
-  `cardapio_id_item` INT NOT NULL,
-  `usuario_id_usuario` INT NOT NULL,
-  `quantidade_item` INT NULL,
-  `observacao_item` TEXT(150) NULL,
-  PRIMARY KEY (`cardapio_id_item`, `usuario_id_usuario`),
-  INDEX `fk_cardapio_has_usuario_usuario1_idx` (`usuario_id_usuario` ASC),
-  INDEX `fk_cardapio_has_usuario_cardapio1_idx` (`cardapio_id_item` ASC),
-  CONSTRAINT `fk_cardapio_has_usuario_cardapio1`
-    FOREIGN KEY (`cardapio_id_item`)
-    REFERENCES `sistema_restaurante`.`cardapio` (`id_item`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_cardapio_has_usuario_usuario1`
-    FOREIGN KEY (`usuario_id_usuario`)
-    REFERENCES `sistema_restaurante`.`usuario` (`id_usuario`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE) ENGINE = InnoDB;
-
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`endereco` (
-  `id_endereco` INT AUTO_INCREMENT PRIMARY KEY,
-  `cep` VARCHAR(9) NOT NULL,
-  `tipo_endereco` CHAR(1) NOT NULL, -- 'C' para comercial, 'R' para residencial (exemplo)
-  `logradouro` VARCHAR(100) NOT NULL,
-  `numero` INT NOT NULL,
-  `complemento` VARCHAR(50) NULL,
-  `bairro` VARCHAR(50) NOT NULL,
-  `cidade` VARCHAR(50) NOT NULL,
-  `unidade_federal` CHAR(2) NOT NULL
-) ENGINE = InnoDB;
-
-CREATE TABLE IF NOT EXISTS `sistema_restaurante`.`endereco_has_usuario` (
-  `endereco_id_endereco` INT NOT NULL,
-  `usuario_id_usuario` INT NOT NULL,
-  PRIMARY KEY (`endereco_id_endereco`, `usuario_id_usuario`),
-  CONSTRAINT `fk_endereco_has_usuario_usuario1`
-    FOREIGN KEY (`usuario_id_usuario`)
-    REFERENCES `sistema_restaurante`.`usuario` (`id_usuario`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_endereco_has_usuario_endereco1`
-    FOREIGN KEY (`endereco_id_endereco`)
-    REFERENCES `sistema_restaurante`.`endereco` (`id_endereco`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-) ENGINE = InnoDB;
-
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+CREATE TABLE likes (
+    id_lk INT PRIMARY KEY AUTO_INCREMENT,
+    id_usu INT,
+    id_post INT,
+    tipo_lk ENUM('curtir', 'nao_curtir') NOT NULL,
+    FOREIGN KEY (id_usu) REFERENCES usuarios(id_usu),
+    FOREIGN KEY (id_post) REFERENCES posts(id_post)
+);
