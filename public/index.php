@@ -13,32 +13,23 @@
     <?php include("../src/components/header.php"); ?>
 
     <main>
-        <section class="navbar_container">
-            <nav class="navbar_lateral">
-                <ul >
-                    <li><i class="ri-home-2-line" ></i> <span>Início</span></li>
-                    <li></li>
-                    <li></li>
-                    <li></li>
-                </ul>
-            </nav>
-        </section>
+        
+        <?php  include("../src/components/nav_bar.php"); ?>
         <section class="main_container">
-
+            <div class="destaques">
+                <h1>Destaques</h1>
+                <div class="cards">
+                    <span>Destaques</span>
+                </div>
+            </div>
         </section>
         <section class="publicacoes_recentes">
 
         </section>
     </main>
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <p>&#169 Todos os direitos reservados | IFApoia <?php echo date("Y") ?></p>
-                </div>
-            </div>
-        </div>
-    </footer>
+    
+    <?php include("../src/components/footer.php"); ?>
+
     <script src="../src/assets/js/javascript.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 </body>
