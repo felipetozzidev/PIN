@@ -87,24 +87,6 @@ if (isset($_POST['signup'])) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
   <style>
-    :root {
-      --primary: #305F2C;
-      --accent: #96C584;
-      --secondary: #A0BF9F;
-      --background: #EEFFEE;
-      --border-color: #d6dce4;
-      --text-color: #2d3748;
-      --text-muted: #718096;
-      --white: #ffffff;
-    }
-
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
       background-image: url('../assets/img/ifcampus.jpg');
       background-size: cover;
@@ -637,4 +619,4 @@ if (isset($_POST['signup'])) {
   </script>
 </body>
 
-</html>
+</html

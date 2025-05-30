@@ -19,10 +19,14 @@
 
         <section class="main_container">
             <div class="destaques">
-                <h1>Destaques</h1>
+                <h1 class="title">Destaques</h1>
                 <div class="cards">
                     <span>Destaques</span>
                 </div>
+            </div>
+            <div class="postagens">
+                <h1 class="title">Destaques</h1>
+
             </div>
         </section>
         <section class="publicacoes_recentes">
