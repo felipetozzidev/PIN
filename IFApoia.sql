@@ -1,5 +1,5 @@
-CREATE database pin;
-USE pin;
+CREATE database IFApoia;
+USE IFApoia;
 
 CREATE TABLE niveis (
     id_nvl INT PRIMARY KEY AUTO_INCREMENT,
@@ -16,6 +16,7 @@ CREATE TABLE usuarios (
     campus_usu VARCHAR(100) NOT NULL,
     sexo_usu VARCHAR(100) NOT NULL,
     orsex_usu VARCHAR(100) NOT NULL,
+    imgperfil_usu VARCHAR(255) DEFAULT ,
     imgcapa_usu VARCHAR(255),
     descricao_usu VARCHAR(255),
     datacriacao_usu DATE NOT NULL,

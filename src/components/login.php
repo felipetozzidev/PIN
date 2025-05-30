@@ -1,6 +1,5 @@
 <?php
 require_once('../../config/conn.php');
-session_start(); // Inicia a sessão no início do script
 
 $login_error = "";
 $signup_success = "";
@@ -15,18 +14,19 @@ if (isset($_POST['login'])) {
     $login_error = "Apenas emails institucionais são permitidos";
   } else {
     // Verifica na tabela usuarios
-    $query = "SELECT id_usu, senha_usu, nome_usu FROM usuarios WHERE email_usu = '$email'";
+    $query = "SELECT id_usu, senha_usu, nome_usu, imgperfil_usu FROM usuarios WHERE email_usu = '$email'"; // Inclui imgperfil_usu
     $result = mysqli_query($conn, $query);
 
     // Verifica se o email existe no banco de dados
     if (mysqli_num_rows($result) > 0) {
       $row = mysqli_fetch_assoc($result);
-      $senha_banco = $row['senha_usu'];
+      $senha_banco = $row['senha_usu']; // Obtém a senha criptografada do banco de dados
 
       // Verifica se a senha informada corresponde à senha armazenada no banco de dados
       if (password_verify($senha, $senha_banco)) {
-        $_SESSION['usuario_id'] = $row['id_usu'];
+        $_SESSION['usuario_id'] = $row['id_usu']; // Salva o ID do usuário na sessão
         $_SESSION['nome_usuario'] = $row['nome_usu']; // Salva o nome do usuário na sessão
+        $_SESSION['imgperfil_usu'] = $row['imgperfil_usu']; // Salva o caminho da foto de perfil na sessão
         $login_success = true;
       } else {
         $login_error = "Sua senha está incorreta";
@@ -59,7 +59,7 @@ if (isset($_POST['signup'])) {
     $login_error = "Apenas emails institucionais são permitidos";
   } else {
     $query = "INSERT INTO usuarios (nome_usu, email_usu, senha_usu, estado_usu, campus_usu, sexo_usu, orsex_usu, datacriacao_usu)
-                  VALUES ('$nome', '$email', '$senha_criptografada', '$estado', '$campus', '$sexo', '$orsex', '$data_criacao')";
+                    VALUES ('$nome', '$email', '$senha_criptografada', '$estado', '$campus', '$sexo', '$orsex', '$data_criacao')";
 
     // Executa a consulta de inserção
     if (mysqli_query($conn, $query)) {
@@ -96,57 +96,6 @@ if (isset($_POST['signup'])) {
       --text-color: #2d3748;
       --text-muted: #718096;
       --white: #ffffff;
-    }
-
-    /* Estilos personalizados para o SweetAlert2 */
-    .swal2-popup {
-      background: var(--background);
-      border-radius: 15px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      color: var(--text-color);
-    }
-
-    .swal2-title {
-      color: var(--primary);
-      font-size: 1.5rem;
-      font-weight: 700;
-    }
-
-    .swal2-content {
-      color: var(--text-muted);
-      font-size: 1rem;
-    }
-
-    .swal2-confirm {
-      background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
-      border: none !important;
-      border-radius: 8px !important;
-      padding: 0.75rem 1.5rem !important;
-      font-size: 1rem !important;
-      font-weight: 500 !important;
-      transition: all 0.3s ease !important;
-    }
-
-    .swal2-confirm:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(98, 28, 212, 0.2) !important;
-    }
-
-    .swal2-cancel {
-      background: var(--background) !important;
-      border: 1px solid var(--border-color) !important;
-      border-radius: 8px !important;
-      padding: 0.75rem 1.5rem !important;
-      font-size: 1rem !important;
-      font-weight: 500 !important;
-      color: var(--text-color) !important;
-      transition: all 0.3s ease !important;
-    }
-
-    .swal2-cancel:hover {
-      background: var(--background) !important;
-      border-color: var(--primary) !important;
-      color: var(--primary) !important;
     }
 
     html,
@@ -401,6 +350,57 @@ if (isset($_POST['signup'])) {
         margin: 1rem auto;
       }
     }
+
+    /* Estilos personalizados para o SweetAlert2 */
+    .swal2-popup {
+      background: var(--white);
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      color: var(--text-color);
+    }
+
+    .swal2-title {
+      color: var(--primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .swal2-content {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .swal2-confirm {
+      background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+      border: none !important;
+      border-radius: 8px !important;
+      padding: 0.75rem 1.5rem !important;
+      font-size: 1rem !important;
+      font-weight: 500 !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .swal2-confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(98, 28, 212, 0.2) !important;
+    }
+
+    .swal2-cancel {
+      background: var(--background) !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 8px !important;
+      padding: 0.75rem 1.5rem !important;
+      font-size: 1rem !important;
+      font-weight: 500 !important;
+      color: var(--text-color) !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .swal2-cancel:hover {
+      background: var(--background) !important;
+      border-color: var(--primary) !important;
+      color: var(--primary) !important;
+    }
   </style>
 </head>
 
@@ -475,7 +475,7 @@ if (isset($_POST['signup'])) {
               <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
               <label for="email">Email</label>
             </div>
-            <div class="row mb-4">
+            <div class="row mb-4 form-floating">
               <div class="col-md-6 form-floating">
                 <input type="password" class="form-control" id="senha" name="senha" placeholder="Senha" required>
                 <label class="labelsenha" for="senha">Senha</label>
@@ -582,7 +582,8 @@ if (isset($_POST['signup'])) {
           campiPorEstado[selectedEstado].forEach(function(campus) {
             const option = document.createElement('option');
             option.value = campus;
-            option.textContent = campus;
+            const parts = campus.split('Campus ');
+            option.textContent = parts[1] ? parts[1] : campus;
             campusSelect.appendChild(option);
           });
           campusSelect.disabled = false;
@@ -615,7 +616,7 @@ if (isset($_POST['signup'])) {
           text: 'Redirecionando...',
           icon: 'success',
           timer: 3000, // Timer de 3 segundos
-          confirmButtonText: false
+          showConfirmButton: false,
         }).then(() => {
           window.location.href = '../../public/index.php'; // Redireciona para a página inicial
         });
@@ -627,7 +628,7 @@ if (isset($_POST['signup'])) {
           title: 'Cadastro completo!',
           text: '<?= $signup_success ?>',
           icon: 'success',
-          timer: 1000, // Timer de 3 segundos
+          timer: 2000, // Timer de 2 segundos
           timerProgressBar: true,
           showConfirmButton: false
         });

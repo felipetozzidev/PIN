@@ -1,3 +1,7 @@
+<?php
+require_once('../config/conn.php');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,6 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Header IFApoia</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -27,26 +32,49 @@
                     <input class="me-2" type="search" name="search" placeholder="Buscar..." aria-label="Search">
                 </form>
             </div>
-            <div class="actions navbar-nav col-6">
+            <div class="actions navbar-nav col-6 justify-content-end">
                 <a class="nav-item" href="">
-                    <img src="../src/assets/icons/add-large-line.svg" alt="" width="30px"> </a>
+                    <img src="../src/assets/icons/add-large-line.svg" alt="" width="35px">
+                </a>
                 <a class="nav-item" href="">
-                    <img src="../src/assets/icons/notification-line.svg" alt="" width="30px">
+                    <img src="../src/assets/icons/notification-line.svg" alt="" width="35px">
                 </a>
-                <a class="nav-item" href="../src/components/login.php">
-                    <?php
-                    if (isset($_SESSION['nome_usuario'])) {
-                        $nomeCompleto = $_SESSION['nome_usuario'];
-                        $primeiroNome = explode(' ', trim($nomeCompleto))[0];
-                        echo '<span class="me-2">' . htmlspecialchars($primeiroNome) . '</span>';
-                    }
-                    ?>
-                    <img src="../src/assets/icons/icon_usuario.svg" alt="" width="30px">
-                </a>
+                <?php if (isset($_SESSION['usuario_id'])): ?>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <?php
+                            if (isset($_SESSION['imgperfil_usu'])) {
+                                echo '<img src="' . htmlspecialchars($_SESSION['imgperfil_usu']) . '" alt="Foto de perfil" width="35px" height="35px" class="rounded">';
+                            } else {
+                                echo '<img src="../src/assets/icons/icon_usuario.svg" alt="Ícone de Usuário" width="35px">';
+                            }
+                            ?>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li class="dropdown-item-text">
+                                <?php if (isset($_SESSION['nome_usuario'])): ?>
+                                    <?php
+                                    $nomeCompleto = $_SESSION['nome_usuario'];
+                                    $primeiroNome = explode(' ', trim($nomeCompleto))[0];
+                                    echo '<span> Olá, ' . htmlspecialchars($primeiroNome) . '!</span>';
+                                    ?>
+                                <?php endif; ?>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="profile.php">Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="settings.php">Configurações</a></li>
+                            <li><a class="dropdown-item" href="../src/components/logout.php">Sair</a></li>
+                        </ul>
+                    </div>
+                <?php else: ?>
+                    <a class="nav-item" href="../src/components/login.php">
+                        <img src="../src/assets/icons/icon_usuario.svg" alt="Ícone de Usuário" width="35px">
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
-
-
     </nav>
 </body>
 
