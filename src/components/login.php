@@ -5,76 +5,68 @@ session_start(); // Inicia a sessão no início do script
 $login_error = "";
 $signup_success = "";
 
+// Verifica se o usuário já está logado
 if (isset($_POST['login'])) {
-  $email = mysqli_real_escape_string($dbc, trim($_POST['email']));
-  $senha = mysqli_real_escape_string($dbc, trim($_POST['senha']));
+  $email = mysqli_real_escape_string($conn, trim($_POST['email']));
+  $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
 
-  // Verifica na tabela cadcli
-  $query = "SELECT id, senha FROM cadcli WHERE email = '$email'";
-  $result = mysqli_query($dbc, $query);
-
-  if (mysqli_num_rows($result) > 0) {
-    $row = mysqli_fetch_assoc($result);
-    $senha_banco = $row['senha'];
-
-    if (password_verify($senha, $senha_banco)) {
-      $_SESSION['usuario_id'] = $row['id'];
-      $_SESSION['tipo_usuario'] = 'cliente'; // Define o tipo de usuário
-      $login_success = true;
-    } else {
-      $login_error = "Senha Incorreta";
-    }
+  // Verifica se o email termina com os domínios permitidos
+  if (!preg_match('/@(ifsp\.edu\.br|aluno\.ifsp\.edu\.br)$/', $email)) {
+    $login_error = "Apenas emails institucionais são permitidos";
   } else {
-    // Verifica na tabela cadesc (escritores)
-    $query = "SELECT id, senha FROM cadesc WHERE email = '$email'";
-    $result = mysqli_query($dbc, $query);
+    // Verifica na tabela usuarios
+    $query = "SELECT id_usu, senha_usu, nome_usu FROM usuarios WHERE email_usu = '$email'";
+    $result = mysqli_query($conn, $query);
 
+    // Verifica se o email existe no banco de dados
     if (mysqli_num_rows($result) > 0) {
       $row = mysqli_fetch_assoc($result);
-      $senha_banco = $row['senha'];
+      $senha_banco = $row['senha_usu'];
 
+      // Verifica se a senha informada corresponde à senha armazenada no banco de dados
       if (password_verify($senha, $senha_banco)) {
-        $_SESSION['usuario_id'] = $row['id'];
-        $_SESSION['tipo_usuario'] = 'escritor'; // Define o tipo de usuário
+        $_SESSION['usuario_id'] = $row['id_usu'];
+        $_SESSION['nome_usuario'] = $row['nome_usu']; // Salva o nome do usuário na sessão
         $login_success = true;
       } else {
-        $login_error = "Senha Incorreta";
+        $login_error = "Sua senha está incorreta";
       }
     } else {
-      $login_error = "Email não encontrado";
+      $login_error = "Seu email não foi encontrado";
     }
   }
 }
 
+// Verifica se o usuário está tentando se cadastrar
 if (isset($_POST['signup'])) {
-  $nome = mysqli_real_escape_string($dbc, trim($_POST['nome']));
-  $sobrenome = mysqli_real_escape_string($dbc, trim($_POST['sobrenome']));
-  $cpf = mysqli_real_escape_string($dbc, trim($_POST['cpf']));
-  $rg = mysqli_real_escape_string($dbc, trim($_POST['rg']));
-  $sexo = mysqli_real_escape_string($dbc, trim($_POST['sexo']));
-  $email = mysqli_real_escape_string($dbc, trim($_POST['email']));
-  $senha = mysqli_real_escape_string($dbc, trim($_POST['senha']));
-  $end_nome = mysqli_real_escape_string($dbc, trim($_POST['end_nome']));
-  $end_num = mysqli_real_escape_string($dbc, trim($_POST['end_num']));
-  $end_comp = mysqli_real_escape_string($dbc, trim($_POST['end_comp']));
-  $cep = mysqli_real_escape_string($dbc, trim($_POST['cep']));
-  $bairro = mysqli_real_escape_string($dbc, trim($_POST['bairro']));
-  $cidade = mysqli_real_escape_string($dbc, trim($_POST['cidade']));
-  $uf = mysqli_real_escape_string($dbc, trim($_POST['uf']));
-  $escritor = isset($_POST['escritor']) ? 1 : 0; // Verifica se o checkbox foi marcado
+  $nome = mysqli_real_escape_string($conn, trim($_POST['nome']));
+  $email = mysqli_real_escape_string($conn, trim($_POST['email']));
+  $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
+  $conf_senha = mysqli_real_escape_string($conn, trim($_POST['conf-senha']));
+  $estado = mysqli_real_escape_string($conn, trim($_POST['uf'])); // Usando o campo de estado do formulário
+  $campus = mysqli_real_escape_string($conn, trim($_POST['campus'])); // Campo "campus" selecionado no formulário
+  $sexo = mysqli_real_escape_string($conn, trim($_POST['sexo']));
+  $orsex = mysqli_real_escape_string($conn, trim($_POST['orsex'])); // Nova informação: orientação sexual
   $senha_criptografada = password_hash($senha, PASSWORD_DEFAULT);
+  $data_criacao = date("Y-m-d"); // Define a data de criação
 
-  // Define a tabela correta com base no checkbox
-  $tabela = $escritor ? 'cadesc' : 'cadcli';
-
-  $query = "INSERT INTO $tabela (nome, sobrenome, cpf, rg, sexo, email, senha, end_nome, end_num, end_comp, cep, bairro, cidade, uf)
-              VALUES ('$nome', '$sobrenome', '$cpf', '$rg', '$sexo', '$email', '$senha_criptografada', '$end_nome', '$end_num', '$end_comp',
-              '$cep', '$bairro', '$cidade', '$uf')";
-
-  if (mysqli_query($dbc, $query)) {
-    $signup_success = "Cadastro realizado com sucesso. Faça login!";
+  // Verifica se as senhas coincidem
+  if ($senha !== $conf_senha) {
+    $login_error = "As senhas não coincidem.";
+  }
+  // Verifica se o email termina com os domínios permitidos
+  elseif (!preg_match('/@(ifsp\.edu\.br|aluno\.ifsp\.edu\.br)$/', $email)) {
+    $login_error = "Apenas emails institucionais são permitidos";
   } else {
-    $login_error = "Erro ao cadastrar: " . mysqli_error($dbc);
+    $query = "INSERT INTO usuarios (nome_usu, email_usu, senha_usu, estado_usu, campus_usu, sexo_usu, orsex_usu, datacriacao_usu)
+                  VALUES ('$nome', '$email', '$senha_criptografada', '$estado', '$campus', '$sexo', '$orsex', '$data_criacao')";
+
+    // Executa a consulta de inserção
+    if (mysqli_query($conn, $query)) {
+      $signup_success = "Cadastro realizado com sucesso. Faça login!";
+    } else {
+      $login_error = "Erro ao cadastrar: " . mysqli_error($conn);
+    }
   }
 }
 ?>
@@ -88,12 +80,11 @@ if (isset($_POST['signup'])) {
   <title>Login e Cadastro</title>
 
   <link rel="stylesheet" href="../src/assets/css/style.css">
-    
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
-  <!-- SweetAlert2 CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">   
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
   <style>
     :root {
@@ -284,25 +275,6 @@ if (isset($_POST['signup'])) {
       color: var(--text-color);
     }
 
-    .form-check-label {
-      vertical-align: middle;
-      margin-left: 5px;
-      line-height: 1.5;
-    }
-
-    .form-check {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    .form-check-input {
-      border: 2px solid var(--primary);
-      vertical-align: middle;
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-
     .btn-primary {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       border: none;
@@ -344,7 +316,7 @@ if (isset($_POST['signup'])) {
       padding: 1rem;
     }
 
-    /* Modal Styles */
+    /* Modal Style */
     .modal-content {
       border-radius: 16px;
       border: none;
@@ -363,7 +335,7 @@ if (isset($_POST['signup'])) {
     }
 
     .modal-body {
-      padding: 2rem;
+      padding: 3rem 4.5rem;
     }
 
     .modal-dialog {
@@ -377,6 +349,11 @@ if (isset($_POST['signup'])) {
       margin-bottom: 0.5rem;
       color: var(--text-color);
       font-weight: 500;
+    }
+
+    .form-floating .labelsenha,
+    .form-floating .labelconf-senha {
+      padding: 1rem 1.5rem;
     }
 
     .btn-close {
@@ -438,7 +415,7 @@ if (isset($_POST['signup'])) {
       <h1>Faça login já!</h1>
     </div>
 
-    <form method="POST" action="login_cadastro.php">
+    <form method="POST" action="login.php">
       <div class="form-floating">
         <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="email" required>
         <label for="floatingInput">Email</label>
@@ -458,7 +435,6 @@ if (isset($_POST['signup'])) {
     </form>
   </main>
 
-  <!-- Modal de Cadastro -->
   <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -467,69 +443,53 @@ if (isset($_POST['signup'])) {
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form method="POST" action="login_cadastro.php">
-            <!-- Primeira linha -->
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="nome" class="form-label">Nome</label>
-                <input type="text" class="form-control" id="nome" name="nome" required>
-              </div>
-              <div class="col-md-6">
-                <label for="sobrenome" class="form-label">Sobrenome</label>
-                <input type="text" class="form-control" id="sobrenome" name="sobrenome" required>
-              </div>
+          <form method="POST" action="login.php">
+            <div class="form-floating mb-4">
+              <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome Completo" required>
+              <label for="nome">Nome Completo</label>
             </div>
 
-            <!-- Segunda linha -->
-            <div class="row mb-3">
-              <div class="col-md-4">
-                <label for="sexo" class="form-label">Sexo</label>
+            <div class="row mb-4">
+              <div class="col-md-6">
                 <select class="form-control" id="sexo" name="sexo" required>
-                  <option value="" disabled selected>Clique para selecionar</option>
+                  <option value="" disabled selected>Sexo Biológico</option>
                   <option value="M">Masculino</option>
                   <option value="F">Feminino</option>
                 </select>
               </div>
-            </div>
-
-            <!-- Terceira linha -->
-            <div class="row mb-3">
               <div class="col-md-6">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-              </div>
-              <div class="col-md-6">
-                <label for="senha" class="form-label">Senha</label>
-                <input type="password" class="form-control" id="senha" name="senha" required>
-              </div>
-            </div>
-
-            <!-- Quarta linha -->
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label for="end_nome" class="form-label">Endereço</label>
-                <input type="text" class="form-control" id="end_nome" name="end_nome" required>
-              </div>
-              <div class="col-md-3">
-                <label for="end_num" class="form-label">Número</label>
-                <input type="text" class="form-control" id="end_num" name="end_num" required>
-              </div>
-              <div class="col-md-3">
-                <label for="end_comp" class="form-label">Complemento</label>
-                <input type="text" class="form-control" id="end_comp" name="end_comp">
+                <select class="form-control" id="orsex" name="orsex" required>
+                  <option value="" disabled selected>Orientação Sexual</option>
+                  <option value="hetero">Heterossexual</option>
+                  <option value="homo">Homossexual</option>
+                  <option value="bissex">Bissexual</option>
+                  <option value="assex">Assexual</option>
+                  <option value="pansex">Pansexual</option>
+                  <option value="queer">Queer</option>
+                  <option value="outro">Outro</option>
+                </select>
               </div>
             </div>
 
-            <!-- Quinta linha -->
-            <div class="row mb-3">
-              <div class="col-md-3">
-                <label for="cidade" class="form-label">Cidade</label>
-                <input type="text" class="form-control" id="cidade" name="cidade" required>
+            <div class="form-floating mb-4">
+              <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+              <label for="email">Email</label>
+            </div>
+            <div class="row mb-4">
+              <div class="col-md-6 form-floating">
+                <input type="password" class="form-control" id="senha" name="senha" placeholder="Senha" required>
+                <label class="labelsenha" for="senha">Senha</label>
               </div>
-              <div class="col-md-3">
-                <label for="uf" class="form-label">Estado</label>
+              <div class="col-md-6 form-floating">
+                <input type="password" class="form-control" id="conf-senha" name="conf-senha" placeholder="Confirmar Senha" required>
+                <label class="labelconf-senha" for="conf-senha">Confirmar Senha</label>
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-md-6">
                 <select class="form-control" id="uf" name="uf" required>
-                  <option value="" disabled selected>Selecione</option>
+                  <option value="" disabled selected>Selecione seu Estado</option>
                   <option value="AC">Acre</option>
                   <option value="AL">Alagoas</option>
                   <option value="AP">Amapá</option>
@@ -559,16 +519,10 @@ if (isset($_POST['signup'])) {
                   <option value="TO">Tocantins</option>
                 </select>
               </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-md-12">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="" name="">
-                  <label class="form-check-label" for="">
-                    Sou um servidor público atuante no câmpus.
-                  </label>
-                </div>
+              <div class="col-md-6">
+                <select class="form-control" id="campus" name="campus" required disabled>
+                  <option value="" disabled selected>Selecione seu Campus</option>
+                </select>
               </div>
             </div>
 
@@ -581,18 +535,73 @@ if (isset($_POST['signup'])) {
     </div>
   </div>
 
-  <!-- Bootstrap JavaScript -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const estadoSelect = document.getElementById('uf');
+      const campusSelect = document.getElementById('campus');
+
+      // Array com os campi dos Institutos Federais por estado
+      const campiPorEstado = {
+        "AC": ["IFAC Campus Rio Branco", "IFAC Campus Cruzeiro do Sul", "IFAC Campus Sena Madureira", "IFAC Campus Tarauacá", "IFAC Campus Xapuri"],
+        "AL": ["IFAL Campus Maceió", "IFAL Campus Arapiraca", "IFAL Campus Marechal Deodoro", "IFAL Campus Palmeira dos Índios", "IFAL Campus Satuba", "IFAL Campus Santana do Ipanema", "IFAL Campus Penedo", "IFAL Campus Murici", "IFAL Campus Batalha"],
+        "AP": ["IFAP Campus Macapá", "IFAP Campus Santana", "IFAP Campus Laranjal do Jari", "IFAP Campus Oiapoque"],
+        "AM": ["IFAM Campus Manaus Centro", "IFAM Campus Manaus Zona Leste", "IFAM Campus Manaus Industrial", "IFAM Campus Tabatinga", "IFAM Campus Coari", "IFAM Campus Maués", "IFAM Campus Parintins", "IFAM Campus Tefé", "IFAM Campus Borba", "IFAM Campus Eirunepé", "IFAM Campus Humaitá", "IFAM Campus Lábrea", "IFAM Campus Presidente Figueiredo", "IFAM Campus São Gabriel da Cachoeira"],
+        "BA": ["IFBA Campus Salvador", "IFBA Campus Barreiras", "IFBA Campus Eunápolis", "IFBA Campus Feira de Santana", "IFBA Campus Ilhéus", "IFBA Campus Irecê", "IFBA Campus Itabuna", "IFBA Campus Jequié", "IFBA Campus Paulo Afonso", "IFBA Campus Santo Antônio de Jesus", "IFBA Campus Seabra", "IFBA Campus Valença", "IFBA Campus Vitória da Conquista", "IFBA Campus Alagoinhas", "IFBA Campus Jacobina", "IFBA Campus Simões Filho", "IFBA Campus Teixeira de Freitas", "IFBA Campus Guanambi", "IFBA Campus Brumado", "IFBA Campus Euclides da Cunha"],
+        "CE": ["IFCE Campus Fortaleza", "IFCE Campus Acaraú", "IFCE Campus Aracati", "IFCE Campus Canindé", "IFCE Campus Cedro", "IFCE Campus Crateús", "IFCE Campus Crato", "IFCE Campus Iguatu", "IFCE Campus Itapipoca", "IFCE Campus Jaguaribe", "IFCE Campus Juazeiro do Norte", "IFCE Campus Limoeiro do Norte", "IFCE Campus Maracanaú", "IFCE Campus Morada Nova", "IFCE Campus Pacajus", "IFCE Campus Quixadá", "IFCE Campus Sobral", "IFCE Campus Tauá", "IFCE Campus Tianguá", "IFCE Campus Ubajara", "IFCE Campus Umirim", "IFCE Campus Camocim", "IFCE Campus Barbalha", "IFCE Campus Paracuru"],
+        "DF": ["IFB Campus Brasília", "IFB Campus Ceilândia", "IFB Campus Estrutural", "IFB Campus Gama", "IFB Campus Itapoã", "IFB Campus Planaltina", "IFB Campus Riacho Fundo", "IFB Campus Samambaia", "IFB Campus São Sebastião", "IFB Campus Taguatinga"],
+        "ES": ["IFES Campus Vitória", "IFES Campus Alegre", "IFES Campus Aracruz", "IFES Campus Cachoeiro de Itapemirim", "IFES Campus Cariacica", "IFES Campus Colatina", "IFES Campus Guarapari", "IFES Campus Ibatiba", "IFES Campus Linhares", "IFES Campus Montanha", "IFES Campus Nova Venécia", "IFES Campus Piúma", "IFES Campus Santa Teresa", "IFES Campus São Mateus", "IFES Campus Serra", "IFES Campus Venda Nova do Imigrante", "IFES Campus Vila Velha"],
+        "GO": ["IFG Campus Goiânia", "IFG Campus Aparecida de Goiânia", "IFG Campus Catalão", "IFG Campus Formosa", "IFG Campus Inhumas", "IFG Campus Itumbiara", "IFG Campus Jataí", "IFG Campus Luziânia", "IFG Campus Rio Verde", "IFG Campus Senador Canedo", "IFG Campus Uruaçu", "IFG Campus Águas Lindas de Goiás", "IFG Campus Cidade de Goiás", "IFG Campus Goianésia", "IFG Campus Iporá"],
+        "MA": ["IFMA Campus São Luís - Monte Castelo", "IFMA Campus Açailândia", "IFMA Campus Alcântara", "IFMA Campus Barra do Corda", "IFMA Campus Barão de Grajaú", "IFMA Campus Carolina", "IFMA Campus Caxias", "IFMA Campus Codó", "IFMA Campus Coelho Neto", "IFMA Campus Coroatá", "IFMA Campus Grajaú", "IFMA Campus Humberto de Campos", "IFMA Campus Imperatriz", "IFMA Campus Itapecuru-Mirim", "IFMA Campus João Lisboa", "IFMA Campus Pedreiras", "IFMA Campus Pinheiro", "IFMA Campus Presidente Dutra", "IFMA Campus Santa Inês", "IFMA Campus São João dos Patos", "IFMA Campus São Raimundo das Mangabeiras", "IFMA Campus Timon", "IFMA Campus Viana", "IFMA Campus Zé Doca"],
+        "MT": ["IFMT Campus Cuiabá", "IFMT Campus Alta Floresta", "IFMT Campus Barra do Garças", "IFMT Campus Cáceres", "IFMT Campus Campo Novo do Parecis", "IFMT Campus Confresa", "IFMT Campus Juína", "IFMT Campus Lucas do Rio Verde", "IFMT Campus Pontes e Lacerda", "IFMT Campus Primavera do Leste", "IFMT Campus Rondonópolis", "IFMT Campus São Vicente", "IFMT Campus Sorriso", "IFMT Campus Tangará da Serra"],
+        "MS": ["IFMS Campus Campo Grande", "IFMS Campus Aquidauana", "IFMS Campus Corumbá", "IFMS Campus Coxim", "IFMS Campus Dourados", "IFMS Campus Jardim", "IFMS Campus Naviraí", "IFMS Campus Nova Andradina", "IFMS Campus Ponta Porã", "IFMS Campus Três Lagoas"],
+        "MG": ["IFMG Campus Bambuí", "IFMG Campus Betim", "IFMG Campus Congonhas", "IFMG Campus Conselheiro Lafaiete", "IFMG Campus Formiga", "IFMG Campus Governador Valadares", "IFMG Campus Itabirito", "IFMG Campus Itaúna", "IFMG Campus João Monlevade", "IFMG Campus Mariana", "IFMG Campus Ouro Branco", "IFMG Campus Ouro Preto", "IFMG Campus Piumhi", "IFMG Campus Ponte Nova", "IFMG Campus Reitoria", "IFMG Campus Sabará", "IFMG Campus Salinas", "IFMG Campus São João Evangelista", "IFMG Campus Teófilo Otoni", "IFMG Campus Três Corações"],
+        "PA": ["IFPA Campus Belém", "IFPA Campus Abaetetuba", "IFPA Campus Altamira", "IFPA Campus Ananindeua", "IFPA Campus Bragança", "IFPA Campus Breves", "IFPA Campus Cametá", "IFPA Campus Canaã dos Carajás", "IFPA Campus Castanhal", "IFPA Campus Conceição do Araguaia", "IFPA Campus Itaituba", "IFPA Campus Marabá", "IFPA Campus Marituba", "IFPA Campus Óbidos", "IFPA Campus Paragominas", "IFPA Campus Parauapebas", "IFPA Campus Santarém", "IFPA Campus Tucuruí"],
+        "PB": ["IFPB Campus João Pessoa", "IFPB Campus Cabedelo", "IFPB Campus Cajazeiras", "IFPB Campus Campina Grande", "IFPB Campus Guarabira", "IFPB Campus Itabaiana", "IFPB Campus Itaporanga", "IFPB Campus Jacareí", "IFPB Campus Mangabeira", "IFPB Campus Monteiro", "IFPB Campus Patos", "IFPB Campus Picuí", "IFPB Campus Princesa Isabel", "IFPB Campus Santa Rita", "IFPB Campus Soledade", "IFPB Campus Cabedelo - Centro", "IFPB Campus Areia", "IFPB Campus Pedras de Fogo", "IFPB Campus Esperança", "IFPB Campus Catolé do Rocha", "IFPB Campus Santa Luzia", "IFPB Campus Sousa - Unidade São Gonçalo", "IFPB Campus Sousa - Unidade Sede"],
+        "PR": ["IFPR Campus Curitiba", "IFPR Campus Assis Chateaubriand", "IFPR Campus Astorga", "IFPR Campus Barracão", "IFPR Campus Campo Largo", "IFPR Campus Capanema", "IFPR Campus Cascavel", "IFPR Campus Colombo", "IFPR Campus Coronel Vivida", "IFPR Campus Foz do Iguaçu", "IFPR Campus Goioerê", "IFPR Campus Ibaiti", "IFPR Campus Irati", "IFPR Campus Ivaiporã", "IFPR Campus Jacarezinho", "IFPR Campus Jaguariaíva", "IFPR Campus Londrina", "IFPR Campus Irati", "IFPR Campus Ivaiporã", "IFPR Campus Jacarezinho", "IFPR Campus Jaguariaíva", "IFPR Campus Londrina", "IFPR Campus Marechal Cândido Rondon", "IFPR Campus Maringá", "IFPR Campus Palmas", "IFPR Campus Paranaguá", "IFPR Campus Paranavaí", "IFPR Campus Pinhais", "IFPR Campus Pitanga", "IFPR Campus Quedas do Iguaçu", "IFPR Campus Rio Negro", "IFPR Campus Telêmaco Borba", "IFPR Campus Toledo", "IFPR Campus Umuarama", "IFPR Campus União da Vitória", "IFPR Campus Arapongas", "IFPR Campus Ponta Grossa", "IFPR Campus Pitanga"],
+        "PE": ["IFPE Campus Recife", "IFPE Campus Abreu e Lima", "IFPE Campus Afogados da Ingazeira", "IFPE Campus Barreiros", "IFPE Campus Belo Jardim", "IFPE Campus Cabo de Santo Agostinho", "IFPE Campus Caruaru", "IFPE Campus Garanhuns", "IFPE Campus Igarassu", "IFPE Campus Ipojuca", "IFPE Campus Jaboatão dos Guararapes", "IFPE Campus Limoeiro", "IFPE Campus Olinda", "IFPE Campus Palmares", "IFPE Campus Paulista", "IFPE Campus Pesqueira", "IFPE Campus Petrolina", "IFPE Campus Petrolina Zona Rural", "IFPE Campus Salgueiro", "IFPE Campus Santa Cruz do Capibaribe", "IFPE Campus Vitória de Santo Antão"],
+        "PI": ["IFPI Campus Teresina Central", "IFPI Campus Angical", "IFPI Campus Campo Maior", "IFPI Campus Cocal", "IFPI Campus Corrente", "IFPI Campus Floriano", "IFPI Campus Oeiras", "IFPI Campus Parnaíba", "IFPI Campus Paulistana", "IFPI Campus Picos", "IFPI Campus Piripiri", "IFPI Campus São João do Piauí", "IFPI Campus São Raimundo Nonato", "IFPI Campus Uruçuí", "IFPI Campus Valença do Piauí", "IFPI Campus Dirceu Arcoverde", "IFPI Campus José de Freitas", "IFPI Campus Pio IX"],
+        "RJ": ["IFRJ Campus Rio de Janeiro", "IFRJ Campus Arraial do Cabo", "IFRJ Campus Belford Roxo", "IFRJ Campus Duque de Caxias", "IFRJ Campus Engenheiro Paulo de Frontin", "IFRJ Campus Itaboraí", "IFRJ Campus Nilópolis", "IFRJ Campus Niterói", "IFRJ Campus Paracambi", "IFRJ Campus Pinheiral", "IFRJ Campus Realengo", "IFRJ Campus Resende", "IFRJ Campus Rio Bonito", "IFRJ Campus São Gonçalo", "IFRJ Campus Volta Redonda"],
+        "RN": ["IFRN Campus Natal-Central", "IFRN Campus Apodi", "IFRN Campus Caicó", "IFRN Campus Canguaretama", "IFRN Campus Currais Novos", "IFRN Campus Ipanguaçu", "IFRN Campus João Câmara", "IFRN Campus Jucurutu", "IFRN Campus Macau", "IFRN Campus Mossoró", "IFRN Campus Nova Cruz", "IFRN Campus Parelhas", "IFRN Campus Pau dos Ferros", "IFRN Campus Santa Cruz", "IFRN Campus São Gonçalo do Amarante", "IFRN Campus Ceará-Mirim", "IFRN Campus Extremoz", "IFRN Campus Guamaré", "IFRN Campus Lajes", "IFRN Campus Parnamirim", "IFRN Campus Natal - Cidade Alta", "IFRN Campus Natal - Zona Leste", "IFRN Campus Natal - Zona Norte", "IFRN Campus São Paulo do Potengi"],
+        "RS": ["IFRS Campus Bento Gonçalves", "IFRS Campus Canoas", "IFRS Campus Caxias do Sul", "IFRS Campus Erechim", "IFRS Campus Farroupilha", "IFRS Campus Feliz", "IFRS Campus Ibirubá", "IFRS Campus Osório", "IFRS Campus Passo Fundo", "IFRS Campus Porto Alegre", "IFRS Campus Restinga", "IFRS Campus Rio Grande", "IFRS Campus Rolante", "IFRS Campus Sertão", "IFRS Campus Vacaria", "IFRS Campus Veranópolis", "IF Farroupilha Campus Alegrete", "IF Farroupilha Campus Frederico Westphalen", "IF Farroupilha Campus Jaguari", "IF Farroupilha Campus Júlio de Castilhos", "IF Farroupilha Campus Panambi", "IF Farroupilha Campus Santa Rosa", "IF Farroupilha Campus Santo Ângelo", "IF Farroupilha Campus Santo Augusto", "IF Farroupilha Unidade São Borja"],
+        "RO": ["IFRO Campus Porto Velho", "IFRO Campus Ariquemes", "IFRO Campus Cacoal", "IFRO Campus Colorado do Oeste", "IFRO Campus Guajará-Mirim", "IFRO Campus Ji-Paraná", "IFRO Campus Jaru", "IFRO Campus Presidente Médici", "IFRO Campus Vilhena", "IFRO Campus Porto Velho Zona Norte", "IFRO Campus Porto Velho Calama", "IFRO Campus Avançado São Miguel do Guaporé"],
+        "RR": ["IFRR Campus Boa Vista", "IFRR Campus Novo Paraíso"],
+        "SC": ["IFSC Campus Florianópolis", "IFSC Campus Araranguá", "IFSC Campus Canoinhas", "IFSC Campus Chapecó", "IFSC Campus Criciúma", "IFSC Campus Gaspar", "IFSC Campus Itajaí", "IFSC Campus Jaraguá do Sul", "IFSC Campus Joinville", "IFSC Campus Lages", "IFSC Campus Mafra", "IFSC Campus Palhoça", "IFSC Campus São Carlos", "IFSC Campus São Miguel do Oeste", "IFSC Campus Tubarão", "IFSC Campus Urupema", "IFSC Campus Xanxerê"],
+        "SE": ["IFS Campus Aracaju", "IFS Campus Lagarto", "IFS Campus Itabaiana", "IFS Campus Glória", "IFS Campus Propriá", "IFS Campus São Cristóvão"],
+        "SP": ["IFSP Campus Araraquara", "IFSP Campus Avaré", "IFSP Campus Barretos", "IFSP Campus Bauru", "IFSP Campus Birigui", "IFSP Campus Boituva", "IFSP Campus Bragança Paulista", "IFSP Campus Campinas", "IFSP Campus Campos do Jordão", "IFSP Campus Capivari", "IFSP Campus Caraguatatuba", "IFSP Campus Catanduva", "IFSP Campus Cubatão", "IFSP Campus Guarulhos", "IFSP Campus Hortolândia", "IFSP Campus Ilha Solteira", "IFSP Campus Itapetininga", "IFSP Campus Itaquaquecetuba", "IFSP Campus Jacareí", "IFSP Campus Jundiaí", "IFSP Campus Matão", "IFSP Campus Miracatu", "IFSP Campus Piracicaba", "IFSP Campus Pirituba", "IFSP Campus Presidente Epitácio", "IFSP Campus Presidente Prudente", "IFSP Campus Registro", "IFSP Campus Rio Claro", "IFSP Campus Salto", "IFSP Campus São Carlos", "IFSP Campus São João da Boa Vista", "IFSP Campus São José do Rio Preto", "IFSP Campus São José dos Campos", "IFSP Campus São Miguel Paulista", "IFSP Campus São Paulo", "IFSP Campus São Roque", "IFSP Campus Sertãozinho", "IFSP Campus Sorocaba", "IFSP Campus Suzano", "IFSP Campus Tupã", "IFSP Campus Votuporanga"],
+        "TO": ["IFTO Campus Palmas", "IFTO Campus Araguaína", "IFTO Campus Araguatins", "IFTO Campus Colinas do Tocantins", "IFTO Campus Dianópolis", "IFTO Campus Gurupi", "IFTO Campus Itaporã do Tocantins", "IFTO Campus Miracema do Tocantins", "IFTO Campus Paraíso do Tocantins", "IFTO Campus Porto Nacional", "IFTO Campus Tocantinópolis"],
+      };
+
+      // Preenche o select de campus com os campi do primeiro estado
+      estadoSelect.addEventListener('change', function() {
+        const selectedEstado = this.value;
+        campusSelect.innerHTML = '<option value="" disabled selected>Selecione seu Campus</option>';
+        campusSelect.disabled = true;
+
+        // Verifica se o estado selecionado tem campi definidos
+        if (campiPorEstado[selectedEstado]) {
+          campiPorEstado[selectedEstado].forEach(function(campus) {
+            const option = document.createElement('option');
+            option.value = campus;
+            option.textContent = campus;
+            campusSelect.appendChild(option);
+          });
+          campusSelect.disabled = false;
+        }
+      });
+    });
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- SweetAlert2 JS -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
+    // Verifica se o DOM está completamente carregado
     document.addEventListener('DOMContentLoaded', function() {
       // Verifica se há uma mensagem de erro de login
       <?php if ($login_error): ?>
         Swal.fire({
-          title: 'Erro!',
+          title: 'Houve um erro!',
           text: '<?= $login_error ?>',
           icon: 'error',
           confirmButtonText: 'OK'
@@ -602,24 +611,25 @@ if (isset($_POST['signup'])) {
       // Verifica se o login foi bem-sucedido
       <?php if (isset($login_success) && $login_success): ?>
         Swal.fire({
-          title: 'Login bem-sucedido!',
-          text: 'Você será redirecionado em 3 segundos.',
+          title: 'Login concluído com sucesso!',
+          text: 'Redirecionando...',
           icon: 'success',
           timer: 3000, // Timer de 3 segundos
-          timerProgressBar: true,
-          showConfirmButton: false
+          confirmButtonText: false
         }).then(() => {
-          window.location.href = '../index.php'; // Redireciona para a página inicial
+          window.location.href = '../../public/index.php'; // Redireciona para a página inicial
         });
       <?php endif; ?>
 
       // Verifica se o cadastro foi bem-sucedido
       <?php if ($signup_success): ?>
         Swal.fire({
-          title: 'Cadastro bem-sucedido!',
+          title: 'Cadastro completo!',
           text: '<?= $signup_success ?>',
           icon: 'success',
-          confirmButtonText: 'OK'
+          timer: 1000, // Timer de 3 segundos
+          timerProgressBar: true,
+          showConfirmButton: false
         });
       <?php endif; ?>
     });

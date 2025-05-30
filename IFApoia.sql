@@ -15,6 +15,7 @@ CREATE TABLE usuarios (
     estado_usu VARCHAR(100) NOT NULL,
     campus_usu VARCHAR(100) NOT NULL,
     sexo_usu VARCHAR(100) NOT NULL,
+    orsex_usu VARCHAR(100) NOT NULL,
     imgcapa_usu VARCHAR(255),
     descricao_usu VARCHAR(255),
     datacriacao_usu DATE NOT NULL,
