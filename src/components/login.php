@@ -79,14 +79,26 @@ if (isset($_POST['signup'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login e Cadastro</title>
 
-  <link rel="stylesheet" href="../src/assets/css/style.css">
-
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="../src/assets/css/style.css">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
   <style>
+    :root {
+      --background: #EEFFEE;
+      --backgroundContrast: #e7f7e78b;
+      --primary: #305F2C;
+      --secondary: #A0BF9F;
+      --accent: #96c584;
+      --border-color: #d6dce4;
+      --text-color: #2d3748;
+      --text-muted: #718096;
+      --white: #ffffff;
+    }
+
     body {
       background-image: url('../assets/img/ifcampus.jpg');
       background-size: cover;
@@ -304,7 +316,7 @@ if (isset($_POST['signup'])) {
 
     @media (max-width: 576px) {
       .form-signin {
-        margin: 1rem;
+        margin: auto;
         padding: 1.5rem;
       }
 

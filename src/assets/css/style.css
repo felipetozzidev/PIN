@@ -65,6 +65,8 @@ input:-webkit-autofill:focus {
 
 /* ========== Fim das linhas de terceiros ========= */
 
+/* ========== Header ========= */
+
 #nav {
     background: var(--primary);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -145,16 +147,21 @@ input:-webkit-autofill:focus {
     }
 }
 
+.actions {
+    justify-content: flex-end;
+}
+
+/* ========== Fim do Header ========= */
+
+
+/* ========== Nav_bar + Main Area + New Posts ========= */
+
 h1.title {
     width: 100%;
     font-size: 20px;
     padding-inline: 20px;
     font-size: 30px;
     margin-bottom: 16px;
-}
-
-.actions {
-    justify-content: flex-end;
 }
 
 main {
@@ -278,6 +285,7 @@ main {
             }
         }
 
+        /* ========== Fim do Nav_bar =========*/
 
         &.main_container {
             grid-area: main;
@@ -287,7 +295,7 @@ main {
             &>div.destaques {
                 display: flex;
                 flex-direction: column;
-                
+
 
                 &>.cards {
                     width: 100%;
@@ -339,11 +347,20 @@ main {
             }
         }
 
+        /* ========== Fim da Main Area ========= */
+
+
+        /* ========== New Posts ========= */
+
         &.publicacoes_recentes {
             grid-area: right;
         }
+
+        /* ========== Fim do New Posts =========*/
     }
 }
+
+/* ========== Footer ========= */
 
 footer {
     position: fixed;
@@ -367,6 +384,10 @@ footer {
     }
 
 }
+
+/* ========== Fim do Footer ========= */
+
+/* ========== Responsividade ========= */
 
 @media (max-width: 767.98px) {
     .navbar-collapse {

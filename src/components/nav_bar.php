@@ -54,8 +54,8 @@
             <li><a href="#" class="nav-link">
                     <p>Notícias</p>
                 </a></li>
-                </ul>
-            </li>
+        </ul>
+        </li>
         </ul>
     </nav>
 </section>
