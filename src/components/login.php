@@ -48,12 +48,12 @@ if (isset($_POST['signup'])) {
   $email = mysqli_real_escape_string($conn, trim($_POST['email']));
   $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
   $conf_senha = mysqli_real_escape_string($conn, trim($_POST['conf-senha']));
-  $estado = mysqli_real_escape_string($conn, trim($_POST['uf'])); // Usando o campo de estado do formulário
-  $campus = mysqli_real_escape_string($conn, trim($_POST['campus'])); // Campo "campus" selecionado no formulário
+  $estado = mysqli_real_escape_string($conn, trim($_POST['uf']));             // Usando o campo de estado do formulário
+  $campus = mysqli_real_escape_string($conn, trim($_POST['campus']));         // Campo "campus" selecionado no formulário
   $sexo = mysqli_real_escape_string($conn, trim($_POST['sexo']));
-  $orsex = mysqli_real_escape_string($conn, trim($_POST['orsex'])); // Nova informação: orientação sexual
+  $orsex = mysqli_real_escape_string($conn, trim($_POST['orsex']));           // Nova informação: orientação sexual
   $senha_criptografada = password_hash($senha, PASSWORD_DEFAULT);
-  $data_criacao = date("Y-m-d"); // Define a data de criação
+  $data_criacao = date("Y-m-d");                                              // Define a data de criação
 
   // Verifica se as senhas coincidem
   if ($senha !== $conf_senha) {
@@ -86,12 +86,15 @@ if (isset($_POST['signup'])) {
       // Configurações do servidor SMTP do Mailtrap
       $mail->SMTPDebug = 0;                               // Habilita o debug para desenvolvimento (0 para desabilitar em produção)
       $mail->isSMTP();                                    // Define o uso de SMTP
-      $mail->Host = 'sandbox.smtp.mailtrap.io';           // Servidor SMTP do Mailtrap
+      $mail->Host = 'smtp.gmail.com';                     // Servidor SMTP do Gmail
       $mail->SMTPAuth = true;                             // Habilita a autenticação SMTP
-      $mail->Username = '32f0338b49585f';                 // Username do Mailtrap
-      $mail->Password = '07d6290b14c507';                 // Senha do Mailtrap
+      $mail->Username = 'brenosilveiradomingues@gmail.com';   // Username do Gmail
+      $mail->Password = 'qxdnmdnyrxgwpbhg';                  // Senha do Gmail
       $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Habilita a encriptação TLS; `PHPMailer::ENCRYPTION_SMTPS` também pode ser usado
-      $mail->Port = 2525;                                 // Porta TCP para conectar com o servidor (use a porta fornecida pelo Mailtrap)
+      $mail->Port = 587;                                 // Porta TCP para conectar com o servidor (use a porta fornecida pelo Mailtrap)
+
+
+       $to = $email; // Certifique-se de que esta linha está aqui
 
       // Remetente e Destinatário
       $mail->setFrom('brenosilveiradomingues@gmail.com', 'IFApoia');    // Seu endereço de email e nome
@@ -615,7 +618,7 @@ if (isset($_POST['verify_email'])) {
           <?php if ($verification_error): ?>
             <div class="alert alert-danger"><?= $verification_error ?></div>
           <?php endif; ?>
-          <p>Um código de verificação de 6 caracteres (letras maiúsculas e números) foi enviado para o seu email. Por favor, insira o código abaixo para completar o cadastro.</p>
+          <p>Um código de verificação de 6 caracteres (letras maiúsculas e números) foi enviado para o email <?php echo $email ?>. Por favor, insira o código abaixo para completar o cadastro.</p>
           <form method="POST" action="login.php">
             <div class="mb-3">
               <label for="verification_code" class="form-label">Código de Verificação</label>
@@ -709,7 +712,7 @@ if (isset($_POST['verify_email'])) {
           text: 'Redirecionando...',
           icon: 'success',
           timer: 3000, // Timer de 3 segundos
-          confirmButtonText: false
+          showConfirmButton: false
         }).then(() => {
           window.location.href = '../../public/index.php'; // Redireciona para a página inicial
         });
