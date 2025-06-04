@@ -1,10 +1,16 @@
 <?php
+require '../../vendor/autoload.php';
 require_once('../../config/conn.php');
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 $login_error = "";
 $signup_success = "";
+$verification_needed = false;
+$verification_error = "";
 
-// Verifica se o usuário já está logado
 if (isset($_POST['login'])) {
   $email = mysqli_real_escape_string($conn, trim($_POST['email']));
   $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
@@ -37,7 +43,6 @@ if (isset($_POST['login'])) {
   }
 }
 
-// Verifica se o usuário está tentando se cadastrar
 if (isset($_POST['signup'])) {
   $nome = mysqli_real_escape_string($conn, trim($_POST['nome']));
   $email = mysqli_real_escape_string($conn, trim($_POST['email']));
@@ -58,15 +63,85 @@ if (isset($_POST['signup'])) {
   elseif (!preg_match('/@(ifsp\.edu\.br|aluno\.ifsp\.edu\.br)$/', $email)) {
     $login_error = "Apenas emails institucionais são permitidos";
   } else {
-    $query = "INSERT INTO usuarios (nome_usu, email_usu, senha_usu, estado_usu, campus_usu, sexo_usu, orsex_usu, datacriacao_usu)
-                    VALUES ('$nome', '$email', '$senha_criptografada', '$estado', '$campus', '$sexo', '$orsex', '$data_criacao')";
+    // Gera o código de verificação alfanumérico de 6 caracteres
+    $verification_code = strtoupper(bin2hex(random_bytes(3)));
 
-    // Executa a consulta de inserção
-    if (mysqli_query($conn, $query)) {
-      $signup_success = "Cadastro realizado com sucesso. Faça login!";
-    } else {
-      $login_error = "Erro ao cadastrar: " . mysqli_error($conn);
+    // Armazena os dados do cadastro e o código na sessão
+    $_SESSION['signup_data'] = [
+      'nome' => $nome,
+      'email' => $email,
+      'senha' => $senha_criptografada,
+      'estado' => $estado,
+      'campus' => $campus,
+      'sexo' => $sexo,
+      'orsex' => $orsex,
+      'datacriacao' => $data_criacao,
+      'verification_code' => $verification_code
+    ];
+
+    // Envia o email de verificação usando PHPMailer
+    $mail = new PHPMailer(true);
+
+    try {
+      // Configurações do servidor SMTP do Mailtrap
+      $mail->SMTPDebug = 0;                               // Habilita o debug para desenvolvimento (0 para desabilitar em produção)
+      $mail->isSMTP();                                    // Define o uso de SMTP
+      $mail->Host = 'sandbox.smtp.mailtrap.io';           // Servidor SMTP do Mailtrap
+      $mail->SMTPAuth = true;                             // Habilita a autenticação SMTP
+      $mail->Username = '32f0338b49585f';                 // Username do Mailtrap
+      $mail->Password = '07d6290b14c507';                 // Senha do Mailtrap
+      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Habilita a encriptação TLS; `PHPMailer::ENCRYPTION_SMTPS` também pode ser usado
+      $mail->Port = 2525;                                 // Porta TCP para conectar com o servidor (use a porta fornecida pelo Mailtrap)
+
+      // Remetente e Destinatário
+      $mail->setFrom('brenosilveiradomingues@gmail.com', 'IFApoia');    // Seu endereço de email e nome
+      $mail->addAddress($to, $nome);                                    // Email e nome do destinatário
+
+      // Conteúdo do Email
+      $mail->isHTML(true);                                                   // Define o formato do email para HTML
+      $mail->Subject = 'Verificação de Email - IFApoia';
+      $mail->Body    = 'Seu código de verificação é: <b>' . $verification_code . '</b>';
+      $mail->AltBody = 'Seu código de verificação é: ' . $verification_code; // Texto sem HTML
+
+      $mail->send();
+      $verification_needed = true;
+    } catch (Exception $e) {
+      $login_error = "Erro ao enviar o email de verificação: {$mail->ErrorInfo}";
     }
+  }
+}
+
+// Verifica se o usuário está tentando verificar o email
+if (isset($_POST['verify_email'])) {
+  if (isset($_SESSION['signup_data'])) {
+    $stored_code = $_SESSION['signup_data']['verification_code'];
+    $entered_code = $_POST['verification_code'];
+
+    // Verifica se o código de verificação inserido corresponde ao código armazenado na sessão
+    if ($stored_code == $entered_code) {
+      $signup_data = $_SESSION['signup_data'];
+      $query = "INSERT INTO usuarios (nome_usu, email_usu, senha_usu, estado_usu, campus_usu, sexo_usu, orsex_usu, datacriacao_usu)
+                      VALUES ('" . mysqli_real_escape_string($conn, $signup_data['nome']) . "',
+                              '" . mysqli_real_escape_string($conn, $signup_data['email']) . "',
+                              '" . $signup_data['senha'] . "',
+                              '" . mysqli_real_escape_string($conn, $signup_data['estado']) . "',
+                              '" . mysqli_real_escape_string($conn, $signup_data['campus']) . "',
+                              '" . mysqli_real_escape_string($conn, $signup_data['sexo']) . "',
+                              '" . mysqli_real_escape_string($conn, $signup_data['orsex']) . "',
+                              '" . $signup_data['datacriacao'] . "')";
+
+      // Executa a consulta de inserção
+      if (mysqli_query($conn, $query)) {
+        $signup_success = "Cadastro realizado com sucesso. Faça login!";
+        unset($_SESSION['signup_data']); // Limpa os dados da sessão após o cadastro
+      } else {
+        $verification_error = "Erro ao finalizar o cadastro: " . mysqli_error($conn);
+      }
+    } else {
+      $verification_error = "Código de verificação incorreto.";
+    }
+  } else {
+    $verification_error = "Sessão de cadastro expirou.";
   }
 }
 ?>
@@ -79,12 +154,10 @@ if (isset($_POST['signup'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login e Cadastro</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-
-  <link rel="stylesheet" href="../src/assets/css/style.css">
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <!--<link rel="stylesheet" href="../assets/css/style.css">-->
 
   <style>
     :root {
@@ -433,7 +506,7 @@ if (isset($_POST['signup'])) {
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="signupModalLabel">Cadastro | Nova conta</h5>
+          <h5 class="modal-title" id="signupModalLabel">NOVA CONTA</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -529,6 +602,32 @@ if (isset($_POST['signup'])) {
     </div>
   </div>
 
+  <div class="modal fade <?php if ($verification_needed) echo 'show'; ?>" id="verificationModal" tabindex="-1" aria-labelledby="verificationModalLabel" aria-hidden="<?php if ($verification_needed) echo 'false';
+                                                                                                                                                                      else echo 'true'; ?>" style="<?php if ($verification_needed) echo 'display: block;'; ?>">
+
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="verificationModalLabel">Verificação de Email</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.reload();"></button>
+        </div>
+        <div class="modal-body">
+          <?php if ($verification_error): ?>
+            <div class="alert alert-danger"><?= $verification_error ?></div>
+          <?php endif; ?>
+          <p>Um código de verificação de 6 caracteres (letras maiúsculas e números) foi enviado para o seu email. Por favor, insira o código abaixo para completar o cadastro.</p>
+          <form method="POST" action="login.php">
+            <div class="mb-3">
+              <label for="verification_code" class="form-label">Código de Verificação</label>
+              <input type="text" class="form-control" id="verification_code" name="verification_code" required minlength="6" maxlength="6">
+            </div>
+            <button type="submit" class="btn btn-primary" name="verify_email">Verificar Email</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const estadoSelect = document.getElementById('uf');
@@ -610,7 +709,7 @@ if (isset($_POST['signup'])) {
           text: 'Redirecionando...',
           icon: 'success',
           timer: 3000, // Timer de 3 segundos
-          showConfirmButton: false,
+          confirmButtonText: false
         }).then(() => {
           window.location.href = '../../public/index.php'; // Redireciona para a página inicial
         });
@@ -627,8 +726,18 @@ if (isset($_POST['signup'])) {
           showConfirmButton: false
         });
       <?php endif; ?>
+
+      <?php if ($verification_needed): ?>
+        const signupModal = new bootstrap.Modal(document.getElementById('signupModal'));
+        signupModal.hide();
+        const verificationModal = new bootstrap.Modal(document.getElementById('verificationModal'), {
+          backdrop: 'static', // Impede que o modal seja fechado ao clicar fora
+          keyboard: false // Impede que o modal seja fechado ao pressionar a tecla Esc
+        });
+        verificationModal.show();
+      <?php endif; ?>
     });
   </script>
 </body>
 
-</html
+</html>

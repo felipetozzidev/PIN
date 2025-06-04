@@ -9,6 +9,8 @@ require_once('../config/conn.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header IFApoia</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -33,19 +35,19 @@ require_once('../config/conn.php');
             </div>
             <div class="actions navbar-nav col-6 justify-content-end">
                 <a class="nav-item" href="">
-                    <img src="../src/assets/icons/add-large-line.svg" alt="" width="30px">
+                    <img src="../src/assets/icons/add-large-line.svg" alt="" width="35px">
                 </a>
                 <a class="nav-item" href="">
-                    <img src="../src/assets/icons/notification-line.svg" alt="" width="30px">
+                    <img src="../src/assets/icons/notification-line.svg" alt="" width="35px">
                 </a>
                 <?php if (isset($_SESSION['usuario_id'])): ?>
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <?php
                             if (isset($_SESSION['imgperfil_usu'])) {
-                                echo '<img src="' . htmlspecialchars($_SESSION['imgperfil_usu']) . '" alt="Foto de perfil" width="30px" height="30px" class="rounded-circle">';
+                                echo '<img src="' . htmlspecialchars($_SESSION['imgperfil_usu']) . '" alt="Foto de Perfil" width="35" height="35" class="">';
                             } else {
-                                echo '<img src="../src/assets/icons/icon_usuario.svg" alt="Ícone de Usuário" width="30px">';
+                                echo '<img src="../src/assets/icons/icon_usuario.svg" alt="Ícone de Usuário" width="30">';
                             }
                             ?>
                         </a>
@@ -69,12 +71,14 @@ require_once('../config/conn.php');
                     </div>
                 <?php else: ?>
                     <a class="nav-item" href="../src/components/login.php">
-                        <img src="../src/assets/icons/icon_usuario.svg" alt="Ícone de Usuário" width="30px">
+                        <img src="../src/assets/icons/icon_usuario.svg" alt="Ícone de Usuário" width="35">
                     </a>
                 <?php endif; ?>
             </div>
         </div>
     </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
