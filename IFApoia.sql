@@ -16,7 +16,7 @@ CREATE TABLE usuarios (
     campus_usu VARCHAR(100) NOT NULL,
     sexo_usu VARCHAR(100) NOT NULL,
     orsex_usu VARCHAR(100) NOT NULL,
-    imgperfil_usu VARCHAR(255) DEFAULT,
+    imgperfil_usu VARCHAR(255) DEFAULT '../src/assets/img/default-user.png',
     imgcapa_usu VARCHAR(255) NOT NULL,
     descricao_usu VARCHAR(255) NOT NULL,
     datacriacao_usu DATE NOT NULL,
