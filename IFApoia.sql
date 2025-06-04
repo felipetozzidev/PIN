@@ -1,4 +1,4 @@
-CREATE database IFApoia;
+CREATE database IFApoia COLLATE utf8_unicode_ci;
 USE IFApoia;
 
 CREATE TABLE niveis (
@@ -16,9 +16,9 @@ CREATE TABLE usuarios (
     campus_usu VARCHAR(100) NOT NULL,
     sexo_usu VARCHAR(100) NOT NULL,
     orsex_usu VARCHAR(100) NOT NULL,
-    imgperfil_usu VARCHAR(255) DEFAULT ,
-    imgcapa_usu VARCHAR(255),
-    descricao_usu VARCHAR(255),
+    imgperfil_usu VARCHAR(255) DEFAULT,
+    imgcapa_usu VARCHAR(255) NOT NULL,
+    descricao_usu VARCHAR(255) NOT NULL,
     datacriacao_usu DATE NOT NULL,
     id_nvl INT,
     FOREIGN KEY (id_nvl) REFERENCES niveis(id_nvl)
