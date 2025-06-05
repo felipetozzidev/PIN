@@ -96,11 +96,107 @@ input:-webkit-autofill:focus {
     background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.8)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
 }
 
-.navbar-collapse {
+/* Estilos para o Offcanvas */
+
+.offcanvas {
     justify-content: flex-end !important;
     flex-wrap: nowrap !important;
-    /* Impede que os itens quebrem em várias linhas */
+    background-color: var(--primary);
+    border-left: 1px solid #dee2e6;
+    width: 300px;
 }
+
+/* Header do Offcanvas */
+.offcanvas-header {
+    background-color: #e9ecef;
+    /* Cor de fundo do header */
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Título do Offcanvas */
+.offcanvas-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+/* Botão de fechar do Offcanvas */
+.btn-close {
+    background-color: transparent;
+    border: 0;
+    font-size: 1.5rem;
+    opacity: 0.5;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.btn-close:hover {
+    opacity: 0.75;
+}
+
+.btn-close:focus {
+    outline: 0;
+    box-shadow: none;
+}
+
+/* Body do Offcanvas (onde o conteúdo do menu estará) */
+.offcanvas-body {
+    padding: 1rem;
+}
+
+/* Estilos específicos para os itens dentro do offcanvas (barra de pesquisa e ações) */
+
+/* Container da barra de pesquisa dentro do offcanvas */
+.offcanvas-body .search {
+    margin-bottom: 1rem;
+}
+
+/* Formulário de pesquisa dentro do offcanvas */
+.offcanvas-body .search form {
+    display: flex;
+}
+
+/* Input de pesquisa dentro do offcanvas */
+.offcanvas-body .search input[type="search"] {
+    flex-grow: 1;
+    margin-right: 0.5rem;
+}
+
+/* Container das ações (ícones) dentro do offcanvas */
+.offcanvas-body .actions {
+    display: flex;
+    flex-direction: column;
+    /* Alinha os itens verticalmente no offcanvas */
+    align-items: flex-end;
+    /* Alinha os ícones à direita no offcanvas */
+}
+
+.offcanvas-body .actions .nav-item {
+    margin-bottom: 0.5rem;
+    /* Espaçamento entre os ícones no offcanvas */
+}
+
+/* Estilos para o dropdown do usuário dentro do offcanvas */
+.offcanvas-body .dropdown .dropdown-menu {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.offcanvas-body .dropdown .dropdown-item {
+    font-size: 1rem;
+    color: #212529;
+}
+
+.offcanvas-body .dropdown .dropdown-item:hover {
+    background-color: #e9ecef;
+}
+
+/* Se você quiser remover a sombra padrão do offcanvas */
+/* .offcanvas {
+    box-shadow: none;
+  } */
 
 .navbar-nav {
     display: flex;
@@ -390,16 +486,6 @@ footer {
 /* ========== Responsividade ========= */
 
 @media (max-width: 767.98px) {
-    .navbar-collapse {
-        background-color: var(--primary);
-    }
-
-    .search {
-        width: 100% !important;
-        margin: 10px 0px 0px 0px !important;
-        padding-top: 15px !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
 
     .nav-item:hover {
         background-color: rgba(255, 255, 255, 0.1);

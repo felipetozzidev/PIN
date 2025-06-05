@@ -84,27 +84,43 @@ if (isset($_POST['signup'])) {
 
     try {
       // Configurações do servidor SMTP do Mailtrap
-      $mail->SMTPDebug = 0;                               // Habilita o debug para desenvolvimento (0 para desabilitar em produção)
-      $mail->isSMTP();                                    // Define o uso de SMTP
-      $mail->Host = 'smtp.gmail.com';                     // Servidor SMTP do Gmail
-      $mail->SMTPAuth = true;                             // Habilita a autenticação SMTP
-      $mail->Username = 'brenosilveiradomingues@gmail.com';   // Username do Gmail
-      $mail->Password = 'qxdnmdnyrxgwpbhg';                  // Senha do Gmail
-      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Habilita a encriptação TLS; `PHPMailer::ENCRYPTION_SMTPS` também pode ser usado
-      $mail->Port = 587;                                 // Porta TCP para conectar com o servidor (use a porta fornecida pelo Mailtrap)
+      $mail->SMTPDebug = 0;                                 // Habilita o debug para desenvolvimento (0 para desabilitar em produção)
+      $mail->isSMTP();                                      // Define o uso de SMTP
+      $mail->Host = 'smtp.gmail.com';                       // Servidor SMTP do Gmail
+      $mail->SMTPAuth = true;                               // Habilita a autenticação SMTP
+      $mail->Username = 'brenosilveiradomingues@gmail.com'; // Username do Gmail
+      $mail->Password = 'qxdnmdnyrxgwpbhg';                 // Senha do Gmail
+      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // Habilita a encriptação TLS; `PHPMailer::ENCRYPTION_SMTPS` também pode ser usado
+      $mail->Port = 587;                                    // Porta TCP para conectar com o servidor (use a porta fornecida pelo Mailtrap)
 
 
-       $to = $email; // Certifique-se de que esta linha está aqui
+      $to = $email; // Certifique-se de que esta linha está aqui
 
       // Remetente e Destinatário
       $mail->setFrom('brenosilveiradomingues@gmail.com', 'IFApoia');    // Seu endereço de email e nome
       $mail->addAddress($to, $nome);                                    // Email e nome do destinatário
 
       // Conteúdo do Email
-      $mail->isHTML(true);                                                   // Define o formato do email para HTML
-      $mail->Subject = 'Verificação de Email - IFApoia';
-      $mail->Body    = 'Seu código de verificação é: <b>' . $verification_code . '</b>';
-      $mail->AltBody = 'Seu código de verificação é: ' . $verification_code; // Texto sem HTML
+      $mail->isHTML(true);                                  // Define o formato do email para HTML
+      $mail->Subject = 'Código de verificação de Email - Rede IFApoia';
+      $mail->Body    = '<div style="font-family: Arial, sans-serif; color: #333; margin: 0 auto; max-width: 600px;">
+      <div style="background-color: #f8f9fa; padding: 20px 0; text-align: center;">
+        <img src="../assets/img/Logotipo_antiga.png" alt="IFApoia" style="max-width: 150px; height: auto;">
+      </div>
+      <div style="padding: 20px;">
+        <h2 style="color: #305F2C;">Bem-vindo(a) ao IFApoia!</h2>
+        <p style="font-size: 16px;">Obrigado por se cadastrar no IFApoia. Para completar seu cadastro, por favor, utilize o seguinte código de verificação:</p>
+        <div style="background-color: #A0BF9F; color: #fff; text-align: center; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <strong style="font-size: 30px;">' . $verification_code . '</strong>
+        </div>
+        <p style="font-size: 16px;">Insira este código na página de cadastro para verificar seu email e começar a usar o IFApoia.</p>
+        <p style="font-size: 16px;">Se você não se cadastrou no IFApoia, por favor, ignore este email.</p>
+      </div>
+      <div style="background-color: #f8f9fa; padding: 10px; text-align: center; font-size: 14px; color: #777;">
+        <p>Atenciosamente,<br>A Equipe IFApoia</p>
+      </div>
+    </div>';
+      $mail->AltBody = "Bem-vindo(a) ao IFApoia!\r\n\r\nObrigado por se cadastrar no IFApoia. Para completar seu cadastro, utilize o seguinte código de verificação:\r\n\r\n" . $verification_code . "\r\n\r\nInsira este código na página de cadastro para verificar seu email e começar a usar o IFApoia.\r\n\r\nSe você não se cadastrou no IFApoia, por favor, ignore este email.\r\n\r\nAtenciosamente,\r\nA Equipe IFApoia"; // Texto alternativo para clientes de email que não suportam HTML
 
       $mail->send();
       $verification_needed = true;
@@ -167,6 +183,7 @@ if (isset($_POST['verify_email'])) {
       --background: #EEFFEE;
       --backgroundContrast: #e7f7e78b;
       --primary: #305F2C;
+      --secondaryButton: #203f1d;
       --secondary: #A0BF9F;
       --accent: #96c584;
       --border-color: #d6dce4;
@@ -295,7 +312,7 @@ if (isset($_POST['verify_email'])) {
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      background: linear-gradient(135deg, var(--primary), var(--secondaryButton));
       border: none;
       padding: 0.8rem 1.5rem;
       font-weight: 600;
@@ -335,7 +352,8 @@ if (isset($_POST['verify_email'])) {
       padding: 1rem;
     }
 
-    /* Modal Style */
+    /* Estilos do modal de cadastro */
+
     .modal-content {
       border-radius: 16px;
       border: none;
@@ -343,18 +361,18 @@ if (isset($_POST['verify_email'])) {
     }
 
     .modal-header {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      background: linear-gradient(135deg, var(--primary), var(--secondaryButton));
       color: var(--white);
       border-radius: 16px 16px 0 0;
       padding: 1.5rem;
     }
 
     .modal-title {
-      font-weight: 600;
+      font-weight: 700;
     }
 
     .modal-body {
-      padding: 3rem 4.5rem;
+      padding: 3rem 3rem;
     }
 
     .modal-dialog {
@@ -388,6 +406,45 @@ if (isset($_POST['verify_email'])) {
 
     .btn-close:focus {
       box-shadow: none;
+    }
+
+    /* Estilos do modal de verificação */
+
+    .modal#verificationModal .modal-content {
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal#verificationModal .modal-header {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .modal#verificationModal .modal-title {
+      font-weight: 600;
+    }
+
+    .modal#verificationModal .modal-body {
+      padding: 20px;
+    }
+
+    .modal#verificationModal .form-label {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .modal#verificationModal .form-control {
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      padding: 10px;
+    }
+
+    .modal#verificationModal .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
+    }
+
+    .modal#verificationModal .btn-close-white {
+      filter: invert(1) grayscale(100%) brightness(200%);
     }
 
     @media (max-width: 576px) {
@@ -441,7 +498,7 @@ if (isset($_POST['verify_email'])) {
     }
 
     .swal2-confirm {
-      background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+      background: linear-gradient(135deg, var(--primary), var(--secondaryButton)) !important;
       border: none !important;
       border-radius: 8px !important;
       padding: 0.75rem 1.5rem !important;
@@ -605,27 +662,43 @@ if (isset($_POST['verify_email'])) {
     </div>
   </div>
 
-  <div class="modal fade <?php if ($verification_needed) echo 'show'; ?>" id="verificationModal" tabindex="-1" aria-labelledby="verificationModalLabel" aria-hidden="<?php if ($verification_needed) echo 'false';
-                                                                                                                                                                      else echo 'true'; ?>" style="<?php if ($verification_needed) echo 'display: block;'; ?>">
-
-    <div class="modal-dialog">
+  <div class="modal fade <?php if ($verification_needed) echo 'show'; ?>" id="verificationModal" tabindex="-1"
+    aria-labelledby="verificationModalLabel" aria-hidden="<?php if ($verification_needed) echo 'false';
+                                                          else echo 'true'; ?>"
+    style="<?php if ($verification_needed) echo 'display: block;'; ?>">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header bg-primary text-white">
           <h5 class="modal-title" id="verificationModalLabel">Verificação de Email</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.reload();"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"
+            onclick="window.location.reload();"></button>
         </div>
         <div class="modal-body">
           <?php if ($verification_error): ?>
             <div class="alert alert-danger"><?= $verification_error ?></div>
           <?php endif; ?>
-          <p>Um código de verificação de 6 caracteres (letras maiúsculas e números) foi enviado para o email <?php echo $email ?>. Por favor, insira o código abaixo para completar o cadastro.</p>
+          <?php
+          function obfuscateEmail($email)
+          {
+            $parts = explode('@', $email);
+            $localPart = $parts[0];
+            $domainPart = $parts[1];
+            $obfuscatedLocalPart = substr($localPart, 0, 2) . str_repeat('*', max(0, strlen($localPart) - 4)) . substr($localPart, -2);
+            return '<strong class="text-primary">' . $obfuscatedLocalPart . '@' . $domainPart . '</strong>';
+          }
+          ?>
+          <p class="mb-3">Um código de verificação de 6 caracteres foi enviado para o email
+            <?php echo obfuscateEmail($email); ?>.
+            Por favor, insira o código abaixo para completar o seu cadastro.</p>
           <form method="POST" action="login.php">
             <div class="mb-3">
               <label for="verification_code" class="form-label">Código de Verificação</label>
-              <input type="text" class="form-control" id="verification_code" name="verification_code" required minlength="6" maxlength="6">
+              <input type="text" class="form-control" id="verification_code" name="verification_code" required
+                minlength="6" maxlength="6">
             </div>
-            <button type="submit" class="btn btn-primary" name="verify_email">Verificar Email</button>
+            <button type="submit" class="btn btn-primary w-100" name="verify_email">Verificar Email</button>
           </form>
+          <p class="mt-3 text-muted"><small>Se você não solicitou este cadastro, ignore esta mensagem.</small></p>
         </div>
       </div>
     </div>
