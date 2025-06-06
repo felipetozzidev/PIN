@@ -83,25 +83,45 @@ if (isset($_POST['signup'])) {
     $mail = new PHPMailer(true);
 
     try {
-      // Configurações do servidor SMTP do Mailtrap
+      // Configurações do servidor SMTP do Gmail
       $mail->SMTPDebug = 0;                                 // Habilita o debug para desenvolvimento (0 para desabilitar em produção)
       $mail->isSMTP();                                      // Define o uso de SMTP
-      $mail->Host = 'smtp.gmail.com';                       // Servidor SMTP do Gmail
       $mail->SMTPAuth = true;                               // Habilita a autenticação SMTP
-      $mail->Username = 'brenosilveiradomingues@gmail.com'; // Username do Gmail
-      $mail->Password = 'qxdnmdnyrxgwpbhg';                 // Senha do Gmail
+
+      // Desabilita a verificação de certificado SSL (não recomendado para produção)
+      $mail->SMTPOptions = array(
+        'ssl' => array(
+          'verify_peer' => false,
+          'verify_peer_name' => false,
+          'allow_self_signed' => true
+        )
+      );
+
+      // Configurações para o certificado CA
+      /*$mail->SMTPOptions = array(
+        'ssl' => array(
+          'capath' => '/xampp/php/extras/ssl', // Caminho para a pasta onde você colocou o cacert.pem
+          'cafile' => '/xampp/php/extras/ssl/cacert.pem', // Caminho completo para o arquivo cacert.pem
+          'verify_peer' => true,
+          'verify_peer_name' => true,
+        )
+      );*/
+
+      $mail->Host = 'smtp.gmail.com';                       // Servidor SMTP do Gmail
+      $mail->Username = 'brenosilveiradomingues@gmail.com'; // Username do email
+      $mail->Password = 'cqtddhaewkwhtqhr';                 // Senha de app do email usado para enviar
       $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // Habilita a encriptação TLS; `PHPMailer::ENCRYPTION_SMTPS` também pode ser usado
-      $mail->Port = 587;                                    // Porta TCP para conectar com o servidor (use a porta fornecida pelo Mailtrap)
+      $mail->Port = 587;                                    // Porta TCP para conectar com o servidor
 
 
-      $to = $email; // Certifique-se de que esta linha está aqui
+      $to = $email; // Email do destinatário
 
       // Remetente e Destinatário
       $mail->setFrom('brenosilveiradomingues@gmail.com', 'IFApoia');    // Seu endereço de email e nome
       $mail->addAddress($to, $nome);                                    // Email e nome do destinatário
 
       // Conteúdo do Email
-      $mail->isHTML(true);                                  // Define o formato do email para HTML
+      $mail->isHTML(true); // Define o formato do email para HTML
       $mail->Subject = 'Código de verificação de Email - Rede IFApoia';
       $mail->Body    = '<div style="font-family: Arial, sans-serif; color: #333; margin: 0 auto; max-width: 600px;">
       <div style="background-color: #f8f9fa; padding: 20px 0; text-align: center;">
@@ -120,12 +140,15 @@ if (isset($_POST['signup'])) {
         <p>Atenciosamente,<br>A Equipe IFApoia</p>
       </div>
     </div>';
-      $mail->AltBody = "Bem-vindo(a) ao IFApoia!\r\n\r\nObrigado por se cadastrar no IFApoia. Para completar seu cadastro, utilize o seguinte código de verificação:\r\n\r\n" . $verification_code . "\r\n\r\nInsira este código na página de cadastro para verificar seu email e começar a usar o IFApoia.\r\n\r\nSe você não se cadastrou no IFApoia, por favor, ignore este email.\r\n\r\nAtenciosamente,\r\nA Equipe IFApoia"; // Texto alternativo para clientes de email que não suportam HTML
+
+      // Texto alternativo para clientes de email que não suportam HTML
+      $mail->AltBody = "Bem-vindo(a) ao IFApoia!\r\n\r\nObrigado por se cadastrar no IFApoia. Para completar seu cadastro, utilize o seguinte código de verificação:\r\n\r\n" . $verification_code . "\r\n\r\nInsira este código na página de cadastro para verificar seu email e começar a usar o IFApoia.\r\n\r\nSe você não se cadastrou no IFApoia, por favor, ignore este email.\r\n\r\nAtenciosamente,\r\nA Equipe IFApoia";
 
       $mail->send();
       $verification_needed = true;
     } catch (Exception $e) {
       $login_error = "Erro ao enviar o email de verificação: {$mail->ErrorInfo}";
+      echo '<script>console.log("' . $login_error . '");</script>'; // Adicione esta linha para logar no console
     }
   }
 }
@@ -135,6 +158,7 @@ if (isset($_POST['verify_email'])) {
   if (isset($_SESSION['signup_data'])) {
     $stored_code = $_SESSION['signup_data']['verification_code'];
     $entered_code = $_POST['verification_code'];
+    $email = $_SESSION['signup_data']['email']; // Recupera o email da sessão
 
     // Verifica se o código de verificação inserido corresponde ao código armazenado na sessão
     if ($stored_code == $entered_code) {
@@ -155,12 +179,18 @@ if (isset($_POST['verify_email'])) {
         unset($_SESSION['signup_data']); // Limpa os dados da sessão após o cadastro
       } else {
         $verification_error = "Erro ao finalizar o cadastro: " . mysqli_error($conn);
+        $verification_needed = true; // Mantém o modal aberto em caso de erro
       }
     } else {
-      $verification_error = "Código de verificação incorreto.";
+      $verification_error = "Código de verificação incorreto, tente novamente";
+      $verification_needed = true; // Mantém o modal aberto em caso de erro
     }
-  } else {
+  } else if (isset($_POST['verify_email']) && empty($_POST['verification_code'])) {
+    $verification_error = "Campo vazio, insira o código de verificação";
+    $verification_needed = true; // Mantém o modal aberto se o código estiver vazio
+  } else if (!isset($_SESSION['signup_data'])) {
     $verification_error = "Sessão de cadastro expirou.";
+    $verification_needed = true; // Mantém o modal aberto em caso de erro
   }
 }
 ?>
@@ -670,21 +700,17 @@ if (isset($_POST['verify_email'])) {
       <div class="modal-content">
         <div class="modal-header bg-primary text-white">
           <h5 class="modal-title" id="verificationModalLabel">Verificação de Email</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"
-            onclick="window.location.reload();"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <?php if ($verification_error): ?>
-            <div class="alert alert-danger"><?= $verification_error ?></div>
-          <?php endif; ?>
           <?php
           function obfuscateEmail($email)
           {
             $parts = explode('@', $email);
             $localPart = $parts[0];
-            $domainPart = $parts[1];
+            $domainPart = $parts[1] ?? ''; // Usar ?? para definir um valor padrão caso $parts[1] não exista
             $obfuscatedLocalPart = substr($localPart, 0, 2) . str_repeat('*', max(0, strlen($localPart) - 4)) . substr($localPart, -2);
-            return '<strong class="text-primary">' . $obfuscatedLocalPart . '@' . $domainPart . '</strong>';
+            return '<strong class="">' . $obfuscatedLocalPart . '@' . $domainPart . '</strong>';
           }
           ?>
           <p class="mb-3">Um código de verificação de 6 caracteres foi enviado para o email
@@ -768,12 +794,91 @@ if (isset($_POST['verify_email'])) {
   <script>
     // Verifica se o DOM está completamente carregado
     document.addEventListener('DOMContentLoaded', function() {
+      const verificationModal = document.getElementById('verificationModal'); // Obtém o modal de verificação
+      const verificationForm = verificationModal.querySelector('form'); // Obtém o formulário dentro do modal
+      const verificationCodeInput = document.getElementById('verification_code'); // Obtém o input do código de verificação
+      const verificationModalCloseButton = verificationModal.querySelector('.btn-close');
+
+      // Caso o código esteja incorreto
+      <?php if ($verification_error): ?>
+        Swal.fire({
+          position: 'top',
+          icon: 'error',
+          title: '<?= $verification_error ?>',
+          toast: true,
+          showConfirmButton: false,
+          timer: 2000
+        });
+      <?php endif; ?>
+
+      // Adiciona um listener para o evento de submit do formulário de verificação
+      if (verificationForm) {
+        verificationForm.addEventListener('submit', function(event) { // Impede o envio se o código estiver vazio/inválido
+          if (verificationCodeInput.value.trim() === '') { // Verifica se o campo está vazio
+            event.preventDefault(); // Impede o envio do formulário
+            $verification_error = "Campo vazio, insira o código de verificação";
+            $verification_needed = true; // Mantém o modal aberto em caso de erro
+            Swal.fire({
+              position: 'top',
+              icon: 'error',
+              title: $verification_error,
+              toast: true,
+              showConfirmButton: false,
+              timer: 2000
+            });
+            return;
+          }
+
+          // Regex para validar o código de verificação
+          const codeRegex = /^[A-Z0-9]{6}$/;
+          // Verifica se o código de verificação corresponde ao padrão esperado
+          // (6 caracteres alfanuméricos em caixa alta)
+          if (!codeRegex.test(verificationCodeInput.value)) {
+            event.preventDefault();
+            $verification_error = "Código de verificação inválido, tente novamente";
+            $verification_needed = true; // Mantém o modal aberto em caso de erro
+            Swal.fire({
+              position: 'top',
+              icon: 'error',
+              title: $verification_error,
+              toast: true,
+              showConfirmButton: false,
+              timer: 2000
+            });
+            return;
+          }
+        });
+      }
+
+      // Forçar o uso de letras em caixa alta no input e permitir apenas números e letras
+      if (verificationCodeInput) {
+        verificationCodeInput.addEventListener('input', function() {
+          this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); // Converte para caixa alta e remove caracteres não alfanuméricos
+        });
+      }
+
+      // Listener para o botão de fechar do modal de verificação
+      if (verificationModalCloseButton) {
+        verificationModalCloseButton.addEventListener('click', function() {
+          Swal.fire({
+            icon: 'info',
+            iconColor: '#203f1d',
+            title: 'Verificação cancelada',
+            text: 'Você pode solicitar um novo código se necessário',
+            timer: 2500,
+            timerProgressBar: true,
+            showConfirmButton: false
+          });
+        });
+      }
+
       // Verifica se há uma mensagem de erro de login
       <?php if ($login_error): ?>
         Swal.fire({
           title: 'Houve um erro!',
           text: '<?= $login_error ?>',
           icon: 'error',
+          iconColor: '#203f1d',
           confirmButtonText: 'OK'
         });
       <?php endif; ?>
@@ -784,6 +889,7 @@ if (isset($_POST['verify_email'])) {
           title: 'Login concluído com sucesso!',
           text: 'Redirecionando...',
           icon: 'success',
+          iconColor: '#203f1d',
           timer: 3000, // Timer de 3 segundos
           showConfirmButton: false
         }).then(() => {
@@ -797,6 +903,7 @@ if (isset($_POST['verify_email'])) {
           title: 'Cadastro completo!',
           text: '<?= $signup_success ?>',
           icon: 'success',
+          iconColor: '#203f1d',
           timer: 2000, // Timer de 2 segundos
           timerProgressBar: true,
           showConfirmButton: false
@@ -806,11 +913,11 @@ if (isset($_POST['verify_email'])) {
       <?php if ($verification_needed): ?>
         const signupModal = new bootstrap.Modal(document.getElementById('signupModal'));
         signupModal.hide();
-        const verificationModal = new bootstrap.Modal(document.getElementById('verificationModal'), {
+        const verificationModalInstance = new bootstrap.Modal(document.getElementById('verificationModal'), {
           backdrop: 'static', // Impede que o modal seja fechado ao clicar fora
           keyboard: false // Impede que o modal seja fechado ao pressionar a tecla Esc
         });
-        verificationModal.show();
+        verificationModalInstance.show();
       <?php endif; ?>
     });
   </script>
