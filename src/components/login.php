@@ -1,11 +1,15 @@
 <?php
+
+// Incluir o autoload do Composer e a conexão com o banco de dados
 require '../../vendor/autoload.php';
 require_once('../../config/conn.php');
 
+// Importar classes necessárias do PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+// Inicializar variáveis
 $login_error = "";
 $signup_success = "";
 $verification_needed = false;
@@ -19,9 +23,12 @@ if (isset($_POST['login'])) {
   if (!preg_match('/@(ifsp\.edu\.br|aluno\.ifsp\.edu\.br)$/', $email)) {
     $login_error = "Apenas emails institucionais são permitidos";
   } else {
-    // Verifica na tabela usuarios
-    $query = "SELECT id_usu, senha_usu, nome_usu, imgperfil_usu FROM usuarios WHERE email_usu = '$email'"; // Inclui imgperfil_usu
-    $result = mysqli_query($conn, $query);
+    // Verifica na tabela usuarios usando prepared statement
+    $query = "SELECT id_usu, senha_usu, nome_usu, imgperfil_usu FROM usuarios WHERE email_usu = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     // Verifica se o email existe no banco de dados
     if (mysqli_num_rows($result) > 0) {
@@ -40,6 +47,7 @@ if (isset($_POST['login'])) {
     } else {
       $login_error = "Seu email não foi encontrado";
     }
+    $stmt->close();
   }
 }
 
@@ -53,7 +61,7 @@ if (isset($_POST['signup'])) {
   $sexo = mysqli_real_escape_string($conn, trim($_POST['sexo']));
   $orsex = mysqli_real_escape_string($conn, trim($_POST['orsex']));           // Nova informação: orientação sexual
   $senha_criptografada = password_hash($senha, PASSWORD_DEFAULT);
-  $data_criacao = date("Y-m-d");                                              // Define a data de criação
+  $data_criacao = date("d-m-Y");                                              // Define a data de criação
 
   // Verifica se as senhas coincidem
   if ($senha !== $conf_senha) {
@@ -81,6 +89,7 @@ if (isset($_POST['signup'])) {
 
     // Envia o email de verificação usando PHPMailer
     $mail = new PHPMailer(true);
+    $mail->CharSet = 'UTF-8'; // Define o charset para UTF-8
 
     try {
       // Configurações do servidor SMTP do Gmail
@@ -160,34 +169,50 @@ if (isset($_POST['verify_email'])) {
     $entered_code = $_POST['verification_code'];
     $email = $_SESSION['signup_data']['email']; // Recupera o email da sessão
 
-    // Verifica se o código de verificação inserido corresponde ao código armazenado na sessão
-    if ($stored_code == $entered_code) {
+    // Verifica se o campo de código de verificação está vazio
+    if (empty($entered_code)) {
+      $verification_error = "Campo vazio, insira o código de verificação";
+      $verification_needed = true; // Mantém o modal aberto se o código estiver vazio
+
+      // Verifica se o código tem 6 caracteres alfanuméricos
+    } elseif (!preg_match('/^[A-Z0-9]{6}$/', $entered_code)) {
+      $verification_error = "Código de verificação inválido!";
+      $verification_needed = true; // Mantém o modal aberto se o código for inválido
+
+      // Verifica se o código inserido corresponde ao código armazenado na sessão
+    } elseif ($stored_code == $entered_code) {
       $signup_data = $_SESSION['signup_data'];
+      // Usar prepared statement para a inserção
       $query = "INSERT INTO usuarios (nome_usu, email_usu, senha_usu, estado_usu, campus_usu, sexo_usu, orsex_usu, datacriacao_usu)
-                      VALUES ('" . mysqli_real_escape_string($conn, $signup_data['nome']) . "',
-                              '" . mysqli_real_escape_string($conn, $signup_data['email']) . "',
-                              '" . $signup_data['senha'] . "',
-                              '" . mysqli_real_escape_string($conn, $signup_data['estado']) . "',
-                              '" . mysqli_real_escape_string($conn, $signup_data['campus']) . "',
-                              '" . mysqli_real_escape_string($conn, $signup_data['sexo']) . "',
-                              '" . mysqli_real_escape_string($conn, $signup_data['orsex']) . "',
-                              '" . $signup_data['datacriacao'] . "')";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+      $stmt = $conn->prepare($query);
+      $stmt->bind_param(
+        "ssssssss",
+        $signup_data['nome'],
+        $signup_data['email'],
+        $signup_data['senha'],
+        $signup_data['estado'],
+        $signup_data['campus'],
+        $signup_data['sexo'],
+        $signup_data['orsex'],
+        $signup_data['datacriacao']
+      );
 
       // Executa a consulta de inserção
-      if (mysqli_query($conn, $query)) {
+      if ($stmt->execute()) {
         $signup_success = "Cadastro realizado com sucesso. Faça login!";
         unset($_SESSION['signup_data']); // Limpa os dados da sessão após o cadastro
       } else {
-        $verification_error = "Erro ao finalizar o cadastro: " . mysqli_error($conn);
+        $verification_error = "Erro ao finalizar o cadastro: " . $stmt->error;
         $verification_needed = true; // Mantém o modal aberto em caso de erro
       }
+
+      $stmt->close();
     } else {
-      $verification_error = "Código de verificação incorreto, tente novamente";
+      $verification_error = "Código de verificação incorreto!";
       $verification_needed = true; // Mantém o modal aberto em caso de erro
     }
-  } else if (isset($_POST['verify_email']) && empty($_POST['verification_code'])) {
-    $verification_error = "Campo vazio, insira o código de verificação";
-    $verification_needed = true; // Mantém o modal aberto se o código estiver vazio
   } else if (!isset($_SESSION['signup_data'])) {
     $verification_error = "Sessão de cadastro expirou.";
     $verification_needed = true; // Mantém o modal aberto em caso de erro
@@ -201,7 +226,7 @@ if (isset($_POST['verify_email'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login e Cadastro</title>
+  <title>Login e Cadastro | IFApoia</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -294,10 +319,6 @@ if (isset($_POST['verify_email'])) {
       font-weight: 600;
       margin-bottom: 1.5rem;
       font-size: 1.75rem;
-    }
-
-    .form-floating {
-      margin-bottom: 1rem;
     }
 
     .form-floating input,
@@ -562,14 +583,14 @@ if (isset($_POST['verify_email'])) {
 </head>
 
 <body class="text-center">
-  <div class="back-button" onclick="window.history.back()">
-    <i class="fas fa-arrow-left"></i>
+  <div class="back-button" href="../index.php">
+    <i class="ri-arrow-left-line"></i>
   </div>
 
-  <main class="form-signin animate__animated animate__fadeIn">
+  <main class="form-signin">
     <div class="logo-container">
-      <img src="" alt="Logo">
-      <h1>Faça login já!</h1>
+      <img src="../assets/img/Logotipo_antiga.png" width="60px" alt="Logo">
+      <h1>Acesse sua conta</h1>
     </div>
 
     <form method="POST" action="login.php">
@@ -596,17 +617,17 @@ if (isset($_POST['verify_email'])) {
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="signupModalLabel">NOVA CONTA</h5>
+          <h5 class="modal-title" id="signupModalLabel">Nova conta</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form method="POST" action="login.php">
-            <div class="form-floating mb-4">
+            <div class="form-floating mb-3">
               <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome Completo" required>
               <label for="nome">Nome Completo</label>
             </div>
 
-            <div class="row mb-4">
+            <div class="row mb-3">
               <div class="col-md-6">
                 <select class="form-control" id="sexo" name="sexo" required>
                   <option value="" disabled selected>Sexo Biológico</option>
@@ -628,11 +649,12 @@ if (isset($_POST['verify_email'])) {
               </div>
             </div>
 
-            <div class="form-floating mb-4">
+            <div class="form-floating mb-3">
               <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
               <label for="email">Email</label>
+              <span class="d-flex text-muted">Apenas emails institucionais são permitidos (@ifsp.edu.br ou @aluno.ifsp.edu.br)</span>
             </div>
-            <div class="row mb-4 form-floating">
+            <div class="row mb-3 form-floating">
               <div class="col-md-6 form-floating">
                 <input type="password" class="form-control" id="senha" name="senha" placeholder="Senha" required>
                 <label class="labelsenha" for="senha">Senha</label>
@@ -643,7 +665,7 @@ if (isset($_POST['verify_email'])) {
               </div>
             </div>
 
-            <div class="row mb-4">
+            <div class="row mb-3">
               <div class="col-md-6">
                 <select class="form-control" id="uf" name="uf" required>
                   <option value="" disabled selected>Selecione seu Estado</option>
@@ -799,7 +821,7 @@ if (isset($_POST['verify_email'])) {
       const verificationCodeInput = document.getElementById('verification_code'); // Obtém o input do código de verificação
       const verificationModalCloseButton = verificationModal.querySelector('.btn-close');
 
-      // Caso o código esteja incorreto
+      // Caso o código esteja incorreto (após o envio e retorno do PHP)
       <?php if ($verification_error): ?>
         Swal.fire({
           position: 'top',
@@ -807,7 +829,7 @@ if (isset($_POST['verify_email'])) {
           title: '<?= $verification_error ?>',
           toast: true,
           showConfirmButton: false,
-          timer: 2000
+          timer: 3000
         });
       <?php endif; ?>
 
@@ -816,15 +838,18 @@ if (isset($_POST['verify_email'])) {
         verificationForm.addEventListener('submit', function(event) { // Impede o envio se o código estiver vazio/inválido
           if (verificationCodeInput.value.trim() === '') { // Verifica se o campo está vazio
             event.preventDefault(); // Impede o envio do formulário
-            $verification_error = "Campo vazio, insira o código de verificação";
-            $verification_needed = true; // Mantém o modal aberto em caso de erro
             Swal.fire({
               position: 'top',
               icon: 'error',
-              title: $verification_error,
+              title: 'Campo vazio!',
+              text: 'Nada inserido. Por favor, insira o código de verificação',
               toast: true,
               showConfirmButton: false,
-              timer: 2000
+              timer: 3000,
+              customClass: {
+                icon: 'swal2.icon',
+                title: 'swal2.title'
+              }
             });
             return;
           }
@@ -835,15 +860,18 @@ if (isset($_POST['verify_email'])) {
           // (6 caracteres alfanuméricos em caixa alta)
           if (!codeRegex.test(verificationCodeInput.value)) {
             event.preventDefault();
-            $verification_error = "Código de verificação inválido, tente novamente";
-            $verification_needed = true; // Mantém o modal aberto em caso de erro
             Swal.fire({
               position: 'top',
               icon: 'error',
-              title: $verification_error,
+              title: 'Código Inválido!',
+              text: 'O código de verificação deve conter 6 caracteres alfanuméricos',
               toast: true,
               showConfirmButton: false,
-              timer: 2000
+              timer: 3000,
+              customClass: {
+                icon: 'swal2.icon',
+                title: 'swal2.title'
+              }
             });
             return;
           }
@@ -921,6 +949,20 @@ if (isset($_POST['verify_email'])) {
       <?php endif; ?>
     });
   </script>
+
+      <style>
+    /* Estilos existentes */
+
+    .swal2.icon {
+      font-size: 3em !important;
+      /* Ajuste o tamanho do ícone conforme necessário */
+    }
+
+    .swal2.title {
+      font-size: 3em !important;
+      /* Ajuste o tamanho do título conforme necessário */
+    }
+  </style>
 </body>
 
 </html>
