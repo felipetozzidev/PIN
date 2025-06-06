@@ -237,6 +237,19 @@ if (isset($_POST['verify_email'])) {
       --white: #ffffff;
     }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
     body {
       background-image: url('../assets/img/ifcampus.jpg');
       background-size: cover;
@@ -247,17 +260,18 @@ if (isset($_POST['verify_email'])) {
       align-items: center;
       justify-content: center;
       font-family: 'Inter', sans-serif;
-      min-height: 100vh;
+      padding: 2rem;
     }
 
     .form-signin {
+      display: flexbox;
+      box-sizing: border-box;
       width: 100%;
       max-width: 420px;
       padding: 2.5rem;
       background: var(--white);
       border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-      margin: 2rem;
       transition: all 0.3s ease;
     }
 
