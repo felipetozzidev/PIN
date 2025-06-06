@@ -33,11 +33,11 @@
 
         </section>
     </main>
-    
+
     <?php include("../src/components/footer.php"); ?>
 
 
-    
+
     <script src="../src/assets/js/javascript.js"></script>
 </body>
 
