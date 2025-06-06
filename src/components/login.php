@@ -19,9 +19,9 @@ if (isset($_POST['login'])) {
   $email = mysqli_real_escape_string($conn, trim($_POST['email']));
   $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
 
-  // Verifica se o email termina com os domínios permitidos
-  if (!preg_match('/@(ifsp\.edu\.br|aluno\.ifsp\.edu\.br)$/', $email)) {
-    $login_error = "Apenas emails institucionais são permitidos";
+  // Verifica se o email termina com os domínios permitidos (IF + siglas de estados com IF)
+  if (!preg_match('/@(if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br|aluno\.if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br)$/i', $email)) {
+    $login_error = "Apenas emails institucionais (IF) são permitidos";
   } else {
     // Verifica na tabela usuarios usando prepared statement
     $query = "SELECT id_usu, senha_usu, nome_usu, imgperfil_usu FROM usuarios WHERE email_usu = ?";
@@ -67,9 +67,9 @@ if (isset($_POST['signup'])) {
   if ($senha !== $conf_senha) {
     $login_error = "As senhas não coincidem.";
   }
-  // Verifica se o email termina com os domínios permitidos
-  elseif (!preg_match('/@(ifsp\.edu\.br|aluno\.ifsp\.edu\.br)$/', $email)) {
-    $login_error = "Apenas emails institucionais são permitidos";
+  // Verifica se o email termina com os domínios permitidos (IF + siglas de estados com IF)
+  elseif (!preg_match('/@(if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br|aluno\.if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br)$/i', $email)) {
+    $login_error = "Apenas emails institucionais (IF) são permitidos";
   } else {
     // Gera o código de verificação alfanumérico de 6 caracteres
     $verification_code = strtoupper(bin2hex(random_bytes(3)));
@@ -656,7 +656,7 @@ if (isset($_POST['verify_email'])) {
             <div class="form-floating mb-3">
               <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
               <label for="email">Email</label>
-              <span class="d-flex text-muted">Apenas emails institucionais são permitidos (@ifsp.edu.br ou @aluno.ifsp.edu.br)</span>
+              <span class="d-flex text-muted">Apenas emails institucionais são permitidos (@if**.edu.br ou @aluno.if**.edu.br)</span>
             </div>
             <div class="row mb-2 form-floating">
               <div class="col-md-6 col-sm-6 mb-2 form-floating">
