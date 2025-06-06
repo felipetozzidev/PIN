@@ -98,21 +98,11 @@ if (isset($_POST['signup'])) {
       $mail->SMTPAuth = true;                               // Habilita a autenticação SMTP
 
       // Desabilita a verificação de certificado SSL (não recomendado para produção)
-      $mail->SMTPOptions = array(
+      /*$mail->SMTPOptions = array(
         'ssl' => array(
           'verify_peer' => false,
           'verify_peer_name' => false,
           'allow_self_signed' => true
-        )
-      );
-
-      // Configurações para o certificado CA
-      /*$mail->SMTPOptions = array(
-        'ssl' => array(
-          'capath' => '/xampp/php/extras/ssl', // Caminho para a pasta onde você colocou o cacert.pem
-          'cafile' => '/xampp/php/extras/ssl/cacert.pem', // Caminho completo para o arquivo cacert.pem
-          'verify_peer' => true,
-          'verify_peer_name' => true,
         )
       );*/
 
@@ -226,7 +216,7 @@ if (isset($_POST['verify_email'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login e Cadastro | IFApoia</title>
+  <title>IFApoia | Login e Cadastro</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -583,7 +573,7 @@ if (isset($_POST['verify_email'])) {
 </head>
 
 <body class="text-center">
-  <div class="back-button" href="../index.php">
+  <div class="back-button" href="/PIN/public/index.php" onclick="window.location.href='/PIN/public/index.php';">
     <i class="ri-arrow-left-line"></i>
   </div>
 
@@ -594,11 +584,11 @@ if (isset($_POST['verify_email'])) {
     </div>
 
     <form method="POST" action="login.php">
-      <div class="form-floating">
+      <div class="form-floating mb-2">
         <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="email" required>
         <label for="floatingInput">Email</label>
       </div>
-      <div class="form-floating">
+      <div class="form-floating mb-2">
         <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="senha" required>
         <label for="floatingPassword">Senha</label>
       </div>
@@ -627,15 +617,15 @@ if (isset($_POST['verify_email'])) {
               <label for="nome">Nome Completo</label>
             </div>
 
-            <div class="row mb-3">
-              <div class="col-md-6">
+            <div class="row mb-2">
+              <div class="col-md-6 col-sm-6 mb-2">
                 <select class="form-control" id="sexo" name="sexo" required>
                   <option value="" disabled selected>Sexo Biológico</option>
                   <option value="M">Masculino</option>
                   <option value="F">Feminino</option>
                 </select>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 col-sm-6 mb-2">
                 <select class="form-control" id="orsex" name="orsex" required>
                   <option value="" disabled selected>Orientação Sexual</option>
                   <option value="hetero">Heterossexual</option>
@@ -654,19 +644,19 @@ if (isset($_POST['verify_email'])) {
               <label for="email">Email</label>
               <span class="d-flex text-muted">Apenas emails institucionais são permitidos (@ifsp.edu.br ou @aluno.ifsp.edu.br)</span>
             </div>
-            <div class="row mb-3 form-floating">
-              <div class="col-md-6 form-floating">
+            <div class="row mb-2 form-floating">
+              <div class="col-md-6 col-sm-6 mb-2 form-floating">
                 <input type="password" class="form-control" id="senha" name="senha" placeholder="Senha" required>
                 <label class="labelsenha" for="senha">Senha</label>
               </div>
-              <div class="col-md-6 form-floating">
+              <div class="col-md-6 col-sm-6 mb-2 form-floating">
                 <input type="password" class="form-control" id="conf-senha" name="conf-senha" placeholder="Confirmar Senha" required>
                 <label class="labelconf-senha" for="conf-senha">Confirmar Senha</label>
               </div>
             </div>
 
-            <div class="row mb-3">
-              <div class="col-md-6">
+            <div class="row mb-2">
+              <div class="col-md-6 col-sm-6 mb-2">
                 <select class="form-control" id="uf" name="uf" required>
                   <option value="" disabled selected>Selecione seu Estado</option>
                   <option value="AC">Acre</option>
@@ -698,7 +688,7 @@ if (isset($_POST['verify_email'])) {
                   <option value="TO">Tocantins</option>
                 </select>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6 col-sm-6 mb-2">
                 <select class="form-control" id="campus" name="campus" required disabled>
                   <option value="" disabled selected>Selecione seu Campus</option>
                 </select>
@@ -906,7 +896,6 @@ if (isset($_POST['verify_email'])) {
           title: 'Houve um erro!',
           text: '<?= $login_error ?>',
           icon: 'error',
-          iconColor: '#203f1d',
           confirmButtonText: 'OK'
         });
       <?php endif; ?>
