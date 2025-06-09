@@ -603,7 +603,7 @@
                 <div class="hourglassGlass"></div>
             </div>
         </div>
-        <h1>REDE EM DESENVOLVIMENTO</h1>
+        <h1>SITE EM DESENVOLVIMENTO</h1>
         <p class="lead">Estamos cuidando dos últimos detalhes para oferecer uma experiência incrível. Muito em breve, esta página estará disponível com tudo o que você merece.</p>
         <span class="">Para acompanhar o andamento do nosso projeto, acesse <a href="https://github.com/felipetozzidev/PIN">aqui</a> nossa documentação </span>
     </div>
