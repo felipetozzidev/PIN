@@ -10,13 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-green: #1b5e20;
-            --primary-green-hover: #2e7d32;
-            --primary-green-light: #4caf50;
-            --secondary-green: #81c784;
-            --accent-orange: #ff9800;
-            --text-dark: #2c3e50;
-            --text-light: #6c757d;
+            --background: #EEFFEE;
+            --backgroundContrast: #e7f7e78b;
+            --primary: #305F2C;
+            --secondary: #A0BF9F;
+            --secondaryButton: #2e7d32;
+            --accent: #96c584;
+            --text-color: #2d3748;
+            --text-muted: #718096;
             --white: #ffffff;
             --light-gray: #f8f9fa;
             --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
@@ -31,25 +32,27 @@
         }
 
         body {
+            background-color: var(--background);
             font-family: 'Inter', 'Segoe UI', sans-serif;
             scroll-behavior: smooth;
             line-height: 1.6;
-            color: var(--text-dark);
+            color: var(--text-color);
             overflow-x: hidden;
         }
 
-        /* Enhanced Navigation */
         .navbar {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.95) !important;
+            background: transparent !important;
             box-shadow: var(--shadow-light);
             border-bottom: 1px solid rgba(27, 94, 32, 0.1);
             transition: var(--transition);
             padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+
         }
 
         .navbar.scrolled {
-            background: rgba(255, 255, 255, 0.98) !important;
             box-shadow: var(--shadow-medium);
             padding: 0.5rem 0;
         }
@@ -57,20 +60,19 @@
         .navbar-brand {
             font-weight: 700;
             font-size: 1.8rem;
-            color: var(--primary-green) !important;
+            color: var(--primary) !important;
             text-decoration: none;
             position: relative;
         }
 
         .navbar-brand:hover {
-            color: var(--primary-green-hover) !important;
             transform: translateY(-1px);
             transition: var(--transition);
         }
 
         .nav-link {
             font-weight: 500;
-            color: var(--text-dark) !important;
+            color: var(--text-color) !important;
             padding: 0.5rem 1rem !important;
             margin: 0 0.25rem;
             border-radius: 8px;
@@ -79,7 +81,7 @@
         }
 
         .nav-link:hover {
-            color: var(--primary-green) !important;
+            color: var(--primary) !important;
             background: rgba(27, 94, 32, 0.05);
             transform: translateY(-1px);
         }
@@ -91,7 +93,7 @@
             left: 50%;
             width: 0;
             height: 2px;
-            background: var(--primary-green);
+            background: var(--primary);
             transform: translateX(-50%);
             transition: var(--transition);
         }
@@ -100,9 +102,8 @@
             width: 80%;
         }
 
-        /* Enhanced Buttons */
         .btn-green {
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-hover) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondaryButton) 100%);
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -121,12 +122,12 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.52), transparent);
             transition: var(--transition);
         }
 
         .btn-green:hover {
-            background: linear-gradient(135deg, var(--primary-green-hover) 0%, var(--primary-green-light) 100%);
+            background: linear-gradient(135deg, var(--secondaryButton) 0%, var(--primary) 100%);
             transform: translateY(-2px);
             box-shadow: var(--shadow-medium);
             color: white;
@@ -140,7 +141,6 @@
             transform: translateY(0);
         }
 
-        /* Enhanced Hero Section */
         .hero {
             background: linear-gradient(135deg, rgba(27, 94, 32, 0.9) 0%, rgba(46, 125, 50, 0.8) 100%),
                 url('https://images.pexels.com/photos/256490/pexels-photo-256490.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;
@@ -209,7 +209,7 @@
         .section-title {
             font-size: 2.5rem;
             font-weight: 700;
-            color: var(--primary-green);
+            color: var(--primary);
             margin-bottom: 2rem;
             position: relative;
             display: inline-block;
@@ -222,7 +222,7 @@
             left: 0;
             width: 60px;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary-green) 0%, var(--accent-orange) 100%);
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
             border-radius: 2px;
         }
 
@@ -239,7 +239,7 @@
 
         #sobre li {
             padding: 1rem 0;
-            border-left: 4px solid var(--primary-green);
+            border-left: 4px solid var(--primary);
             padding-left: 2rem;
             margin: 1rem 0;
             background: white;
@@ -252,7 +252,7 @@
         #sobre li:hover {
             transform: translateX(10px);
             box-shadow: var(--shadow-medium);
-            border-left-color: var(--accent-orange);
+            border-left-color: var(--accent);
         }
 
         #sobre li::before {
@@ -261,7 +261,7 @@
             left: -12px;
             top: 50%;
             transform: translateY(-50%);
-            background: var(--primary-green);
+            background: var(--primary);
             color: white;
             width: 24px;
             height: 24px;
@@ -275,7 +275,7 @@
         }
 
         #sobre li:hover::before {
-            background: var(--accent-orange);
+            background: var(--accent);
             transform: translateY(-50%) scale(1.1);
         }
 
@@ -303,7 +303,7 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary-green) 0%, var(--accent-orange) 100%);
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
         }
 
         .structure-card:hover {
@@ -325,7 +325,7 @@
         }
 
         .structure-card p {
-            color: var(--text-light);
+            color: var(--text-muted);
             font-weight: 500;
         }
 
@@ -352,7 +352,7 @@
         .accordion-button {
             background: white;
             border: none;
-            color: var(--text-dark);
+            color: var(--text-color);
             font-weight: 600;
             font-size: 1.1rem;
             padding: 1.5rem 2rem;
@@ -360,7 +360,7 @@
         }
 
         .accordion-button:not(.collapsed) {
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-hover) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondaryButton) 100%);
             color: white;
             box-shadow: none;
         }
@@ -388,7 +388,7 @@
         /* Enhanced Testimonials */
         .testimonial-section {
             padding: 6rem 0;
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-hover) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondaryButton) 100%);
             color: white;
         }
 
@@ -397,7 +397,7 @@
         }
 
         .testimonial-section .section-title::after {
-            background: linear-gradient(90deg, white 0%, var(--accent-orange) 100%);
+            background: linear-gradient(90deg, white 0%, var(--accent) 100%);
         }
 
         .carousel-item {
@@ -466,14 +466,14 @@
         }
 
         .form-control:focus {
-            border-color: var(--primary-green);
+            border-color: var(--primary);
             box-shadow: 0 0 0 0.25rem rgba(27, 94, 32, 0.15);
             background: white;
         }
 
         .form-label {
             font-weight: 600;
-            color: var(--text-dark);
+            color: var(--text-color);
             margin-bottom: 0.75rem;
         }
 
@@ -496,7 +496,7 @@
             justify-content: center;
             width: 50px;
             height: 50px;
-            background: var(--primary-green);
+            background: var(--primary);
             color: white;
             border-radius: 50%;
             margin: 0 0.5rem;
@@ -505,26 +505,26 @@
         }
 
         .social-links a:hover {
-            background: var(--accent-orange);
+            background: var(--accent);
             transform: translateY(-3px);
             box-shadow: var(--shadow-medium);
         }
 
         /* Enhanced Footer */
         footer {
-            background: linear-gradient(135deg, var(--text-dark) 0%, #34495e 100%);
+            background: linear-gradient(135deg, var(--text-color) 0%, #34495e 100%);
             color: white;
             padding: 3rem 0;
         }
 
         footer a {
-            color: var(--secondary-green);
+            color: var(--secondary);
             text-decoration: none;
             transition: var(--transition);
         }
 
         footer a:hover {
-            color: var(--accent-orange);
+            color: var(--accent);
             text-decoration: underline;
         }
 
@@ -621,7 +621,7 @@
         /* Focus Styles */
         .btn-green:focus,
         .nav-link:focus {
-            outline: 2px solid var(--accent-orange);
+            outline: 2px solid var(--accent);
             outline-offset: 2px;
         }
 
@@ -635,19 +635,19 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--primary-green);
+            background: var(--primary);
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-green-hover);
+            background: var(--secondaryButton);
         }
     </style>
 </head>
 
 <body>
     <!-- Cabeçalho -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" id="navbar">
+    <nav class="navbar navbar-expand-lg fixed" id="navbar">
         <div class="container">
             <a class="navbar-brand" href="#inicio">IFApoia</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -709,21 +709,21 @@
                 <div class="col-md-4 mb-4">
                     <div class="structure-card">
                         <img src="https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg?auto=compress&cs=tinysrgb&w=400" class="img-fluid" alt="Laboratório">
-                        <h4 class="mt-3 mb-3" style="color: var(--primary-green); font-weight: 600;">Laboratórios Modernos</h4>
+                        <h4 class="mt-3 mb-3" style="color: var(--primary); font-weight: 600;">Laboratórios Modernos</h4>
                         <p>Laboratórios modernos e equipados com tecnologia de ponta para diversas áreas do conhecimento, proporcionando experiência prática aos estudantes.</p>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4">
                     <div class="structure-card">
                         <img src="https://images.pexels.com/photos/2041540/pexels-photo-2041540.jpeg?auto=compress&cs=tinysrgb&w=400" class="img-fluid" alt="Biblioteca">
-                        <h4 class="mt-3 mb-3" style="color: var(--primary-green); font-weight: 600;">Biblioteca Digital</h4>
+                        <h4 class="mt-3 mb-3" style="color: var(--primary); font-weight: 600;">Biblioteca Digital</h4>
                         <p>Bibliotecas com acervo atualizado, espaços de estudo colaborativo e recursos digitais para pesquisa acadêmica avançada.</p>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4">
                     <div class="structure-card">
                         <img src="https://images.pexels.com/photos/1438072/pexels-photo-1438072.jpeg?auto=compress&cs=tinysrgb&w=400" class="img-fluid" alt="Convivência">
-                        <h4 class="mt-3 mb-3" style="color: var(--primary-green); font-weight: 600;">Espaços de Convivência</h4>
+                        <h4 class="mt-3 mb-3" style="color: var(--primary); font-weight: 600;">Espaços de Convivência</h4>
                         <p>Áreas de convivência modernas que promovem a integração entre os alunos e facilitam o networking acadêmico.</p>
                     </div>
                 </div>
@@ -910,22 +910,22 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="contact-info">
-                        <h4 style="color: var(--primary-green); margin-bottom: 2rem;">
+                        <h4 style="color: var(--primary); margin-bottom: 2rem;">
                             <i class="fas fa-info-circle me-2"></i>Informações de Contato
                         </h4>
                         <p>
-                            <i class="fas fa-map-marker-alt me-3" style="color: var(--primary-green);"></i>
+                            <i class="fas fa-map-marker-alt me-3" style="color: var(--primary);"></i>
                             <strong>Endereço:</strong><br>
                             Av. IFSP, 123 - Centro<br>
                             Piracicaba, SP - CEP: 13400-000
                         </p>
                         <p>
-                            <i class="fas fa-phone me-3" style="color: var(--primary-green);"></i>
+                            <i class="fas fa-phone me-3" style="color: var(--primary);"></i>
                             <strong>Telefone:</strong><br>
                             (19) 1234-5678
                         </p>
                         <p>
-                            <i class="fas fa-envelope me-3" style="color: var(--primary-green);"></i>
+                            <i class="fas fa-envelope me-3" style="color: var(--primary);"></i>
                             <strong>Email:</strong><br>
                             contato@ifsp.edu.br
                         </p>
