@@ -562,28 +562,57 @@
         @media (max-width: 600px) {
             .container {
                 padding: 40px 30px;
+
+                &>h1 {
+                    font-size: 2rem;
+                }
+
+                &>p {
+                    font-size: 1rem !important;
+                }
+
+                &>span {
+                    font-size: 10px !important;
+                }
             }
 
-            h1 {
-                font-size: 1.5rem;
-            }
-
-            p {
-                font-size: 0.9rem !important;
-            }
-
-            span {
-                font-size: 8px;
-            }
+            
         }
 
-        @media (max-width: 350px) {
-            h1 {
-                font-size: 1.2rem;
+        @media (max-width: 450px) {
+            .container {
+                padding: 30px 20px;
+
+                &>h1 {
+                    font-size: 1.7rem;
+                }
+
+                &>p {
+                    font-size: 0.7rem !important;
+                }
+
+                &>span {
+                    font-size: 8px !important;
+                }
             }
 
-            span {
-                font-size: 5px;
+        }
+
+        @media (max-width: 375px) {
+            .container {
+                padding: 20px 10px;
+
+                &>h1 {
+                    font-size: 1rem;
+                }
+
+                &>p {
+                    font-size: 0.5rem !important;
+                }
+
+                &>span {
+                    font-size: 5px !important;
+                }
             }
         }
     </style>
