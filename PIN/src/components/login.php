@@ -328,6 +328,8 @@ if (isset($_POST['verify_email'])) {
     .form-floating input,
     .form-control,
     select.form-control {
+      position: relative;
+      /* Relative necessário para implementar o botão .passwordView */
       border: 2px solid var(--border-color);
       border-radius: 8px;
       padding: 1rem 0.75rem;
@@ -364,6 +366,29 @@ if (isset($_POST['verify_email'])) {
 
     select.form-control option {
       color: var(--text-color);
+    }
+
+    .passwordView {
+      border: none;
+      background-color: transparent;
+      position: absolute;
+      /* Absolute para definir o posicionamento do botão via css */
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      /* Z-index para garantir que o botão fique acima do input */
+
+      &>i {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+      }
     }
 
     .btn-primary {
@@ -441,6 +466,28 @@ if (isset($_POST['verify_email'])) {
       margin-bottom: 0.5rem;
       color: var(--text-color);
       font-weight: 500;
+    }
+
+    /* Igual ao .passwordView, mas para o modal de cadastro */
+    .passwordViewModal {
+      border: none;
+      background-color: transparent;
+      position: absolute;
+      top: 50%;
+      right: 1.1rem;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+
+      &>i {
+        color: var(--text-muted);
+        font-size: 1rem;
+      }
     }
 
     .form-floating .labelsenha,
@@ -599,11 +646,12 @@ if (isset($_POST['verify_email'])) {
 
     <form method="POST" action="login.php">
       <div class="form-floating mb-2">
-        <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" name="email" required>
+        <input type="email" class="form-control" id="floatingInput" placeholder="Email" name="email" required>
         <label for="floatingInput">Email</label>
       </div>
       <div class="form-floating mb-2">
-        <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="senha" required>
+        <input type="password" class="form-control" id="floatingPassword" placeholder="Senha" name="senha" required>
+        <button class="passwordView"><i class="ri-eye-line"></i></button>
         <label for="floatingPassword">Senha</label>
       </div>
 
@@ -661,10 +709,12 @@ if (isset($_POST['verify_email'])) {
             <div class="row mb-2 form-floating">
               <div class="col-md-6 col-sm-6 mb-2 form-floating">
                 <input type="password" class="form-control" id="senha" name="senha" placeholder="Senha" required>
+                <button class="passwordViewModal"><i class="ri-eye-line"></i></button>
                 <label class="labelsenha" for="senha">Senha</label>
               </div>
               <div class="col-md-6 col-sm-6 mb-2 form-floating">
                 <input type="password" class="form-control" id="conf-senha" name="conf-senha" placeholder="Confirmar Senha" required>
+                <button class="passwordViewModal"><i class="ri-eye-line"></i></button>
                 <label class="labelconf-senha" for="conf-senha">Confirmar Senha</label>
               </div>
             </div>
@@ -757,6 +807,46 @@ if (isset($_POST['verify_email'])) {
   </div>
 
   <script>
+    // Listener para tornar a senha visível ou invisível
+    document.addEventListener('DOMContentLoaded', function() {
+      const passwordViewButtons = document.querySelectorAll('.passwordView, .passwordViewModal'); // Seleciona os botões de ver senhas
+      passwordViewButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+          event.preventDefault(); // Previne o comportamento padrão do botão
+          // Encontra todos os inputs de senha e confirmação de senha dentro do modal
+          const form = this.closest('form'); // Encontra o formulário mais próximo do botão clicado
+          const senhaInput = form ? form.querySelector('input[name="senha"]') : null;
+          const confSenhaInput = form ? form.querySelector('input[name="conf-senha"]') : null;
+
+          // Se ambos os campos existem e estão preenchidos, alterna ambos juntos
+          if (senhaInput && confSenhaInput && senhaInput.value && confSenhaInput.value) {
+            const isSenha = senhaInput.type === 'password';
+            senhaInput.type = isSenha ? 'text' : 'password';
+            confSenhaInput.type = isSenha ? 'text' : 'password';
+            // Atualiza todos os botões do formulário/modal
+            const allButtons = form.querySelectorAll('.passwordView, .passwordViewModal');
+            allButtons.forEach(btn => {
+              btn.innerHTML = isSenha ?
+                '<i class="ri-eye-close-line"></i>' :
+                '<i class="ri-eye-line"></i>';
+            });
+          } else {
+            // Alterna apenas o campo relacionado ao botão clicado
+            const input = this.previousElementSibling || this.parentElement.previousElementSibling;
+            if (input && input.type === 'password') {
+              input.type = 'text';
+              this.innerHTML = '<i class="ri-eye-close-line"></i>';
+            } else if (input) {
+              input.type = 'password';
+              this.innerHTML = '<i class="ri-eye-line"></i>';
+            }
+          }
+        });
+      });
+    });
+
+
+    // Listener para atualizar os campi com base no estado selecionado
     document.addEventListener('DOMContentLoaded', function() {
       const estadoSelect = document.getElementById('uf');
       const campusSelect = document.getElementById('campus');
@@ -794,15 +884,17 @@ if (isset($_POST['verify_email'])) {
 
       // Preenche o select de campus com os campi do primeiro estado
       estadoSelect.addEventListener('change', function() {
-        const selectedEstado = this.value;
+        const selectedEstado = this.value; // Obtém o estado selecionado
+        // Limpa o select de campus
         campusSelect.innerHTML = '<option value="" disabled selected>Selecione seu Campus</option>';
         campusSelect.disabled = true;
 
         // Verifica se o estado selecionado tem campi definidos
         if (campiPorEstado[selectedEstado]) {
           campiPorEstado[selectedEstado].forEach(function(campus) {
-            const option = document.createElement('option');
-            option.value = campus;
+            const option = document.createElement('option'); // Cria um novo elemento option
+            option.value = campus; // Define o valor do option como o nome do campus
+            // Divide o nome do campus para exibir apenas a parte após "Campus "
             const parts = campus.split('Campus ');
             option.textContent = parts[1] ? parts[1] : campus;
             campusSelect.appendChild(option);
@@ -823,7 +915,7 @@ if (isset($_POST['verify_email'])) {
       const verificationModal = document.getElementById('verificationModal'); // Obtém o modal de verificação
       const verificationForm = verificationModal.querySelector('form'); // Obtém o formulário dentro do modal
       const verificationCodeInput = document.getElementById('verification_code'); // Obtém o input do código de verificação
-      const verificationModalCloseButton = verificationModal.querySelector('.btn-close');
+      const verificationModalCloseButton = verificationModal.querySelector('.btn-close'); // Obtém o botão de fechar do modal
 
       // Caso o código esteja incorreto (após o envio e retorno do PHP)
       <?php if ($verification_error): ?>
