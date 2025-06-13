@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IFApoia - IFSP Piracicaba</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -28,39 +28,35 @@
         }
 
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
         body {
             background-color: var(--background);
-            font-family: 'Inter', 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             scroll-behavior: smooth;
             line-height: 1.6;
             color: var(--text-color);
             overflow-x: hidden;
+            /* Previne o scroll horizontal */
+            position: relative;
+            /* Permite o uso de position: absolute no navbar */
         }
 
-        .navbar {
-            background: transparent !important;
-            box-shadow: var(--shadow-light);
-            border-bottom: 1px solid rgba(27, 94, 32, 0.1);
-            transition: var(--transition);
-            padding: 1rem 0;
-            position: fixed;
-            width: 100%;
+        #nav {
+            position: absolute;
             z-index: 1000;
-
-        }
-
-        .navbar.scrolled {
-            box-shadow: var(--shadow-medium);
-            padding: 0.5rem 0;
+            /* Garante que a navbar fique acima de outros elementos */
+            left: 0;
+            right: 0;
+            margin: 10px 50px 0 50px;
+            background: transparent;
         }
 
         .navbar-brand {
-            font-weight: 700;
-            font-size: 1.8rem;
-            color: var(--primary) !important;
+            color: var(--white) !important;
             text-decoration: none;
             position: relative;
         }
@@ -72,16 +68,14 @@
 
         .nav-link {
             font-weight: 500;
-            color: var(--text-color) !important;
-            padding: 0.5rem 1rem !important;
-            margin: 0 0.25rem;
+            color: var(--white) !important;
             border-radius: 8px;
             position: relative;
             transition: var(--transition);
         }
 
         .nav-link:hover {
-            color: var(--primary) !important;
+            color: var(--accent) !important;
             background: rgba(27, 94, 32, 0.05);
             transform: translateY(-1px);
         }
@@ -93,7 +87,7 @@
             left: 50%;
             width: 0;
             height: 2px;
-            background: var(--primary);
+            background: var(--accent);
             transform: translateX(-50%);
             transition: var(--transition);
         }
@@ -102,8 +96,8 @@
             width: 80%;
         }
 
-        .btn-green {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondaryButton) 100%);
+        .btn-acess {
+            background: var(--secondaryButton);
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
@@ -115,7 +109,7 @@
             overflow: hidden;
         }
 
-        .btn-green::before {
+        .btn-acess::before {
             content: '';
             position: absolute;
             top: 0;
@@ -126,24 +120,24 @@
             transition: var(--transition);
         }
 
-        .btn-green:hover {
+        .btn-acess:hover {
             background: linear-gradient(135deg, var(--secondaryButton) 0%, var(--primary) 100%);
             transform: translateY(-2px);
             box-shadow: var(--shadow-medium);
             color: white;
         }
 
-        .btn-green:hover::before {
+        .btn-acess:hover::before {
             left: 100%;
         }
 
-        .btn-green:active {
+        .btn-acess:active {
             transform: translateY(0);
         }
 
         .hero {
-            background: linear-gradient(135deg, rgba(27, 94, 32, 0.9) 0%, rgba(46, 125, 50, 0.8) 100%),
-                url('https://images.pexels.com/photos/256490/pexels-photo-256490.jpeg?auto=compress&cs=tinysrgb&w=1600') center/cover no-repeat;
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.7) 0%, rgba(48, 95, 44, 0.88) 100%),
+                url('src/assets/img/ifcampus.jpg') center/cover no-repeat;
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             padding: 8rem 2rem;
@@ -619,7 +613,7 @@
         }
 
         /* Focus Styles */
-        .btn-green:focus,
+        .btn-acess:focus,
         .nav-link:focus {
             outline: 2px solid var(--accent);
             outline-offset: 2px;
@@ -646,40 +640,55 @@
 </head>
 
 <body>
-    <!-- Cabeçalho -->
-    <nav class="navbar navbar-expand-lg fixed" id="navbar">
-        <div class="container">
-            <a class="navbar-brand" href="#inicio">IFApoia</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="#inicio">Início</a></li>
+    <nav class="navbar navbar-expand-md" id="nav">
+        <div class="container-fluid">
+            <div class="col-2 d-flex justify-content-start">
+                <a class="navbar-brand" href="ifapoia.com.br">
+                    <img class="logo" src="" alt="Logo IFApoia">
+                </a>
+            </div>
+            <div class="col-8 navbar-nav d-flex justify-content-center d-none d-md-flex">
+                <ul class="navbar-nav d-flex justify-content-center">
                     <li class="nav-item"><a class="nav-link" href="#sobre">Sobre o Projeto</a></li>
                     <li class="nav-item"><a class="nav-link" href="#estrutura">Estrutura do Campus</a></li>
                     <li class="nav-item"><a class="nav-link" href="#cursos">Cursos Oferecidos</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
                 </ul>
-                <a class="btn btn-green" href="https://github.com/ifapoia" target="_blank">
-                    <i class="fab fa-github me-2"></i>Ver no GitHub
+            </div>
+            <div class="col-2 justify-content-end d-flex align-items-center">
+                <a class="btn btn-acess d-none d-md-inline-block" href="#" target="_blank">
+                    <i class="ri-login-box-line me-2"></i>Acesse IFApoia
+                </a>
+            </div>
+            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav d-md-none">
+                    <li class="nav-item"><a class="nav-link" href="#sobre">Sobre o Projeto</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#estrutura">Estrutura do Campus</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#cursos">Cursos Oferecidos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
+                </ul>
+                <a class="btn btn-acess d-md-none w-100 mt-2" href="#" target="_blank">
+                    <i class="ri-login-box-line me-2"></i>Acesse IFApoia
                 </a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero -->
+
     <section id="inicio" class="hero">
-        <div class="hero-content">
+        <div class="container">
             <h1>Bem-vindo ao IFApoia</h1>
             <p>Conectando você ao futuro da educação no IFSP Piracicaba com excelência e inovação.</p>
-            <a href="#sobre" class="btn btn-green">
+            <a href="#sobre" class="btn btn-acess">
                 <i class="fas fa-arrow-down me-2"></i>Descobrir Mais
             </a>
         </div>
     </section>
 
-    <!-- Sobre o Projeto -->
     <section id="sobre" class="fade-in">
         <div class="container">
             <h2 class="section-title">Sobre o Projeto</h2>
@@ -701,26 +710,25 @@
         </div>
     </section>
 
-    <!-- Estrutura do Campus -->
     <section id="estrutura" class="fade-in">
         <div class="container">
             <h2 class="section-title">Estrutura do Campus</h2>
-            <div class="row">
-                <div class="col-md-4 mb-4">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
                     <div class="structure-card">
                         <img src="https://images.pexels.com/photos/2280571/pexels-photo-2280571.jpeg?auto=compress&cs=tinysrgb&w=400" class="img-fluid" alt="Laboratório">
                         <h4 class="mt-3 mb-3" style="color: var(--primary); font-weight: 600;">Laboratórios Modernos</h4>
                         <p>Laboratórios modernos e equipados com tecnologia de ponta para diversas áreas do conhecimento, proporcionando experiência prática aos estudantes.</p>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col">
                     <div class="structure-card">
                         <img src="https://images.pexels.com/photos/2041540/pexels-photo-2041540.jpeg?auto=compress&cs=tinysrgb&w=400" class="img-fluid" alt="Biblioteca">
                         <h4 class="mt-3 mb-3" style="color: var(--primary); font-weight: 600;">Biblioteca Digital</h4>
                         <p>Bibliotecas com acervo atualizado, espaços de estudo colaborativo e recursos digitais para pesquisa acadêmica avançada.</p>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
+                <div class="col">
                     <div class="structure-card">
                         <img src="https://images.pexels.com/photos/1438072/pexels-photo-1438072.jpeg?auto=compress&cs=tinysrgb&w=400" class="img-fluid" alt="Convivência">
                         <h4 class="mt-3 mb-3" style="color: var(--primary); font-weight: 600;">Espaços de Convivência</h4>
@@ -731,7 +739,6 @@
         </div>
     </section>
 
-    <!-- Cursos Oferecidos -->
     <section id="cursos" class="fade-in">
         <div class="container">
             <h2 class="section-title">Cursos Oferecidos</h2>
@@ -817,7 +824,6 @@
         </div>
     </section>
 
-    <!-- Depoimentos -->
     <section class="testimonial-section fade-in">
         <div class="container">
             <h2 class="section-title text-center">Depoimentos</h2>
@@ -860,7 +866,6 @@
         </div>
     </section>
 
-    <!-- Contato -->
     <section id="contato" class="fade-in">
         <div class="container">
             <div class="row">
@@ -868,24 +873,20 @@
                     <h2 class="section-title">Entre em Contato</h2>
                     <form id="contactForm">
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <label for="nome" class="form-label">
-                                        <i class="fas fa-user me-2"></i>Nome Completo
-                                    </label>
-                                    <input type="text" class="form-control" id="nome" required>
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nome" class="form-label">
+                                    <i class="fas fa-user me-2"></i>Nome Completo
+                                </label>
+                                <input type="text" class="form-control" id="nome" required>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <label for="email" class="form-label">
-                                        <i class="fas fa-envelope me-2"></i>E-mail
-                                    </label>
-                                    <input type="email" class="form-control" id="email" required>
-                                </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-2"></i>E-mail
+                                </label>
+                                <input type="email" class="form-control" id="email" required>
                             </div>
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label for="assunto" class="form-label">
                                 <i class="fas fa-tag me-2"></i>Assunto
                             </label>
@@ -897,13 +898,13 @@
                                 <option value="outros">Outros assuntos</option>
                             </select>
                         </div>
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label for="mensagem" class="form-label">
                                 <i class="fas fa-comment me-2"></i>Mensagem
                             </label>
                             <textarea class="form-control" id="mensagem" rows="5" required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-green btn-lg">
+                        <button type="submit" class="btn btn-acess btn-lg">
                             <i class="fas fa-paper-plane me-2"></i>Enviar Mensagem
                         </button>
                     </form>
@@ -943,7 +944,6 @@
         </div>
     </section>
 
-    <!-- Rodapé -->
     <footer class="text-center">
         <div class="container">
             <div class="row">
@@ -981,16 +981,6 @@
         }, observerOptions);
 
         document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-        // Enhanced navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 100) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
 
         // Smooth scroll for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
