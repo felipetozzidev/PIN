@@ -53,101 +53,116 @@
             right: 0;
             margin: 10px 50px 0 50px;
             background: transparent;
-        }
 
-        .navbar-brand {
-            color: var(--white) !important;
-            text-decoration: none;
-            position: relative;
-        }
+            &>.container-fluid {
 
-        .navbar-brand:hover {
-            transform: translateY(-1px);
-            transition: var(--transition);
-        }
+                &>.col-6 .navbar-brand {
+                    color: var(--white) !important;
+                    text-decoration: none;
+                    filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.4));
+                    position: relative;
 
-        .nav-link {
-            font-weight: 500;
-            color: var(--white) !important;
-            border-radius: 8px;
-            position: relative;
-            transition: var(--transition);
-        }
+                    &>img {
+                        width: 35px;
+                    }
 
-        .nav-link:hover {
-            color: var(--accent) !important;
-            background: rgba(27, 94, 32, 0.05);
-            transform: translateY(-1px);
-        }
+                    &>img:hover {
+                        transform: scale(1.05);
+                        transition: var(--transition);
+                    }
+                }
 
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 2px;
-            background: var(--accent);
-            transform: translateX(-50%);
-            transition: var(--transition);
-        }
 
-        .nav-link:hover::after {
-            width: 80%;
-        }
+                .btn-acess {
+                    background: none;
+                    color: white;
+                    border: none;
+                    font-weight: 600;
+                    border-radius: var(--border-radius);
+                    transition: all 0.3s;
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                }
 
-        .btn-acess {
-            background: var(--secondaryButton);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-light);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
+                .btn-acess .text {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    transition: var(--transition);
+                    font-size: 1.2rem;
 
-        .btn-acess::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.52), transparent);
-            transition: var(--transition);
-        }
+                    &>i {
+                        font-size: 20px;
+                    }
+                }
 
-        .btn-acess:hover {
-            background: linear-gradient(135deg, var(--secondaryButton) 0%, var(--primary) 100%);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
-            color: white;
-        }
+                .btn-acess .text.hover {
+                    position: absolute;
+                    opacity: 0;
+                    pointer-events: none;
+                }
 
-        .btn-acess:hover::before {
-            left: 100%;
-        }
+                .btn-acess:hover .text.normal {
+                    opacity: 0;
+                }
 
-        .btn-acess:active {
-            transform: translateY(0);
+                .btn-acess:hover .text.hover {
+                    opacity: 1;
+                }
+
+                /* From Uiverse.io by Mike11jr */
+                .btn-acess:before {
+                    content: "";
+                    position: absolute;
+                    width: 135px;
+                    height: 120%;
+                    z-index: 10;
+                    background-color: rgb(228, 228, 228);
+                    filter: blur(10px);
+                    top: 50%;
+                    transform: skewX(30deg) translate(-150%, -50%);
+                    transition: all 0.5s;
+                }
+
+                .btn-acess:hover {
+                    background-color: var(--secondaryButton);
+                    color: var(--white);
+                    padding: 0.5rem 0.8rem;
+                    box-shadow: 0 2px 0 2px rgb(9, 75, 15);
+                    transform: scale(1.2);
+                }
+
+                .btn-acess:hover::before {
+                    transform: translate(-50%, -50%);
+                    transform: skewX(30deg) translate(150%, -50%);
+                    transition-delay: 0.1s;
+                }
+
+                .btn-acess:active {
+                    transform: scale(0.9);
+                }
+            }
+
         }
 
         .hero {
-            background: linear-gradient(135deg, rgba(46, 125, 50, 0.7) 0%, rgba(48, 95, 44, 0.88) 100%),
-                url('src/assets/img/ifcampus.jpg') center/cover no-repeat;
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.7) 0%, rgba(48, 95, 44, 0.88) 100%), url('src/assets/img/ifcampus.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
             color: white;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             padding: 8rem 2rem;
             text-align: center;
             position: relative;
             overflow: hidden;
-            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 100vh;
         }
 
         .hero::before {
@@ -159,17 +174,6 @@
             bottom: 0;
             background: linear-gradient(45deg, rgba(27, 94, 32, 0.1) 25%, transparent 25%, transparent 75%, rgba(27, 94, 32, 0.1) 75%);
             background-size: 20px 20px;
-            animation: backgroundMove 20s linear infinite;
-        }
-
-        @keyframes backgroundMove {
-            0% {
-                transform: translateX(0) translateY(0);
-            }
-
-            100% {
-                transform: translateX(20px) translateY(20px);
-            }
         }
 
         .hero-content {
@@ -183,23 +187,45 @@
             font-size: 3.5rem;
             font-weight: 700;
             margin-bottom: 1.5rem;
-            animation: fadeInUp 1s ease-out;
+            animation: fadeInUp 0.8s ease-out;
         }
 
         .hero p {
             font-size: 1.3rem;
             margin-bottom: 2rem;
             font-weight: 300;
-            animation: fadeInUp 1s ease-out 0.2s both;
+            animation: fadeInUp 0.9s ease-out 0.2s both;
         }
 
-        .hero .btn {
-            animation: fadeInUp 1s ease-out 0.4s both;
-            font-size: 1.1rem;
-            padding: 1rem 2rem;
+        .hero .btn-more {
+            animation: fadeInUp 1.5s ease-out 0.4s both;
+            background: rgb(150, 197, 132, 0.4);
+            color: white;
+            text-decoration: none;
+            border: 3px solid var(--accent);
+            padding: 1.1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
         }
 
-        /* Enhanced Section Titles */
+        .hero .btn-more:hover {
+            padding: 1.1rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0px 0px 15px inset rgba(48, 95, 44, 1);
+            border: 3px solid #8cc974;
+        }
+
+        .hero .btn-more:active {
+            padding: 0.9rem;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: none;
+            border: 3px solid var(--accent);
+        }
+
         .section-title {
             font-size: 2.5rem;
             font-weight: 700;
@@ -221,17 +247,17 @@
         }
 
         /* Enhanced About Section */
-        #sobre {
+        #ns1 {
             padding: 6rem 0;
             background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
         }
 
-        #sobre ul {
+        #ns1 ul {
             list-style: none;
             padding: 0;
         }
 
-        #sobre li {
+        #ns1 li {
             padding: 1rem 0;
             border-left: 4px solid var(--primary);
             padding-left: 2rem;
@@ -243,13 +269,13 @@
             position: relative;
         }
 
-        #sobre li:hover {
+        #ns1 li:hover {
             transform: translateX(10px);
             box-shadow: var(--shadow-medium);
             border-left-color: var(--accent);
         }
 
-        #sobre li::before {
+        #ns1 li::before {
             content: '✓';
             position: absolute;
             left: -12px;
@@ -268,13 +294,13 @@
             transition: var(--transition);
         }
 
-        #sobre li:hover::before {
+        #ns1 li:hover::before {
             background: var(--accent);
             transform: translateY(-50%) scale(1.1);
         }
 
         /* Enhanced Structure Section */
-        #estrutura {
+        #ns2 {
             padding: 6rem 0;
             background: var(--light-gray);
         }
@@ -324,7 +350,7 @@
         }
 
         /* Enhanced Courses Section */
-        #cursos {
+        #ns3 {
             padding: 6rem 0;
             background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
         }
@@ -445,7 +471,7 @@
         }
 
         /* Enhanced Contact Section */
-        #contato {
+        #ns4 {
             padding: 6rem 0;
             background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
         }
@@ -625,12 +651,12 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: var(--background);
         }
 
         ::-webkit-scrollbar-thumb {
             background: var(--primary);
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
@@ -642,56 +668,36 @@
 <body>
     <nav class="navbar navbar-expand-md" id="nav">
         <div class="container-fluid">
-            <div class="col-2 d-flex justify-content-start">
+            <div class="col-6">
                 <a class="navbar-brand" href="ifapoia.com.br">
-                    <img class="logo" src="" alt="Logo IFApoia">
+                    <img src="src/assets/img/Logotipo_antiga2.png" alt="Logo IFApoia">
                 </a>
             </div>
-            <div class="col-8 navbar-nav d-flex justify-content-center d-none d-md-flex">
-                <ul class="navbar-nav d-flex justify-content-center">
-                    <li class="nav-item"><a class="nav-link" href="#sobre">Sobre o Projeto</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#estrutura">Estrutura do Campus</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#cursos">Cursos Oferecidos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
-                </ul>
-            </div>
-            <div class="col-2 justify-content-end d-flex align-items-center">
-                <a class="btn btn-acess d-none d-md-inline-block" href="#" target="_blank">
-                    <i class="ri-login-box-line me-2"></i>Acesse IFApoia
-                </a>
-            </div>
-            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav d-md-none">
-                    <li class="nav-item"><a class="nav-link" href="#sobre">Sobre o Projeto</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#estrutura">Estrutura do Campus</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#cursos">Cursos Oferecidos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contato">Contato</a></li>
-                </ul>
-                <a class="btn btn-acess d-md-none w-100 mt-2" href="#" target="_blank">
-                    <i class="ri-login-box-line me-2"></i>Acesse IFApoia
+            <div class="col-6 d-flex justify-content-end">
+                <a class="btn btn-acess" href="#" target="_blank">
+                    <span class="text normal">
+                        <i class="ri-login-box-line me-2"></i>Acesse IFApoia</span>
+                    <span class="text hover">
+                        <i class="ri-user-smile-line me-2"></i>Entre agora!</span>
                 </a>
             </div>
         </div>
     </nav>
 
 
-    <section id="inicio" class="hero">
-        <div class="container">
-            <h1>Bem-vindo ao IFApoia</h1>
-            <p>Conectando você ao futuro da educação no IFSP Piracicaba com excelência e inovação.</p>
-            <a href="#sobre" class="btn btn-acess">
-                <i class="fas fa-arrow-down me-2"></i>Descobrir Mais
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Conheça o IFApoia</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eget ligula facilisis, faucibus ipsum ut, fringilla neque. Pellentesque in ultricies libero. Phasellus ac ante gravida, congue lacus vestibulum, posuere ante.</p>
+            <a class="btn-more" href="#ns1" target="_blank">
+                <i class="ri-arrow-down-line me-2"></i>Descobrir mais
             </a>
         </div>
     </section>
 
-    <section id="sobre" class="fade-in">
+    <section id="ns1" class="fade-in">
         <div class="container">
-            <h2 class="section-title">Sobre o Projeto</h2>
+            <h2 class="section-title">ns1</h2>
             <div class="row">
                 <div class="col-lg-8">
                     <p class="lead">O IFApoia tem como objetivo principal apoiar estudantes e promover iniciativas educacionais que integrem a comunidade e estimulem o desenvolvimento sustentável, criando um ambiente de aprendizado colaborativo e inovador.</p>
@@ -710,9 +716,9 @@
         </div>
     </section>
 
-    <section id="estrutura" class="fade-in">
+    <section id="ns2" class="fade-in">
         <div class="container">
-            <h2 class="section-title">Estrutura do Campus</h2>
+            <h2 class="section-title">ns2</h2>
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col">
                     <div class="structure-card">
@@ -739,29 +745,29 @@
         </div>
     </section>
 
-    <section id="cursos" class="fade-in">
+    <section id="ns3" class="fade-in">
         <div class="container">
-            <h2 class="section-title">Cursos Oferecidos</h2>
-            <div class="accordion" id="cursosAccordion">
+            <h2 class="section-title">ns3</h2>
+            <div class="accordion" id="ns3Accordion">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingComp">
                         <button class="accordion-button collapsed" type="button"
                             data-bs-toggle="collapse" data-bs-target="#collapseComp"
                             aria-expanded="false" aria-controls="collapseComp">
-                            <i class="fas fa-laptop-code me-3"></i>Engenharia da Computação
+                            <i class="ri-terminal-window-line me-3"></i>Engenharia da Computação
                         </button>
                     </h2>
                     <div id="collapseComp" class="accordion-collapse collapse"
-                        aria-labelledby="headingComp" data-bs-parent="#cursosAccordion">
+                        aria-labelledby="headingComp" data-bs-parent="#ns3Accordion">
                         <div class="accordion-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong><i class="fas fa-clock me-2"></i>Duração:</strong> 10 semestres</p>
-                                    <p><strong><i class="fas fa-user-graduate me-2"></i>Modalidade:</strong> Presencial</p>
+                                    <p><strong><i class="ri-time-line me-2"></i>Duração:</strong> 10 semestres</p>
+                                    <p><strong><i class="ri-graduation-cap-line me-2"></i>Modalidade:</strong> Presencial</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong><i class="fas fa-certificate me-2"></i>Titulação:</strong> Bacharel</p>
-                                    <p><strong><i class="fas fa-calendar me-2"></i>Período:</strong> Integral</p>
+                                    <p><strong><i class="ri-article-line me-2"></i>Titulação:</strong> Bacharel</p>
+                                    <p><strong><i class="ri-calendar-2-line me-2"></i>Período:</strong> Integral</p>
                                 </div>
                             </div>
                             <p><strong>Perfil Profissional:</strong> Planejar, projetar e desenvolver sistemas embarcados, redes de computadores e soluções de segurança digital para diferentes setores da indústria.</p>
@@ -774,20 +780,20 @@
                         <button class="accordion-button collapsed" type="button"
                             data-bs-toggle="collapse" data-bs-target="#collapseInfo"
                             aria-expanded="false" aria-controls="collapseInfo">
-                            <i class="fas fa-database me-3"></i>Tecnologia em Análise e Desenvolvimento de Sistemas
+                            <i class="ri-database-2-line me-3"></i>Tecnologia em Análise e Desenvolvimento de Sistemas
                         </button>
                     </h2>
                     <div id="collapseInfo" class="accordion-collapse collapse"
-                        aria-labelledby="headingInfo" data-bs-parent="#cursosAccordion">
+                        aria-labelledby="headingInfo" data-bs-parent="#ns3Accordion">
                         <div class="accordion-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong><i class="fas fa-clock me-2"></i>Duração:</strong> 6 semestres</p>
-                                    <p><strong><i class="fas fa-user-graduate me-2"></i>Modalidade:</strong> Presencial</p>
+                                    <p><strong><i class="ri-time-line me-2"></i>Duração:</strong> 6 semestres</p>
+                                    <p><strong><i class="ri-graduation-cap-line me-2"></i>Modalidade:</strong> Presencial</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong><i class="fas fa-certificate me-2"></i>Titulação:</strong> Tecnólogo</p>
-                                    <p><strong><i class="fas fa-calendar me-2"></i>Período:</strong> Noturno</p>
+                                    <p><strong><i class="ri-article-line me-2"></i>Titulação:</strong> Tecnólogo</p>
+                                    <p><strong><i class="ri-calendar-2-line me-2"></i>Período:</strong> Noturno</p>
                                 </div>
                             </div>
                             <p><strong>Perfil Profissional:</strong> Desenvolver sistemas de informação, aplicações web e mobile, gerenciar bancos de dados e implementar soluções tecnológicas inovadoras.</p>
@@ -800,20 +806,20 @@
                         <button class="accordion-button collapsed" type="button"
                             data-bs-toggle="collapse" data-bs-target="#collapseMec"
                             aria-expanded="false" aria-controls="collapseMec">
-                            <i class="fas fa-cogs me-3"></i>Engenharia Mecânica
+                            <i class="ri-home-gear-line me-3"></i>Engenharia Mecânica
                         </button>
                     </h2>
                     <div id="collapseMec" class="accordion-collapse collapse"
-                        aria-labelledby="headingMec" data-bs-parent="#cursosAccordion">
+                        aria-labelledby="headingMec" data-bs-parent="#ns3Accordion">
                         <div class="accordion-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong><i class="fas fa-clock me-2"></i>Duração:</strong> 10 semestres</p>
-                                    <p><strong><i class="fas fa-user-graduate me-2"></i>Modalidade:</strong> Presencial</p>
+                                    <p><strong><i class="ri-time-line me-2"></i>Duração:</strong> 10 semestres</p>
+                                    <p><strong><i class="ri-graduation-cap-line me-2"></i>Modalidade:</strong> Presencial</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong><i class="fas fa-certificate me-2"></i>Titulação:</strong> Bacharel</p>
-                                    <p><strong><i class="fas fa-calendar me-2"></i>Período:</strong> Integral</p>
+                                    <p><strong><i class="ri-article-line me-2"></i>Titulação:</strong> Bacharel</p>
+                                    <p><strong><i class="ri-calendar-2-line me-2"></i>Período:</strong> Integral</p>
                                 </div>
                             </div>
                             <p><strong>Perfil Profissional:</strong> Projetar, desenvolver e otimizar sistemas mecânicos, máquinas industriais e processos de manufatura com foco em sustentabilidade.</p>
@@ -839,7 +845,7 @@
                     </div>
                     <div class="carousel-item">
                         <blockquote class="blockquote text-center">
-                            <p class="mb-0">"Os professores são incríveis e sempre apoiam nossos projetos. A infraestrutura é de primeira qualidade e as oportunidades são infinitas."</p>
+                            <p class="mb-0">"Os professores são incríveis e sempre apoiam nossos projetos. A infrans2 é de primeira qualidade e as oportunidades são infinitas."</p>
                             <footer class="blockquote-footer mt-3">
                                 <strong>Lucas Santos</strong>, Aluno de Análise e Desenvolvimento de Sistemas
                             </footer>
@@ -847,7 +853,7 @@
                     </div>
                     <div class="carousel-item">
                         <blockquote class="blockquote text-center">
-                            <p class="mb-0">"A experiência no IFSP me proporcionou não apenas conhecimento técnico, mas também uma visão ampla sobre inovação e sustentabilidade."</p>
+                            <p class="mb-0">"A experiência no IFSP me proporcionou não apenas conhecimento técnico, mas também uma visão ampla 1 inovação e sustentabilidade."</p>
                             <footer class="blockquote-footer mt-3">
                                 <strong>Maria Oliveira</strong>, Ex-aluna de Engenharia Mecânica
                             </footer>
@@ -866,11 +872,11 @@
         </div>
     </section>
 
-    <section id="contato" class="fade-in">
+    <section id="ns4" class="fade-in">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8">
-                    <h2 class="section-title">Entre em Contato</h2>
+                    <h2 class="section-title">ns4</h2>
                     <form id="contactForm">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -892,9 +898,9 @@
                             </label>
                             <select class="form-control" id="assunto" required>
                                 <option value="">Selecione um assunto</option>
-                                <option value="informacoes">Informações sobre cursos</option>
+                                <option value="informacoes">Informações 1 cursos</option>
                                 <option value="inscricoes">Processo de inscrição</option>
-                                <option value="campus">Estrutura do campus</option>
+                                <option value="campus">ns2 do campus</option>
                                 <option value="outros">Outros assuntos</option>
                             </select>
                         </div>
