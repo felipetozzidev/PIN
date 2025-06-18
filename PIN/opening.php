@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
         :root {
             --background: #EEFFEE;
@@ -36,7 +38,6 @@
         body {
             background-color: var(--background);
             font-family: 'Inter', sans-serif;
-            scroll-behavior: smooth;
             line-height: 1.6;
             color: var(--text-color);
             overflow-x: hidden;
@@ -113,7 +114,6 @@
                     opacity: 1;
                 }
 
-                /* From Uiverse.io by Mike11jr */
                 .btn-acess:before {
                     content: "";
                     position: absolute;
@@ -132,7 +132,7 @@
                     color: var(--white);
                     padding: 0.5rem 0.8rem;
                     box-shadow: 0 2px 0 2px rgb(9, 75, 15);
-                    transform: scale(1.2);
+                    transform: scale(1.05);
                 }
 
                 .btn-acess:hover::before {
@@ -187,18 +187,15 @@
             font-size: 3.5rem;
             font-weight: 700;
             margin-bottom: 1.5rem;
-            animation: fadeInUp 0.8s ease-out;
         }
 
         .hero p {
             font-size: 1.3rem;
             margin-bottom: 2rem;
             font-weight: 300;
-            animation: fadeInUp 0.9s ease-out 0.2s both;
         }
 
         .hero .btn-more {
-            animation: fadeInUp 1.5s ease-out 0.4s both;
             background: rgb(150, 197, 132, 0.4);
             color: white;
             text-decoration: none;
@@ -269,7 +266,7 @@
             position: relative;
         }
 
-        #ns1 li:hover {
+        /*#ns1 li:hover {
             transform: translateX(10px);
             box-shadow: var(--shadow-medium);
             border-left-color: var(--accent);
@@ -297,7 +294,7 @@
         #ns1 li:hover::before {
             background: var(--accent);
             transform: translateY(-50%) scale(1.1);
-        }
+        }*/
 
         /* Enhanced Structure Section */
         #ns2 {
@@ -548,59 +545,6 @@
             text-decoration: underline;
         }
 
-        /* Enhanced Animations */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        /* Loading Animation */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, .3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
         /* Responsive Enhancements */
         @media (max-width: 768px) {
             .hero h1 {
@@ -638,14 +582,7 @@
             }
         }
 
-        /* Focus Styles */
-        .btn-acess:focus,
-        .nav-link:focus {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-        }
-
-        /* Custom Scrollbar */
+        /* Scrollbar Styles */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -666,7 +603,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md" id="nav">
+    <nav class="animate__animated animate__slideInDown animate__fast navbar navbar-expand-md" id="nav">
         <div class="container-fluid">
             <div class="col-6">
                 <a class="navbar-brand" href="ifapoia.com.br">
@@ -687,15 +624,15 @@
 
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1>Conheça o IFApoia</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eget ligula facilisis, faucibus ipsum ut, fringilla neque. Pellentesque in ultricies libero. Phasellus ac ante gravida, congue lacus vestibulum, posuere ante.</p>
-            <a class="btn-more" href="#ns1" target="_blank">
+            <h1 class="animate__animated animate__fadeInUp animate__fast">Conheça o IFApoia</h1>
+            <p class="animate__animated animate__fadeInUp">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eget ligula facilisis, faucibus ipsum ut, fringilla neque. Pellentesque in ultricies libero. Phasellus ac ante gravida, congue lacus vestibulum, posuere ante.</p>
+            <a class="animate__animated animate__fadeIn animate__delay-1s btn-more" href="#ns1">
                 <i class="ri-arrow-down-line me-2"></i>Descobrir mais
             </a>
         </div>
     </section>
 
-    <section id="ns1" class="fade-in">
+    <section id="ns1" class="">
         <div class="container">
             <h2 class="section-title">ns1</h2>
             <div class="row">
@@ -716,7 +653,7 @@
         </div>
     </section>
 
-    <section id="ns2" class="fade-in">
+    <section id="ns2" class="">
         <div class="container">
             <h2 class="section-title">ns2</h2>
             <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -745,7 +682,7 @@
         </div>
     </section>
 
-    <section id="ns3" class="fade-in">
+    <section id="ns3" class="">
         <div class="container">
             <h2 class="section-title">ns3</h2>
             <div class="accordion" id="ns3Accordion">
@@ -830,10 +767,10 @@
         </div>
     </section>
 
-    <section class="testimonial-section fade-in">
+    <section class="testimonial-section">
         <div class="container">
             <h2 class="section-title text-center">Depoimentos</h2>
-            <div id="carouselDepoimentos" class="carousel slide" data-bs-ride="carousel">
+            <div id="carrouselDepoimentos" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <blockquote class="blockquote text-center">
@@ -860,11 +797,11 @@
                         </blockquote>
                     </div>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselDepoimentos" data-bs-slide="prev">
+                <button class="carousel-control-prev" type="button" data-bs-target="#carrouselDepoimentos" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Anterior</span>
                 </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselDepoimentos" data-bs-slide="next">
+                <button class="carousel-control-next" type="button" data-bs-target="#carrouselDepoimentos" data-bs-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Próximo</span>
                 </button>
@@ -872,7 +809,7 @@
         </div>
     </section>
 
-    <section id="ns4" class="fade-in">
+    <section id="ns4" class="">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8">
@@ -971,90 +908,15 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // Enhanced scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-        // Smooth scroll for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Enhanced form submission with validation
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-
-            // Show loading state
-            submitBtn.innerHTML = '<div class="loading-spinner me-2"></div>Enviando...';
-            submitBtn.disabled = true;
-
-            // Simulate form submission
-            setTimeout(() => {
-                alert('Mensagem enviada com sucesso! Entraremos em contato em breve.');
-                this.reset();
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 2000);
-        });
-
-        // Add hover effects to cards
-        document.querySelectorAll('.structure-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-            });
-
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
-        });
-
-        // Auto-advance carousel
-        const carousel = document.querySelector('#carouselDepoimentos');
+        // carousel automático
+        const carousel = document.querySelector('#carrouselDepoimentos');
         if (carousel) {
             const carouselInstance = new bootstrap.Carousel(carousel, {
                 interval: 5000,
                 wrap: true
             });
-        }
-
-        // Add typing effect to hero text (optional enhancement)
-        function typeWriter(element, text, speed = 50) {
-            let i = 0;
-            element.innerHTML = '';
-
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                }
-            }
-            type();
         }
 
         // Lazy loading for images
@@ -1075,12 +937,27 @@
             });
         }
 
-        // Add parallax effect to hero section
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            if (hero) {
-                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+        // Smooth scroll para o botão .btn-more com anime.js
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnMore = document.querySelector('.hero .btn-more');
+
+            if (btnMore) {
+                btnMore.addEventListener('click', function(e) {
+                    e.preventDefault(); // Previne o comportamento padrão do link
+                    const targetSection = document.querySelector(this.getAttribute('href'));
+                    if (targetSection) {
+                        const targetPosition = targetSection.offsetTop;
+                        console.log('Seção alvo encontrada:', targetSection); // Adicionado para verificar a seção
+                        console.log('Posição alvo:', targetPosition); // Adicionado para verificar a posição
+                        window.anime({
+                            targets: 'html, body',
+                            scrollTop: targetPosition,
+                            duration: 100, // Duração da animação em milissegundos
+                            easing: 'easeInOutQuad' // Tipo de easing para a animação
+                        });
+                    }
+                    console.log('Animação anime.js iniciada.'); // Adicionado para verificar se o anime é chamado
+                });
             }
         });
 
