@@ -65,11 +65,11 @@ require_once('../config/conn.php');
                             </li>
                             <li><a class="dropdown-item" href="profile.php">Meu Perfil</a></li>
                             <li><a class="dropdown-item" href="settings.php">Configurações</a></li>
-                            <li><a class="dropdown-item" href="../src/components/logout.php">Sair</a></li>
+                            <li><a class="dropdown-item" href="logout.php">Sair</a></li>
                         </ul>
                     </div>
                 <?php else: ?>
-                    <a class="nav-item d-none d-md-block" href="../src/components/login.php">
+                    <a class="nav-item d-none d-md-block" href="login.php">
                         <img src="../src/assets/icons/icon_usuario.svg" alt="Ícone de Usuário" width="35">
                     </a>
                 <?php endif; ?>

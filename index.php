@@ -565,25 +565,33 @@
             }
 
             h1 {
-                font-size: 1.5rem;
+                font-size: 2rem;
             }
 
-            p {
+            .lead {
                 font-size: 0.9rem !important;
             }
 
             span {
-                font-size: 8px;
+                font-size: 9px;
             }
         }
 
-        @media (max-width: 350px) {
-            h1 {
+        @media (max-width: 425px) {
+            h1{
+                font-size: 1.6rem;
+            }
+            .lead {
+                font-size: 0.8rem !important;
+            }
+        }
+
+        @media (max-width: 365px) {
+            h1{
                 font-size: 1.2rem;
             }
-
-            span {
-                font-size: 5px;
+            .lead {
+                font-size: 0.7rem !important;
             }
         }
     </style>
@@ -603,7 +611,7 @@
                 <div class="hourglassGlass"></div>
             </div>
         </div>
-        <h1>REDE EM DESENVOLVIMENTO</h1>
+        <h1>SITE EM DESENVOLVIMENTO</h1>
         <p class="lead">Estamos cuidando dos últimos detalhes para oferecer uma experiência incrível. Muito em breve, esta página estará disponível com tudo o que você merece.</p>
         <span class="">Para acompanhar o andamento do nosso projeto, acesse <a href="https://github.com/felipetozzidev/PIN">aqui</a> nossa documentação </span>
     </div>

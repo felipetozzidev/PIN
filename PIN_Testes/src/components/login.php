@@ -1,8 +1,8 @@
 <?php
 
 // Incluir o autoload do Composer e a conexão com o banco de dados
-require '../../vendor/autoload.php';
-require_once('../../config/conn.php');
+require ('../vendor/autoload.php');
+require_once('../config/conn.php');
 
 // Importar classes necessárias do PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
@@ -251,7 +251,7 @@ if (isset($_POST['verify_email'])) {
     }
 
     body {
-      background-image: url('../assets/img/ifcampus.jpg');
+      background-image: url('../src/assets/img/ifcampus.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -634,7 +634,7 @@ if (isset($_POST['verify_email'])) {
 </head>
 
 <body class="text-center">
-  <div class="back-button" href="/PIN/public/index.php" onclick="window.location.href='/PIN/public/index.php';">
+  <div class="back-button" onclick="window.location.href='index.php';">
     <i class="ri-arrow-left-line"></i>
   </div>
 
