@@ -5,6 +5,7 @@ const objetos = {
     nav: document.querySelector("nav"),
     main: document.querySelector("main"),
     footer: document.querySelector("footer"),
+    community_cards_container: document.querySelector("div.community_cards_container"),
     tamanhoCabecalho: function() {
         return this.nav.clientHeight;
     },
@@ -23,6 +24,7 @@ const objetos = {
 
 objetos.main.style.marginTop = `${objetos.tamanhoCabecalho()}px`;
 objetos.main.style.marginBottom = `${objetos.tamanhoFooter()}px`;
+objetos.community_cards_container.style.top = `calc(${objetos.tamanhoCabecalho()}px + 20px)`;
 objetos.navbar.style.height = `calc(100% - ${objetos.tamanhoCabecalho()}px - ${objetos.tamanhoFooter()}px - ${objetos.paddingCabecalho()})`;
 console.log(objetos.paddingCabecalho());
 

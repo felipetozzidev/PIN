@@ -562,57 +562,28 @@
         @media (max-width: 600px) {
             .container {
                 padding: 40px 30px;
-
-                &>h1 {
-                    font-size: 2rem;
-                }
-
-                &>p {
-                    font-size: 1rem !important;
-                }
-
-                &>span {
-                    font-size: 10px !important;
-                }
             }
 
-            
-        }
-
-        @media (max-width: 450px) {
-            .container {
-                padding: 30px 20px;
-
-                &>h1 {
-                    font-size: 1.7rem;
-                }
-
-                &>p {
-                    font-size: 0.7rem !important;
-                }
-
-                &>span {
-                    font-size: 8px !important;
-                }
+            h1 {
+                font-size: 1.5rem;
             }
 
+            p {
+                font-size: 0.9rem !important;
+            }
+
+            span {
+                font-size: 8px;
+            }
         }
 
-        @media (max-width: 375px) {
-            .container {
-                padding: 20px 10px;
+        @media (max-width: 350px) {
+            h1 {
+                font-size: 1.2rem;
+            }
 
-                &>h1 {
-                    font-size: 1rem;
-                }
-
-                &>p {
-                    font-size: 0.5rem !important;
-                }
-
-                &>span {
-                    font-size: 5px !important;
-                }
+            span {
+                font-size: 5px;
             }
         }
     </style>
@@ -632,7 +603,7 @@
                 <div class="hourglassGlass"></div>
             </div>
         </div>
-        <h1>SITE EM DESENVOLVIMENTO</h1>
+        <h1>REDE EM DESENVOLVIMENTO</h1>
         <p class="lead">Estamos cuidando dos últimos detalhes para oferecer uma experiência incrível. Muito em breve, esta página estará disponível com tudo o que você merece.</p>
         <span class="">Para acompanhar o andamento do nosso projeto, acesse <a href="https://github.com/felipetozzidev/PIN">aqui</a> nossa documentação </span>
     </div>

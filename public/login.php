@@ -1,8 +1,8 @@
 <?php
 
 // Incluir o autoload do Composer e a conexão com o banco de dados
-require '../../vendor/autoload.php';
-require_once('../../config/conn.php');
+require ('../vendor/autoload.php');
+require_once('../config/conn.php');
 
 // Importar classes necessárias do PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
