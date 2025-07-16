@@ -613,18 +613,37 @@ footer {
             margin: 0;
         }
     }
-
 }
 
 /* ========== Fim do Footer ========= */
 
 /* ========== Responsividade ========= */
 
-@media (max-width: 767.98px) {
+/*@media only screen and (min-width: 720px) {
+    body{
+        main{
+            background-color: blue;
+            grid-template-columns: "main";
+            width: 100vw;
+            & > section {
+                width: 100%;
+                &.main_container {
+                    & > div.main_content {
+                        & > div.postagens_e_publicacoes {
+                            display: flex !important;
+                            flex-direction: column-reverse !important;
+    
+                        }
+                    }
+                }
+            }
+        }
+    }
 
+    .navbar_container{
+        display: none;
+    }
     .nav-item:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
-}
-
-@media (min-width: 768px) {}
+}*/
