@@ -6,7 +6,7 @@ USE IFApoia;
 
 -- Tabela para os níveis de acesso dos usuários (ex: Comum, Administrador).
 CREATE TABLE niveis (
-    id_nvl INT PRIMARY KEY AUTO_INCREMENT,
+    id_nvl INT PRIMARY KEY,
     nome_nvl VARCHAR(100) NOT NULL UNIQUE, -- Nome do nível deve ser único.
     descricao_nvl VARCHAR(255)
 );
@@ -147,8 +147,9 @@ CREATE TABLE likes (
 );
 
 -- Inserindo níveis de usuário padrão.
-INSERT INTO niveis (nome_nvl, descricao_nvl) VALUES
-('Administrador', 'Acesso total ao sistema e painel de administração.'),
-('Moderador', 'Pode gerenciar posts e usuários em comunidades específicas.'),
-('Comum', 'Usuário padrão com permissões básicas de postagem e interação.');
+INSERT INTO niveis (id_nvl, nome_nvl, descricao_nvl) VALUES
+('1', 'Administrador', 'Acesso total ao sistema e painel de administração.'),
+('2', 'Técnico Administrativo', 'Pode gerenciar posts e usuários em comunidades específicas.'),
+('3', 'Docente', 'Pode gerenciar posts e usuários em comunidades específicas.'),
+('4', 'Discente', 'Usuário padrão com permissões básicas de postagem e interação.');
 
