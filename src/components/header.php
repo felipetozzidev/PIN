@@ -52,11 +52,11 @@ require_once('../config/conn.php');
                             <li><a class="dropdown-item" href="profile.php">Meu Perfil</a></li>
                             <li><a class="dropdown-item" href="../../modules/admin/admin.php">Painel Admin</a></li>
                             <li><a class="dropdown-item" href="settings.php">Configurações</a></li>
-                            <li><a class="dropdown-item" href="../src/components/logout.php">Sair</a></li>
+                            <li><a class="dropdown-item" href="../../public/logout.php">Sair</a></li>
                         </ul>
                     </div>
                 <?php else: ?>
-                    <a class="nav-item d-none d-md-block" href="../src/components/login.php">
+                    <a class="nav-item d-none d-md-block" href="../../public/login.php">
                         <img src="../src/assets/icons/icon_usuario.svg" alt="Ícone de Usuário" width="35">
                     </a>
                 <?php endif; ?>
@@ -114,12 +114,13 @@ require_once('../config/conn.php');
                                 <hr class="dropdown-divider">
                             </li>
                             <li><a class="dropdown-item" href="profile.php">Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="../../modules/admin/admin.php">Painel Admin</a></li>
                             <li><a class="dropdown-item" href="settings.php">Configurações</a></li>
-                            <li><a class="dropdown-item" href="../src/components/logout.php">Sair</a></li>
+                            <li><a class="dropdown-item" href="../../public/logout.php">Sair</a></li>
                         </ul>
                     </div>
                 <?php else: ?>
-                    <a class="nav-item d-block d-md-none" href="../src/components/login.php">
+                    <a class="nav-item d-block d-md-none" href="../../public/login.php">
                         <img src="../src/assets/icons/icon_usuario.svg" alt="Ícone de Usuário" width="35">
                     </a>
                 <?php endif; ?>
