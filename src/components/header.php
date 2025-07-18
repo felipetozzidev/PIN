@@ -49,9 +49,9 @@ require_once('../config/conn.php');
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="profile.php">Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="">Meu Perfil</a></li>
                             <li><a class="dropdown-item" href="../../modules/admin/admin.php">Painel Admin</a></li>
-                            <li><a class="dropdown-item" href="settings.php">Configurações</a></li>
+                            <li><a class="dropdown-item" href="">Configurações</a></li>
                             <li><a class="dropdown-item" href="../../public/logout.php">Sair</a></li>
                         </ul>
                     </div>
@@ -113,9 +113,9 @@ require_once('../config/conn.php');
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="profile.php">Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="">Meu Perfil</a></li>
                             <li><a class="dropdown-item" href="../../modules/admin/admin.php">Painel Admin</a></li>
-                            <li><a class="dropdown-item" href="settings.php">Configurações</a></li>
+                            <li><a class="dropdown-item" href="">Configurações</a></li>
                             <li><a class="dropdown-item" href="../../public/logout.php">Sair</a></li>
                         </ul>
                     </div>
