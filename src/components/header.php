@@ -50,6 +50,7 @@ require_once('../config/conn.php');
                                 <hr class="dropdown-divider">
                             </li>
                             <li><a class="dropdown-item" href="profile.php">Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="../../modules/admin/admin.php">Painel Admin</a></li>
                             <li><a class="dropdown-item" href="settings.php">Configurações</a></li>
                             <li><a class="dropdown-item" href="../src/components/logout.php">Sair</a></li>
                         </ul>

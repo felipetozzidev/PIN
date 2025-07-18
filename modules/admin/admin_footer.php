@@ -1,5 +1,4 @@
 <?php
-// admin_footer.php
 ?>
 <footer class="admin-footer">
     <div class="container">

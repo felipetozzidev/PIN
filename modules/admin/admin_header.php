@@ -1,5 +1,4 @@
 <?php
-// admin_header.php
 session_start();
 
 // Verifica se o usuário está logado e se tem o nível de administrador (assumindo que id_nvl = 1 para admin)
