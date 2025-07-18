@@ -2,7 +2,7 @@
 session_start();
 
 // Verifica se o usuário está logado e se tem o nível de administrador (assumindo que id_nvl = 1 para admin)
-if (!isset($_SESSION['id_usu']) || $_SESSION['id_nvl'] != 1) {
+if (!isset($_SESSION['id_usu']) /*|| $_SESSION['id_nvl'] != 1*/) {
     // Se não for admin, redireciona para a página de login ou para a home
     header("Location: ../../public/login.php?erro=acesso_negado");
     exit();

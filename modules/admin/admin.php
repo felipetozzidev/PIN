@@ -1,5 +1,4 @@
 <?php
-// admin.php
 // Inclui o cabeçalho do painel de administração, que já contém a verificação de sessão.
 include 'admin_header.php';
 include '../../config/conn.php'; // Inclui a conexão com o banco
