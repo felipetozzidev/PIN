@@ -1,0 +1,36 @@
+{
+    "Creators": [
+        {
+            "name": "Breno Silva",
+            "email": "",
+            "github": "https://github.com/brenindexdev"
+        },
+        {
+            "name": "Felipe Tozzi Bertochi",
+            "email": "fetobertochi@gmail.com",
+            "github": "https://github.com/felipetozzidev"
+        }
+    ],
+    "packages": [
+        {
+            "name": "PHPMailer",
+            "version": "6.4.0",
+            "description": "Usado para envio de emails para os usuários"
+        },
+        {
+            "name": "bootstrap",
+            "version": "4.4.1",
+            "description": "Usado em determinadas partes para padronização de estilos"
+        },
+        {
+            "name": "RemixIcons",
+            "version": "4.6.0",
+            "description": "Biblioteca de icones usada em todo o projeto"
+        },
+        {
+            "name": "gsap",
+            "version": "3.13.0",
+            "description": "Usado para animacoes do site"
+        }
+    ]
+}

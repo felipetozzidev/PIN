@@ -1,7 +1,7 @@
 <?php
 
 // Incluir o autoload do Composer e a conexão com o banco de dados
-require ('../vendor/autoload.php');
+require('../vendor/autoload.php');
 require_once('../config/conn.php');
 
 // Importar classes necessárias do PHPMailer
@@ -24,7 +24,7 @@ if (isset($_POST['login'])) {
     $login_error = "Apenas emails institucionais (IF) são permitidos";
   } else {
     // Verifica na tabela usuarios usando prepared statement
-    $query = "SELECT id_usu, senha_usu, nome_usu, imgperfil_usu FROM usuarios WHERE email_usu = ?";
+    $query = "SELECT id_usu, senha_usu, nome_usu, imgperfil_usu, id_nvl FROM usuarios WHERE email_usu = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -37,9 +37,11 @@ if (isset($_POST['login'])) {
 
       // Verifica se a senha informada corresponde à senha armazenada no banco de dados
       if (password_verify($senha, $senha_banco)) {
-        $_SESSION['usuario_id'] = $row['id_usu']; // Salva o ID do usuário na sessão
-        $_SESSION['nome_usuario'] = $row['nome_usu']; // Salva o nome do usuário na sessão
+        session_regenerate_id(true); // Segurança: regenera o ID da sessão
+        $_SESSION['id_usu'] = $row['id_usu']; // Salva o ID do usuário na sessão
+        $_SESSION['nome_usu'] = $row['nome_usu']; // Salva o nome do usuário na sessão
         $_SESSION['imgperfil_usu'] = $row['imgperfil_usu']; // Salva o caminho da foto de perfil na sessão
+        $_SESSION['id_nvl'] = $row['id_nvl']; // Salva o nível de acesso do usuário na sessão
         $login_success = true;
       } else {
         $login_error = "Sua senha está incorreta";
@@ -61,7 +63,7 @@ if (isset($_POST['signup'])) {
   $sexo = mysqli_real_escape_string($conn, trim($_POST['sexo']));
   $orsex = mysqli_real_escape_string($conn, trim($_POST['orsex']));           // Nova informação: orientação sexual
   $senha_criptografada = password_hash($senha, PASSWORD_DEFAULT);
-  $data_criacao = date("d-m-Y");                                              // Define a data de criação
+  $data_criacao = date("Y-m-d H:i:s");                                        // Define a data de criação
 
   // Verifica se as senhas coincidem
   if ($senha !== $conf_senha) {
@@ -98,15 +100,15 @@ if (isset($_POST['signup'])) {
       $mail->SMTPAuth = true;                               // Habilita a autenticação SMTP
 
       // Desabilita a verificação de certificado SSL (não recomendado para produção)
-      /*$mail->SMTPOptions = array(
+      $mail->SMTPOptions = array(
         'ssl' => array(
           'verify_peer' => false,
           'verify_peer_name' => false,
           'allow_self_signed' => true
         )
-      );*/
+      );
 
-      $mail->Host = 'smtp.gmail.com';                       // Servidor SMTP do Gmail
+      $mail->Host = '172.217.194.108';                      // IP direto para smtp.gmail.com para evitar erro de DNS
       $mail->Username = 'brenosilveiradomingues@gmail.com'; // Username do email
       $mail->Password = 'cqtddhaewkwhtqhr';                 // Senha de app do email usado para enviar
       $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // Habilita a encriptação TLS; `PHPMailer::ENCRYPTION_SMTPS` também pode ser usado
@@ -124,7 +126,7 @@ if (isset($_POST['signup'])) {
       $mail->Subject = 'Código de verificação de Email - Rede IFApoia';
       $mail->Body    = '<div style="font-family: Arial, sans-serif; color: #333; margin: 0 auto; max-width: 600px;">
       <div style="background-color: #f8f9fa; padding: 20px 0; text-align: center;">
-        <img src="../assets/img/Logotipo_antiga.png" alt="IFApoia" style="max-width: 150px; height: auto;">
+        <img src="../src/assets/img/Logotipo_antiga.png" alt="IFApoia" style="max-width: 150px; height: auto;">
       </div>
       <div style="padding: 20px;">
         <h2 style="color: #305F2C;">Bem-vindo(a) ao IFApoia!</h2>
@@ -147,7 +149,7 @@ if (isset($_POST['signup'])) {
       $verification_needed = true;
     } catch (Exception $e) {
       $login_error = "Erro ao enviar o email de verificação: {$mail->ErrorInfo}";
-      echo '<script>console.log("' . $login_error . '");</script>'; // Adicione esta linha para logar no console
+      echo '<script>console.log("' . addslashes($login_error) . '");</script>'; // Adicione esta linha para logar no console
     }
   }
 }
@@ -172,13 +174,14 @@ if (isset($_POST['verify_email'])) {
       // Verifica se o código inserido corresponde ao código armazenado na sessão
     } elseif ($stored_code == $entered_code) {
       $signup_data = $_SESSION['signup_data'];
+      $id_nvl_padrao = 4; // Nível de acesso padrão (Discente)
       // Usar prepared statement para a inserção
-      $query = "INSERT INTO usuarios (nome_usu, email_usu, senha_usu, estado_usu, campus_usu, sexo_usu, orsex_usu, datacriacao_usu)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+      $query = "INSERT INTO usuarios (nome_usu, email_usu, senha_usu, estado_usu, campus_usu, sexo_usu, orsex_usu, datacriacao_usu, id_nvl)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
       $stmt = $conn->prepare($query);
       $stmt->bind_param(
-        "ssssssss",
+        "ssssssssi",
         $signup_data['nome'],
         $signup_data['email'],
         $signup_data['senha'],
@@ -186,7 +189,8 @@ if (isset($_POST['verify_email'])) {
         $signup_data['campus'],
         $signup_data['sexo'],
         $signup_data['orsex'],
-        $signup_data['datacriacao']
+        $signup_data['datacriacao'],
+        $id_nvl_padrao
       );
 
       // Executa a consulta de inserção
@@ -634,13 +638,13 @@ if (isset($_POST['verify_email'])) {
 </head>
 
 <body class="text-center">
-  <div class="back-button" onclick="window.location.href='index.php';">
+  <div class="back-button" onclick="window.history.back();">
     <i class="ri-arrow-left-line"></i>
   </div>
 
   <main class="form-signin">
     <div class="logo-container">
-      <img src="../assets/img/Logotipo_antiga.png" width="60px" alt="Logo">
+      <img src="../src/assets/img/Logotipo_antiga.png" width="60px" alt="Logo">
       <h1>Acesse sua conta</h1>
     </div>
 
@@ -1016,7 +1020,7 @@ if (isset($_POST['verify_email'])) {
           timer: 3000, // Timer de 3 segundos
           showConfirmButton: false
         }).then(() => {
-          window.location.href = '../../public/index.php'; // Redireciona para a página inicial
+          window.location.href = "index.php"; // Redireciona para a página anterior
         });
       <?php endif; ?>
 
@@ -1046,8 +1050,6 @@ if (isset($_POST['verify_email'])) {
   </script>
 
       <style>
-    /* Estilos existentes */
-
     .swal2.icon {
       font-size: 3em !important;
       /* Ajuste o tamanho do ícone conforme necessário */
