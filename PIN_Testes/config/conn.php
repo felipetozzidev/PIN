@@ -5,10 +5,10 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Configurações do banco de dados
-$host = "localhost";
-$username = "root"; // ou seu utilizador do XAMPP
-$passw = ""; // ou sua senha do XAMPP
-$db = "ifapoia"; // ou o nome do seu banco local
+$host = "77.37.127.2";
+$username = "u245002075_ifapoia"; // ou seu utilizador do XAMPP
+$passw = "Ifapoia@2024"; // ou sua senha do XAMPP
+$db = "u245002075_ifapoia"; // ou o nome do seu banco local
 
 // Cria a conexão
 $conn = new mysqli($host, $username, $passw, $db);
