@@ -1,18 +1,22 @@
 <?php
-//Variaveis que armazenam os dados de conexão
-$host = "localhost";
-$user = "root";
-$passw = "";
-$banco = "ifapoia";
-
-//conexão
-$conn = mysqli_connect($host, $user, $passw, $banco);
-if (!$conn) {
-    die("Não conectado" . mysqli_connect_error());
+// Inicia a sessão se ainda não houver uma ativa.
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
 }
 
-//Faz o teste da conexão
-// date_default_timezone_set('Brazil/East');
-// mysqli_query($conn, "SET NAMES 'utf8'");
+// Configurações do banco de dados
+$host = "localhost";
+$username = "root"; // ou seu utilizador do XAMPP
+$passw = ""; // ou sua senha do XAMPP
+$db = "ifapoia"; // ou o nome do seu banco local
 
-session_start();
+// Cria a conexão
+$conn = new mysqli($host, $username, $passw, $db);
+
+// Verifica a conexão
+if ($conn->connect_error) {
+    die("Falha na conexão: " . $conn->connect_error);
+}
+
+// Define o charset para UTF-8 para evitar problemas com acentuação
+$conn->set_charset("utf8mb4");
