@@ -1,10 +1,9 @@
 <?php
-session_start();
 
-//Verifica se o usuário está logado e se tem o nível de administrador (assumindo que id_nvl = 1 para admin)
-if (!isset($_SESSION['id_usu']) /*|| $_SESSION['id_nvl'] != 1*/) {
-    // Se não for admin, redireciona para a página de login ou para a home
-    header("Location: ../../public/login.php?erro=acesso_negado");
+// Verifica se o usuário está logado e se tem o nível de administrador (assumindo que id_nvl = 1 para admin)
+if (isset($_SESSION['id_usu']) && $_SESSION['id_nvl'] == 1) {
+    // Se for admin, redireciona para a página de login ou para a home
+    header("Location: admin.php");
     exit();
 }
 ?>
@@ -15,7 +14,7 @@ if (!isset($_SESSION['id_usu']) /*|| $_SESSION['id_nvl'] != 1*/) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Administração - IFApoia</title>
-    <link rel="stylesheet" href="a../../src/assets/css/admin.css">
+    <link rel="stylesheet" href="../../src/assets/css/admin.css">
 </head>
 
 <body>

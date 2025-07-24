@@ -1,7 +1,7 @@
 <?php
 // Inclui o cabeçalho do painel de administração, que já contém a verificação de sessão.
-include 'admin_header.php';
-include '../../config/conn.php'; // Inclui a conexão com o banco
+require_once("../../config/conn.php"); // Inclui a conexão com o banco
+include("admin_header.php");
 
 // --- Consultas para o Dashboard ---
 

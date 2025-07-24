@@ -5,6 +5,10 @@ const objetos = {
     nav: document.querySelector("nav"),
     main: document.querySelector("main"),
     footer: document.querySelector("footer"),
+<<<<<<< HEAD
+=======
+    community_cards_container: document.querySelector("div.community_cards_container"),
+>>>>>>> 7fc9a5a528a9cfe8cab2e3603e2c128b08acb1ba
     tamanhoCabecalho: function() {
         return this.nav.clientHeight;
     },
@@ -23,6 +27,10 @@ const objetos = {
 
 objetos.main.style.marginTop = `${objetos.tamanhoCabecalho()}px`;
 objetos.main.style.marginBottom = `${objetos.tamanhoFooter()}px`;
+<<<<<<< HEAD
+=======
+objetos.community_cards_container.style.top = `calc(${objetos.tamanhoCabecalho()}px + 20px)`;
+>>>>>>> 7fc9a5a528a9cfe8cab2e3603e2c128b08acb1ba
 objetos.navbar.style.height = `calc(100% - ${objetos.tamanhoCabecalho()}px - ${objetos.tamanhoFooter()}px - ${objetos.paddingCabecalho()})`;
 console.log(objetos.paddingCabecalho());
 

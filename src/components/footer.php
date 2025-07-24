@@ -6,9 +6,13 @@
             </div>
         </div>
     </div>
+<<<<<<< HEAD
 </footer>
 
    <script src="../src/assets/js/javascript.js"></script>
 </body>
 
 </html>
+=======
+</footer>
+>>>>>>> 7fc9a5a528a9cfe8cab2e3603e2c128b08acb1ba

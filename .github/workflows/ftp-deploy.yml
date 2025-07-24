@@ -1,0 +1,34 @@
+# Code of ftp-deploy.yml
+
+name: 🚀 Deploy ifapoia.com.br on push   # Give it whatever name you want
+
+# Trigger: The action will be executed on every push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy   # Give it whatever name you want
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Download the latest code from SamKirkland repository
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+
+      # 2. Synchronize files with FTP server
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          # Your server address
+          server: 77.37.127.2
+          
+          # FTP User Read from Repository Secrets
+          username: ${{ secrets.FTP_USERNAME }}
+          
+          # FTP Password Read from Repository Secrets
+          password: ${{ secrets.FTP_PASSWORD }}
+          
+          # Destination folder on server
+          server-dir: /

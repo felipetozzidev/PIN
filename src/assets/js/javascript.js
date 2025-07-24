@@ -5,17 +5,23 @@ const objetos = {
     nav: document.querySelector("nav"),
     main: document.querySelector("main"),
     footer: document.querySelector("footer"),
+<<<<<<< HEAD
     body: document.querySelector("body"),
+=======
+>>>>>>> 7fc9a5a528a9cfe8cab2e3603e2c128b08acb1ba
     community_cards_container: document.querySelector("div.community_cards_container"),
     tamanhoCabecalho: function() {
         return this.nav.clientHeight;
     },
+<<<<<<< HEAD
     tamanhoMain: function () {
         return this.main.clientHeight  
     },
     tamanhoBody: function () {
         return this.body.clientHeight
     },
+=======
+>>>>>>> 7fc9a5a528a9cfe8cab2e3603e2c128b08acb1ba
     paddingCabecalho: function() {
         return getComputedStyle(this.main).paddingTop;
     },
@@ -30,6 +36,7 @@ const objetos = {
 // --- Tamanho do cabecalho
 
 objetos.main.style.marginTop = `${objetos.tamanhoCabecalho()}px`;
+<<<<<<< HEAD
 if (typeof(objetos.community_cards_container) != 'undefined' && objetos.community_cards_container != null)
 {
   // exists.
@@ -41,6 +48,10 @@ console.log(objetos.tamanhoCabecalho() + objetos.tamanhoBody() + " | " + window.
 if(objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height - objetos.tamanhoFooter()) {
     objetos.footer.style = `position: fixed; bottom: 0;`;
 }
+=======
+objetos.main.style.marginBottom = `${objetos.tamanhoFooter()}px`;
+objetos.community_cards_container.style.top = `calc(${objetos.tamanhoCabecalho()}px + 20px)`;
+>>>>>>> 7fc9a5a528a9cfe8cab2e3603e2c128b08acb1ba
 objetos.navbar.style.height = `calc(100% - ${objetos.tamanhoCabecalho()}px - ${objetos.tamanhoFooter()}px - ${objetos.paddingCabecalho()})`;
 console.log(objetos.paddingCabecalho());
 

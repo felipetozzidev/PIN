@@ -6,3 +6,5 @@ Primária: #305F2C
 Secundária: #A0BF9F
 Accent: #96c584
 
+Pacotes necessários:
+
