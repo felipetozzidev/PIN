@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-<?php 
-
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
-=======
 <?php
 require_once("../../config/conn.php");
 include("admin_header.php");
@@ -101,4 +84,3 @@ $ultimos_usuarios = $conn->query("SELECT nome_usu, email_usu, datacriacao_usu FR
 include('admin_footer.php');
 $conn->close();
 ?>
->>>>>>> 7fc9a5a528a9cfe8cab2e3603e2c128b08acb1ba

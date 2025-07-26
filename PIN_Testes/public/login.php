@@ -18,6 +18,7 @@ $verification_error = "";
 if (isset($_POST['login'])) {
   $email = mysqli_real_escape_string($conn, trim($_POST['email']));
   $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
+  $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
 
   // Verifica se o email termina com os domínios permitidos (IF + siglas de estados com IF)
   if (!preg_match('/@(if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br|aluno\.if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br)$/i', $email)) {
