@@ -262,7 +262,7 @@ h1.title {
 }
 
 main {
-    /* MEXER EM ALGO AQUI */
+    /* MEXER EM ALGO AQUI */ /* NAV_BAR ESTÁ SEM DROPDOWN */
     --tamanho_navbar: 12%;
     display: grid;
     grid-template-areas:
@@ -601,7 +601,7 @@ main {
 
 /* ========== Footer ========= */
 
-footer {
+footer { /* ESTÁ APARECENDO A TODO MOMENTO NA TELA */
     position: fixed;
     bottom: 0;
     width: 100%;
