@@ -280,6 +280,7 @@ main {
             width: var(--tamanho_navbar);
             font-size: .875rem;
             overflow-y: auto;
+            z-index:9000; 
 
             &>nav.navbar_lateral {
                 &>ul {
@@ -379,8 +380,8 @@ main {
                     }
                 }
             }
-        }
 
+        }
         /* ========== Fim do Nav_bar =========*/
 
         &.main_container {
@@ -464,28 +465,48 @@ main {
                             width: 100%;
                             border: 1px solid var(--secondary);
                             border-radius: 10px;
-                            padding: 20px;
+                            --padding: 20px;
                             margin-bottom: 10px;
 
                             &>header.post_header {
+                                padding: var(--padding);
                                 display: flex;
                                 align-items: center;
+                                justify-content: space-between;
+                                height: fit-content;
+                                margin-bottom: 10px;
 
-                                &>div.user_icon {
-                                    width: 40px;
-                                    color: var(--background);
-                                    height: 40px;
-                                    border-radius: 50%;
-                                    background-color: var(--secondary);
-                                    display: flex;
+
+                                &>div.user_info {
+                                    display: inherit;
                                     align-items: center;
-                                    justify-content: center;
-                                    font-size: 20px;
+
+                                    &>.user-details {
+                                        & > .user-name {
+                                            font-weight: bold;    
+                                        }
+                                    }
+
+                                    &>div.user_icon {
+                                        display: inherit;
+                                        margin-right: 10px;
+
+                                        &>img {
+                                            width: 50px;
+                                            color: var(--background);
+                                            height: 50px;
+                                            border-radius: 50%;
+                                            background-color: var(--secondary);
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            font-size: 20px;
+                                        }
+                                    }
                                 }
 
                                 &>p {
                                     display: inherit;
-                                    flex-direction: column;
                                     margin-bottom: 0;
                                     line-height: 1em;
                                     margin-left: 10px;
@@ -502,9 +523,89 @@ main {
                                         }
                                     }
                                 }
+
+                                & > .post-info{
+                                    display: inherit;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 0.8em;
+                                    opacity: 0.85;
+                                    column-gap: 10px;
+
+                                    & > .post-views{
+                                        display: flex;
+                                        flex-direction: column;
+                                        align-items: center;
+                                    
+                                        & > i{
+                                            font-size: 18px
+                                        }
+
+                                        & > span{
+                                            margin-top: -5px;
+                                        }
+                                    }
+                                }
                             }
 
                             &>section.post_main {
+                                margin-bottom: 10px;
+                                padding-inline: var(--padding);
+                                padding-bottom: calc(var(--padding)/2);
+
+                                &>div.post-media-grid {
+                                    width: 100%;
+                                    display: grid;
+                                    overflow: hidden;
+                                    height: 400px;
+                                    gap: 2px;
+                                    margin-top: 12px;
+                                    border-radius: 16px;
+                                    overflow: hidden;
+                                    aspect-ratio: 16 / 9;
+                                    border: 1px solid #e1e8ed;
+
+                                    &>img {
+                                        width: 100%;
+                                        height: 100%;
+                                        object-fit: cover;
+                                        cursor: pointer;
+                                        transition: opacity 0.2s ease;
+
+                                        &:hover {
+                                            opacity: 0.9;
+                                        }
+                                    }
+                                }
+
+                                .post-media-grid[data-count="1"] {
+                                    grid-template-columns: 1fr;
+                                }
+
+                                .post-media-grid[data-count="2"] {
+                                    grid-template-columns: 1fr 1fr;
+                                }
+
+                                .post-media-grid[data-count="3"] {
+                                    grid-template-columns: 1fr 1fr;
+                                    grid-template-rows: 1fr 1fr;
+                                }
+
+                                .post-media-grid[data-count="3"]{
+                                    grid-template-columns: 1fr 1fr;
+                                    
+                                    & > img:nth-child(1){
+                                        grid-row: 1 / 3;
+                                    } 
+                                    & > img:nth-child(3) {
+                                        grid-row: 2 / 4;
+                                    } 
+                                }
+
+                                .post-media-grid[data-count="4"] {
+                                    grid-template-columns: 1fr 1fr;
+                                    grid-template-rows: 1fr 1fr;
+                                }
 
                                 div.row {
                                     &>div.img_post {
@@ -512,6 +613,48 @@ main {
                                             &>img {
                                                 border-radius: 10px;
                                             }
+                                        }
+                                    }
+                                }
+                            }
+
+                            & > .post_footer{
+                                padding-inline: var(--padding);
+                                padding-block: var(--padding);
+                                display: flex;
+                                justify-content: space-between;
+                                margin-top: 10px;
+                                border-top: 1px solid #e1e8ed;
+
+                                & > div{
+                                    display: flex;
+                                    align-items: center;
+                                    column-gap: 10px;
+
+                                    & > button{
+                                        border: 0;
+                                        display: flex;
+                                        align-items: center;
+                                        background-color: transparent;
+                                    }
+
+                                    & > div{
+                                        display: flex;
+                                        align-items: center;
+                                    }
+
+                                    & > div, & > button{
+
+                                        &:not(.liked){
+                                            opacity: 0.6;
+                                        }
+                                        & > i{
+                                            font-size: 1.6rem;
+                                            margin-right: 5px;
+                                        }
+
+                                        & > span{
+                                            font-size: 1.2rem;
                                         }
                                     }
                                 }
@@ -583,12 +726,14 @@ main {
             &>div.main_content[data-pagina="destaques"] {
                 display: flex;
                 flex-direction: column;
-                gap: 24px;                
+                gap: 24px;
                 width: 100%;
-                & > div.cardDestaque_container{                    
+
+                &>div.cardDestaque_container {
                     display: flex;
                     column-gap: 24px;
-                    & > div.cardDestaque{
+
+                    &>div.cardDestaque {
                         --padding_cardDestaque: 48px;
 
                         /* DECIDIR SE ALTARERMOS AS CORES E/OU COLOCAREMOS IMAGENS */
@@ -602,8 +747,8 @@ main {
                         position: relative;
                         transition: all .2s ease-in-out;
                         cursor: pointer;
-                        
-                        &::after{
+
+                        &::after {
                             content: "";
                             position: absolute;
                             top: 0;
@@ -620,15 +765,15 @@ main {
                             transition: all .2s ease-in-out;
                         }
 
-                        &:hover{
+                        &:hover {
                             transform: scale(1.01);
 
-                            &::after{
+                            &::after {
                                 clip-path: polygon(0 0, 120px 0, 190px 100%, 0 100%);
                             }
                         }
-                        
-                        &> h1{
+
+                        &>h1 {
                             font-size: calc(1.5em + 1.5vw) !important;
                             z-index: 2;
                         }
@@ -639,16 +784,17 @@ main {
             &>div.main_content[data-pagina="comunidades"] {
                 width: 70%;
 
-                & > h1{
+                &>h1 {
                     margin-bottom: 24px;
                 }
 
-                &>.community_cards_container{
+                &>.community_cards_container {
                     display: grid;
                     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
                     grid-template-rows: repeat(auto-fill, minmax(100px, 1fr));
                     gap: 24px;
-                    &>.community_card{
+
+                    &>.community_card {
                         display: flex;
                         border-radius: 5px;
 
@@ -658,27 +804,34 @@ main {
                         border: var(--secondary) 1px solid;
                         width: 350px;
 
-                        & > div.container_icon_text{
+                        &>div.container_icon_text {
                             display: flex;
                             align-items: center;
 
-                            &>.community_icon{
+                            &>.community_icon {
                                 width: 50px;
                                 height: 50px;
                             }
-    
-                            &>div.text_card{
+
+                            &>div.text_card {
                                 margin-left: 10px;
                                 display: flex;
                                 flex-direction: column;
-                                &>p.community_name{
+
+                                &>p.community_name {
                                     font-size: 1.2em;
                                     font-weight: 600;
                                     margin: 0;
+                                    word-break: keep-all;
                                     padding: 0;
+                                    width: 200px; /* Ou qualquer largura desejada */
+                                    white-space: nowrap;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
                                 }
-                                &>span{
-                                    &.community_followers{
+
+                                &>span {
+                                    &.community_followers {
                                         font-size: .9em;
                                         opacity: .8;
                                     }
@@ -686,13 +839,14 @@ main {
                             }
                         }
 
-                        &>div.community_subscribe{
+                        &>div.community_subscribe {
                             width: 35%;
                             height: 45px;
                             display: flex;
                             align-items: center;
                             justify-content: end;
-                            a.button_follow{
+
+                            a.button_follow {
                                 margin-left: auto;
                                 display: flex;
                                 align-items: center;
@@ -707,12 +861,12 @@ main {
                                 cursor: pointer;
                                 transition: all .2s ease-in-out;
 
-                                & > p{
+                                &>p {
                                     margin: 0;
                                     padding: 0;
                                 }
 
-                                &:hover{
+                                &:hover {
                                     background-color: var(--primary);
                                 }
                             }
@@ -720,17 +874,17 @@ main {
                     }
                 }
 
-                & > section.paginacao_container{
+                &>section.paginacao_container {
                     margin-top: 24px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
 
-                    &>div.paginacao{
+                    &>div.paginacao {
                         display: flex;
                         column-gap: 10px;
 
-                        & > a{
+                        &>a {
                             text-decoration: none;
                             color: var(--primary);
                             font-weight: 600;
@@ -761,9 +915,108 @@ main {
     }
 }
 
+/* ========== Lightbox de Imagem ========= */
+.lightbox {
+    display: none;
+    position: fixed;
+    z-index: 1002;
+    padding: 20px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s;
+}
+
+.lightbox-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90vh;
+    animation: zoomIn 0.3s;
+}
+
+.lightbox-nav {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+    transition: 0.3s ease;
+    border-radius: 50%;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.lightbox-nav.prev {
+    left: 15px;
+    padding-right: 5px;
+}
+
+.lightbox-nav.next {
+    right: 15px;
+}
+
+.lightbox-nav:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #96c584;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.lightbox-close:hover,
+.lightbox-close:focus {
+    color: #bbb;
+    text-decoration: none;
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
 /* ========== Footer ========= */
 
-footer {
+footer.pag_footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     bottom: 0;
     width: 100%;
@@ -787,17 +1040,93 @@ footer {
 
 /* ========== Fim do Footer ========= */
 
+
+
+/* ========== INICIO BARRA DE NAVEGAÇÃO MOBILE ========= */
+
+nav.navbar_mobile {
+    display: none; /* Escondida por padrão */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    
+    height: 60px;
+    z-index: 9000;
+   
+    background-color: #305F2C; 
+    
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    div.select_item {
+                            transition: all .2s ease-in-out;
+
+                            &:hover {
+                                background-color: var(--secondary);
+                            }
+                        }
+    /* Estiliza a lista para ser horizontal */
+    ul {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        list-style: none;
+        padding: 0;
+        
+        width: 100%;
+        height: 100%;
+
+        li {
+            flex-grow: 2; /* Faz cada item ocupar o mesmo espaço */
+            height: 100%;
+
+            a.nav-link {
+                display: flex;
+                flex-direction: column; /* Ícone em cima, texto em baixo */
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                text-decoration: none;
+                transition: color 0.2s ease-in-out;
+
+                &.active,
+                &:hover {
+                    color: var(--primary-color);
+                }
+
+                i {
+                    font-size: 1.4rem;
+                    margin-bottom: 2px;
+                    color: white;
+                }
+
+                
+            }
+        }
+    }
+}
+/* ========== FIM BARRA DE NAVEGAÇÃO MOBILE ========= */
+
 /* ========== Responsividade ========= */
 
 @media only screen and (max-width: 720px) {
+    html{
+        max-width: 100vw;
+        width: 100%;
+
+
+    }
+    
+    
     body {
         width: 100%;
     }
 
     main {
-        width: 100vw;
+        width: 100%;
+       
         display: flex;
-
+         
         &>section {
             width: 100%;
 
@@ -805,8 +1134,33 @@ footer {
                 padding: 0;
                 margin: 0;
                 width: 100%;
+
+                /* &>div.main_content[data-pagina="destaques"] {
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+                width: 100%;
+
+                    &>.cardDestaque_container {
+                        display: flex; 
+                        flex-wrap: wrap; 
+                         gap: 1.5rem;
+                        &>div.cardDestaque{
+                            width: 100%;
+
+                        }
+                    }
+                } */
+                &>div.cardDestaque_container {
+                    display: flex;
+                    column-gap: 24px;
+
+                    &>div.cardDestaque {
+                        --padding_cardDestaque: 48px;
                 &>div.main_content {
-                    width: inherit;
+                     width: 100%;
+                    
+
                     &>div.postagens_e_publicacoes {
                         display: flex !important;
                         flex-direction: column-reverse !important;
@@ -816,12 +1170,31 @@ footer {
             }
         }
     }
+    }
+    }
 
-    .navbar_container {
+    nav.navbar_lateral {
         display: none;
+    }
+    footer.pag_footer {
+        display: none;
+    }
+    nav.navbar_mobile{
+        display:block;
+
     }
 
     .nav-item:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
+
+    .cardDestaque_container {
+        display: flex; /* Se você já usa flexbox aqui */
+        flex-wrap: wrap; /* ESSA É A LINHA MAIS IMPORTANTE! */
+    /* Outros estilos que você possa ter, como margem, etc. */
+    }
+    
+
+    
+
 }

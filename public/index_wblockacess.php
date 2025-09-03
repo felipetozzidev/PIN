@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['usuario_id'])) {
+if (!isset($_SESSION['id_usu'])) {
     echo '<!DOCTYPE html>
     <html lang="pt-BR">
     <head>
