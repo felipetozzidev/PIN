@@ -5,7 +5,7 @@ session_start();
 $host = "localhost";
 $user = "root";
 $passw = "";
-$banco = "ifapoia";
+$banco = "ifapoia2";
 
 //conexão
 $conn = mysqli_connect($host, $user, $passw, $banco);

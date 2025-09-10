@@ -1,17 +1,32 @@
 <?php
+// Inclui o cabeçalho do painel de administração.
 require_once("../../config/conn.php");
 include("admin_header.php");
 
-// --- Consultas para o Dashboard ---
-$total_usuarios = $conn->query("SELECT COUNT(*) as total FROM usuarios")->fetch_assoc()['total'];
-$total_posts = $conn->query("SELECT COUNT(*) as total FROM posts")->fetch_assoc()['total'];
-$total_comunidades = $conn->query("SELECT COUNT(*) as total FROM comunidades")->fetch_assoc()['total'];
-$total_denuncias = $conn->query("SELECT COUNT(*) as total FROM denuncias WHERE status_den = 'pendente'")->fetch_assoc()['total'];
-$total_comentarios = $conn->query("SELECT COUNT(*) as total FROM comentarios")->fetch_assoc()['total'];
-$total_likes = $conn->query("SELECT COUNT(*) as total FROM likes WHERE tipo_lk = 'curtir'")->fetch_assoc()['total'];
+// --- Consultas para os Cards do Dashboard ---
 
-// Últimos 5 usuários cadastrados
-$ultimos_usuarios = $conn->query("SELECT nome_usu, email_usu, datacriacao_usu FROM usuarios ORDER BY id_usu DESC LIMIT 5");
+// Contar total de cada tabela
+$total_usuarios = $conn->query("SELECT COUNT(*) as total FROM usuarios")->fetch_assoc()['total'];
+$total_niveis = $conn->query("SELECT COUNT(*) as total FROM niveis")->fetch_assoc()['total'];
+$total_posts = $conn->query("SELECT COUNT(*) as total FROM posts")->fetch_assoc()['total'];
+$total_tags = $conn->query("SELECT COUNT(*) as total FROM tags")->fetch_assoc()['total'];
+$total_comunidades = $conn->query("SELECT COUNT(*) as total FROM comunidades")->fetch_assoc()['total'];
+$total_grupos = $conn->query("SELECT COUNT(*) as total FROM grupos")->fetch_assoc()['total'];
+$total_denuncias = $conn->query("SELECT COUNT(*) as total FROM denuncias WHERE status_denn = 'pendente'")->fetch_assoc()['total'];
+
+// --- CONSULTA ATUALIZADA: Lê diretamente da tabela de log ---
+$sql_recent_activity = "
+    SELECT 
+        log.data_evento as event_date,
+        log.tipo_evento as event_type,
+        COALESCE(u.nome_usu, log.assunto_principal) as event_subject,
+        log.detalhes_evento as event_details
+    FROM audit_log log
+    LEFT JOIN usuarios u ON log.id_usuario_acao = u.id_usu
+    ORDER BY log.data_evento DESC
+    LIMIT 10;
+";
+$recent_activities = $conn->query($sql_recent_activity);
 ?>
 
 <main class="container">
@@ -19,60 +34,80 @@ $ultimos_usuarios = $conn->query("SELECT nome_usu, email_usu, datacriacao_usu FR
     <p>Bem-vindo ao painel de administração do IFApoia.</p>
 
     <div class="dashboard-grid">
+        <!-- Card de Usuários -->
         <div class="dashboard-card">
-            <h2><i class="ri-group-line"></i> Usuários Totais</h2>
+            <h2><i class="ri-group-line"></i> Usuários</h2>
             <p class="stat-number"><?php echo $total_usuarios; ?></p>
-            <a href="admin_users.php" class="card-link">Gerenciar Usuários &rarr;</a>
+            <a href="admin_users.php" class="card-link">Gerenciar &rarr;</a>
         </div>
+
+        <!-- Card de Níveis -->
         <div class="dashboard-card">
-            <h2><i class="ri-article-line"></i> Posts Criados</h2>
+            <h2><i class="ri-shield-star-line"></i> Níveis de Acesso</h2>
+            <p class="stat-number"><?php echo $total_niveis; ?></p>
+            <a href="admin_niveis.php" class="card-link">Gerenciar &rarr;</a>
+        </div>
+
+        <!-- Card de Posts -->
+        <div class="dashboard-card">
+            <h2><i class="ri-article-line"></i> Posts</h2>
             <p class="stat-number"><?php echo $total_posts; ?></p>
-            <a href="admin_posts.php" class="card-link">Gerenciar Posts &rarr;</a>
+            <a href="admin_posts.php" class="card-link">Gerenciar &rarr;</a>
         </div>
+
+        <!-- Card de Tags -->
         <div class="dashboard-card">
-            <h2><i class="ri-message-3-line"></i> Comentários</h2>
-            <p class="stat-number"><?php echo $total_comentarios; ?></p>
-            <a href="admin_posts.php" class="card-link">Ver Posts &rarr;</a>
+            <h2><i class="ri-price-tag-3-line"></i> Tags</h2>
+            <p class="stat-number"><?php echo $total_tags; ?></p>
+            <a href="admin_tags.php" class="card-link">Gerenciar &rarr;</a>
         </div>
-        <div class="dashboard-card">
-            <h2><i class="ri-thumb-up-line"></i> Likes</h2>
-            <p class="stat-number"><?php echo $total_likes; ?></p>
-            <a href="admin_posts.php" class="card-link">Ver Posts &rarr;</a>
-        </div>
+
+        <!-- Card de Comunidades -->
         <div class="dashboard-card">
             <h2><i class="ri-community-line"></i> Comunidades</h2>
             <p class="stat-number"><?php echo $total_comunidades; ?></p>
-            <a href="admin_comms.php" class="card-link">Gerenciar Comunidades &rarr;</a>
+            <a href="admin_comms.php" class="card-link">Gerenciar &rarr;</a>
         </div>
+
+        <!-- Card de Grupos -->
         <div class="dashboard-card">
-            <h2><i class="ri-error-warning-line"></i> Denúncias Pendentes</h2>
+            <h2><i class="ri-group-2-line"></i> Grupos</h2>
+            <p class="stat-number"><?php echo $total_grupos; ?></p>
+            <a href="admin_gps.php" class="card-link">Gerenciar &rarr;</a>
+        </div>
+
+        <!-- Card de Denúncias -->
+        <div class="dashboard-card">
+            <h2><i class="ri-error-warning-line"></i> Denúncias</h2>
             <p class="stat-number"><?php echo $total_denuncias; ?></p>
-            <a href="admin_denns.php" class="card-link">Ver Denúncias &rarr;</a>
+            <a href="admin_denns.php" class="card-link">Gerenciar &rarr;</a>
         </div>
     </div>
 
+    <h1>Atividades Recentes</h1>
     <div class="table-container" style="margin-top: 2rem;">
-        <h2>Últimos Usuários Cadastrados</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Data de Cadastro</th>
+                    <th>Data</th>
+                    <th>Tipo de Evento</th>
+                    <th>Realizado Por</th>
+                    <th>Detalhes</th>
                 </tr>
             </thead>
             <tbody>
-                <?php if ($ultimos_usuarios->num_rows > 0): ?>
-                    <?php while ($usuario = $ultimos_usuarios->fetch_assoc()): ?>
+                <?php if ($recent_activities && $recent_activities->num_rows > 0): ?>
+                    <?php while ($activity = $recent_activities->fetch_assoc()): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($usuario['nome_usu']); ?></td>
-                            <td><?php echo htmlspecialchars($usuario['email_usu']); ?></td>
-                            <td><?php echo date("d/m/Y H:i", strtotime($usuario['datacriacao_usu'])); ?></td>
+                            <td><?php echo date("d/m/Y H:i", strtotime($activity['event_date'])); ?></td>
+                            <td><span class="status-badge status-info"><?php echo htmlspecialchars($activity['event_type']); ?></span></td>
+                            <td><?php echo htmlspecialchars($activity['event_subject'] ?? 'Sistema'); ?></td>
+                            <td class="event-details"><?php echo htmlspecialchars($activity['event_details']); ?></td>
                         </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="3">Nenhum usuário encontrado.</td>
+                        <td colspan="4">Nenhuma atividade recente encontrada.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
@@ -81,6 +116,7 @@ $ultimos_usuarios = $conn->query("SELECT nome_usu, email_usu, datacriacao_usu FR
 </main>
 
 <?php
-include('admin_footer.php');
+// Inclui o rodapé do painel de administração.
+include 'admin_footer.php';
 $conn->close();
 ?>

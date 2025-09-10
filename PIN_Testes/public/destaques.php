@@ -14,7 +14,7 @@
 
 <body>
     
-    <main>
+    <main class="index-container">
        
          <?php include("../src/components/nav_bar.php"); ?>
         <section class="main_container">

@@ -101,13 +101,13 @@ if (isset($_POST['signup'])) {
       $mail->SMTPAuth = true;                               // Habilita a autenticação SMTP
 
       // Desabilita a verificação de certificado SSL (não recomendado para produção)
-      $mail->SMTPOptions = array(
-        'ssl' => array(
-          'verify_peer' => false,
-          'verify_peer_name' => false,
-          'allow_self_signed' => true
-        )
-      );
+      // $mail->SMTPOptions = array(
+      //   'ssl' => array(
+      //     'verify_peer' => false,
+      //     'verify_peer_name' => false,
+      //     'allow_self_signed' => true
+      //   )
+      // );
 
       $mail->Host = '172.217.194.108';                      // IP direto para smtp.gmail.com para evitar erro de DNS
       $mail->Username = 'brenosilveiradomingues@gmail.com'; // Username do email

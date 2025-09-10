@@ -14,7 +14,7 @@ include("../src/components/header.php"); ?>
 </head>
 
 <body>
-    <main>
+    <main class="index-container">
         <?php include("../src/components/nav_bar.php"); ?>
         <section class="main_container">
             <div class="main_content" data-pagina="comunidades">

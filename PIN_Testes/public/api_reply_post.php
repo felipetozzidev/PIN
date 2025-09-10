@@ -1,8 +1,10 @@
 <?php
 require_once('../config/conn.php');
+
+// Define o cabeçalho da resposta como JSON
 header('Content-Type: application/json');
 
-// Segurança: Verifica se o usuário está logado e se os dados foram enviados
+// Verifica se o usuário está logado e se os dados foram enviados
 if (!isset($_SESSION['id_usu'])) {
     echo json_encode(['success' => false, 'error' => 'Usuário não autenticado.']);
     exit();
@@ -24,14 +26,14 @@ if (empty($conteudo_post)) {
 $conn->begin_transaction();
 
 try {
-    // 1. Insere o novo post (a resposta)
+    // Insere o novo comentário
     $stmt_insert = $conn->prepare("INSERT INTO posts (id_usu, conteudo_post, tipo_post, id_post_pai) VALUES (?, ?, 'resposta', ?)");
     $stmt_insert->bind_param("isi", $id_usu, $conteudo_post, $id_post_pai);
     $stmt_insert->execute();
     $new_comment_id = $conn->insert_id;
     $stmt_insert->close();
 
-    // 2. Atualiza o contador de respostas no post pai
+    // Atualiza o contador de comentários no post pai
     $stmt_update = $conn->prepare("UPDATE posts SET cont_respostas = cont_respostas + 1 WHERE id_post = ?");
     $stmt_update->bind_param("i", $id_post_pai);
     $stmt_update->execute();
@@ -45,10 +47,11 @@ try {
         'success' => true,
         'comment' => [
             'id_post' => $new_comment_id,
-            'conteudo_post' => htmlspecialchars($conteudo_post),
-            'data_post' => date("H:i · d/m/Y"),
+            'id_usu' => $id_usu, // <-- LINHA ADICIONADA AQUI
+            'conteudo_post' => nl2br(htmlspecialchars($conteudo_post)), // Adicionado nl2br para quebras de linha
+            'data_post' => date("d/m/Y H:i"),
             'nome_usu' => $_SESSION['nome_usu'],
-            'imgperfil_usu' => $_SESSION['imgperfil_usu'] // Assumindo que você salva isso na sessão
+            'imgperfil_usu' => $_SESSION['imgperfil_usu']
         ]
     ];
     echo json_encode($response_data);
