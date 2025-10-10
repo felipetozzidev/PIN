@@ -45,7 +45,7 @@
                                 </div>
                             </section>
                             <footer class="post_footer">
-    
+
                             </footer>
                         </div>
                         <div class="post_container">
@@ -79,7 +79,7 @@
                                 </div>
                             </section>
                             <footer class="post_footer">
-    
+
                             </footer>
                         </div>
                     </div>
@@ -143,4 +143,3 @@
     </main>
 
     <?php include("../src/components/footer.php"); ?>
- 

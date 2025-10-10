@@ -1,164 +1,188 @@
+<?php
+include("../src/components/header.php");
+
+// Pega o ID do usuário logado, ou 0 se for um visitante
+$current_user_id = isset($_SESSION['id_usu']) ? $_SESSION['id_usu'] : 0;
+
+// SQL APRIMORADO: Adiciona u.id_usu para o link do perfil
+$sql_posts = "SELECT 
+                p.id_post,
+                p.conteudo_post,
+                p.data_post,
+                p.cont_visualizacoes,
+                p.cont_likes,
+                p.cont_respostas,
+                p.cont_reposts,
+                p.cont_citacoes,
+                u.id_usu,
+                u.nome_usu,
+                u.imgperfil_usu,
+                GROUP_CONCAT(pm.url_media SEPARATOR ';') as media_urls,
+                (SELECT COUNT(*) FROM likes l WHERE l.id_post = p.id_post AND l.id_usu = ?) AS user_has_liked
+            FROM posts AS p
+            JOIN usuarios AS u ON p.id_usu = u.id_usu
+            LEFT JOIN post_media AS pm ON p.id_post = pm.id_post
+            WHERE p.tipo_post = 'padrao' AND p.stats_post = 'ativo'
+            GROUP BY p.id_post
+            ORDER BY p.data_post DESC
+            LIMIT 20";
+
+// Usa prepared statements para segurança
+$stmt_posts = $conn->prepare($sql_posts);
+$stmt_posts->bind_param("i", $current_user_id);
+$stmt_posts->execute();
+$result_posts = $stmt_posts->get_result();
+
+
+// Busca as 5 comunidades mais populares (com mais membros)
+$sql_comunidades = "SELECT 
+                        c.nome_com,
+                        COUNT(uc.id_usu) as total_membros
+                    FROM comunidades c
+                    LEFT JOIN usuarios_comunidades uc ON c.id_com = uc.id_com
+                    GROUP BY c.id_com
+                    ORDER BY total_membros DESC
+                    LIMIT 5";
+
+$result_comunidades = $conn->query($sql_comunidades);
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeto PIN</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="../src/assets/css/style.css">
+    <title>IFApoia - Início</title>
 </head>
 
-<body>
-    <?php include("../src/components/header.php"); ?>
+<body data-is-logged-in="<?php echo ($current_user_id > 0) ? 'true' : 'false'; ?>">
 
-    <main>
+    <main class="index-container">
+        <!-- Coluna 1: Navbar Lateral -->
         <?php include("../src/components/nav_bar.php"); ?>
 
+        <!-- Coluna 2: Conteúdo Principal -->
         <section class="main_container">
-            <div class="main_content">
-                <div class="destaques">
-                    <h1 class="title">Destaques</h1>
-                    <div class="cards">
-                        <span>Destaques</span>
-                    </div>
+            <div class="destaques">
+                <h1 class="title">Destaques</h1>
+                <div class="cards"><span>Destaques</span></div>
+            </div>
+            <div class="postagens">
+                <h1 class="title">Postagens</h1>
+                <div>
+                    <?php if ($result_posts && $result_posts->num_rows > 0): ?>
+                        <?php while ($post = $result_posts->fetch_assoc()):
+                            $user_has_liked = $post['user_has_liked'] > 0;
+                        ?>
+                            <!-- A tag <a> foi removida daqui e o card agora tem um data-attribute -->
+                            <div class="post-card" data-post-url="post_view.php?id_post=<?php echo $post['id_post']; ?>">
+                                <header class="post-header">
+                                    <div class="user-info" data-user-id="<?php echo $post['id_usu']; ?>">
+                                        <div class="user-icon">
+                                            <img src="<?php echo htmlspecialchars($post['imgperfil_usu']); ?>" alt="Foto de Perfil">
+                                        </div>
+                                        <div class="user-details">
+                                            <span class="user-name"><?php echo htmlspecialchars($post['nome_usu']); ?></span><br>
+                                            <span class="user-tag">@<?php echo strtolower(explode(' ', $post['nome_usu'])[0]); ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="post-info">
+                                        <div class="post-date">
+                                            <div class="post-hour">
+                                                <?php echo "" . date("H:i", strtotime(($post['data_post']))); ?>
+                                            </div>
+                                            <div class="post-calendar">
+                                                <?php echo date("d/m/Y", strtotime($post['data_post'])); ?>
+                                            </div>
+                                        </div>
+                                        <div class="post-views">
+                                            <i class="ri-bar-chart-grouped-line"></i>
+                                            <span><?php echo $post['cont_visualizacoes']; ?></span>
+                                        </div>
+                                    </div>
+                                </header>
+                                <section class="post-main">
+                                    <p><?php echo nl2br(htmlspecialchars($post['conteudo_post'])); ?></p>
+                                    <?php
+                                    $media_urls = !empty($post['media_urls']) ? explode(';', $post['media_urls']) : [];
+                                    $media_count = count($media_urls);
+                                    if ($media_count > 0): ?>
+                                        <div class="post-media-grid" data-count="<?php echo $media_count; ?>">
+                                            <?php foreach ($media_urls as $url): ?>
+                                                <img src="<?php echo htmlspecialchars($url); ?>" alt="Imagem do Post">
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </section>
+                                <footer class="post-footer">
+                                    <div class="post-stats-left">
+                                        <button class="post-icon like-btn <?php echo $user_has_liked ? 'liked' : ''; ?>" data-post-id="<?php echo $post['id_post']; ?>">
+                                            <i class="ri-heart-<?php echo $user_has_liked ? 'fill' : 'line'; ?>"></i>
+                                            <span class="post-cont"><?php echo $post['cont_likes']; ?></span>
+                                        </button>
+                                        <div class="post-icon">
+                                            <i class="ri-chat-3-line"></i>
+                                            <span class="post-cont"><?php echo $post['cont_respostas']; ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="post-stats-right">
+                                        <div class="post-icon">
+                                            <i class="ri-repeat-line"></i>
+                                            <span class="post-cont"><?php echo $post['cont_reposts']; ?></span>
+                                        </div>
+                                        <div class="post-icon">
+                                            <i class="ri-chat-quote-line"></i>
+                                            <span class="post-cont"><?php echo $post['cont_citacoes']; ?></span>
+                                        </div>
+                                    </div>
+                                </footer>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="post-card">
+                            <section class="post-main">
+                                <p>Ainda não há nenhuma postagem. Seja o primeiro a publicar!</p>
+                            </section>
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <div class="postagens_e_publicacoes">
-                    <div class="postagens">
-                        <h1 class="title">Postagens</h1>
-                        <div class="post_container">
-                            <header class="post_header">
-                                <div class="user_icon">
-                                    <i class="ri-user-line"></i>
-                                </div>
-                                <p>
-                                    <span class="user_name">NomeDoUsuario</span>
-                                    <span class="user_tag">@username</span>
-                                </p>
-                            </header>
-                            <hr class="post_divider">
-                            <section class="post_main">
-                                <p>
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
-                                    has been the industry's standard dummy text ever since the 1500s, when an unknown
-                                    printer took a galley of type and scrambled it to make a type specimen book. It has
-                                    survived not only five centuries, but also the leap into electronic typesetting,
-                                    remaining essentially unchanged. It was popularised in the 1960s with the release of
-                                    Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
-                                    publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                                </p>
-                                <div class="row">
-                                    <div class="col img_post">
-                                        <!-- Colocar verificação no php para que, se houver mais de uma imagem, ser inserido uma estrutura de carrossel -->
-                                        <div class="carrossel_post container_img_post">
-                                            <img src="..\src\assets\img\ifcampus.jpg" alt="Logo IFSP" class="img-fluid">
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                            <footer class="post_footer">
+            </div>
+        </section>
 
-                            </footer>
+        <!-- Coluna 3: Comunidades Populares -->
+        <section class="publicacoes_recentes">
+            <div class="comunidades_populares">
+                <h1 class="title">Comunidades Populares</h1>
+                <div class="community_cards_container">
+                    <?php if ($result_comunidades && $result_comunidades->num_rows > 0): ?>
+                        <?php while ($comunidade = $result_comunidades->fetch_assoc()): ?>
+                            <div class="community_card">
+                                <div class="community_icon"><i class="ri-group-line"></i></div>
+                                <p>
+                                    <span class="community_name"><?php echo htmlspecialchars($comunidade['nome_com']); ?></span>
+                                    <span class="community_followers"><?php echo $comunidade['total_membros']; ?> seguidores</span>
+                                </p>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="community_card">
+                            <p>Nenhuma comunidade popular encontrada.</p>
                         </div>
-                        <div class="post_container">
-                            <header class="post_header">
-                                <div class="user_icon">
-                                    <i class="ri-user-line"></i>
-                                </div>
-                                <p>
-                                    <span class="user_name">NomeDoUsuario</span>
-                                    <span class="user_tag">@username</span>
-                                </p>
-                            </header>
-                            <hr class="post_divider">
-                            <section class="post_main">
-                                <p>
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
-                                    has been the industry's standard dummy text ever since the 1500s, when an unknown
-                                    printer took a galley of type and scrambled it to make a type specimen book. It has
-                                    survived not only five centuries, but also the leap into electronic typesetting,
-                                    remaining essentially unchanged. It was popularised in the 1960s with the release of
-                                    Letraset sheets containing Lorem Ipsum passages, and more recently with desktop
-                                    publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                                </p>
-                                <div class="row">
-                                    <div class="col img_post">
-                                        <!-- Colocar verificação no php para que, se houver mais de uma imagem, ser inserido uma estrutura de carrossel -->
-                                        <div class="carrossel_post container_img_post">
-                                            <img src="..\src\assets\img\ifcampus.jpg" alt="Logo IFSP" class="img-fluid">
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                            <footer class="post_footer">
-
-                            </footer>
-                        </div>
-                    </div>
-                    <div class="comunidades_populares">
-                        <h1 class="title">Comunidades Populares</h1>
-                        <div class="community_cards_container">
-                            <div class="community_card">
-                                <div class="community_icon">
-                                    <i class="ri-group-line"></i>
-                                </div>
-                                <p>
-                                    <span class="community_name">NomeDaComunidade1</span>
-                                    <span class="community_followers">100.000 seguidores</span>
-                                </p>
-                            </div>
-                            <hr class="community_divider">
-                            <div class="community_card">
-                                <div class="community_icon">
-                                    <i class="ri-group-line"></i>
-                                </div>
-                                <p>
-                                    <span class="community_name">NomeDaComunidade1</span>
-                                    <span class="community_followers">100.000 seguidores</span>
-                                </p>
-                            </div>
-                            <hr class="community_divider">
-                            <div class="community_card">
-                                <div class="community_icon">
-                                    <i class="ri-group-line"></i>
-                                </div>
-                                <p>
-                                    <span class="community_name">NomeDaComunidade1</span>
-                                    <span class="community_followers">100.000 seguidores</span>
-                                </p>
-                            </div>
-                            <hr class="community_divider">
-                            <div class="community_card">
-                                <div class="community_icon">
-                                    <i class="ri-group-line"></i>
-                                </div>
-                                <p>
-                                    <span class="community_name">NomeDaComunidade1</span>
-                                    <span class="community_followers">100.000 seguidores</span>
-                                </p>
-                            </div>
-                            <hr class="community_divider">
-                            <div class="community_card">
-                                <div class="community_icon">
-                                    <i class="ri-group-line"></i>
-                                </div>
-                                <p>
-                                    <span class="community_name">NomeDaComunidade1</span>
-                                    <span class="community_followers">100.000 seguidores</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Lightbox Modal para Visualização de Imagem -->
+    <div id="imageLightbox" class="lightbox">
+        <span class="lightbox-close">&times;</span>
+        <a class="lightbox-nav prev">&#10094;</a>
+        <img class="lightbox-content" id="lightboxImage">
+        <a class="lightbox-nav next">&#10095;</a>
+    </div>
+
     <?php include("../src/components/footer.php"); ?>
-    <script src="../src/assets/js/javascript.js"></script>
 </body>
 
 </html>

@@ -2,10 +2,10 @@
 session_start();
 
 //Variaveis que armazenam os dados de conexão
-$host = "localhost";
-$user = "root";
-$passw = "";
-$banco = "ifapoia";
+$host = "srv1435.hstgr.io";
+$user = "u245002075_ifapoia_adm_2";
+$passw = "KzV[sCsD4Mv~";
+$banco = "u245002075_ifapoia2";
 
 //conexão
 $conn = mysqli_connect($host, $user, $passw, $banco);
