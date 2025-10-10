@@ -47,6 +47,23 @@ $stmt_comments = $conn->prepare($sql_comments);
 $stmt_comments->bind_param("ii", $current_user_id, $id_post);
 $stmt_comments->execute();
 $result_comments = $stmt_comments->get_result();
+
+// --- INSERT DOS COMENTARIOS NO BANCO DE DADOS ---
+if (isset($_POST['comment'])) {
+    $comment = $_POST['conteudo_comentario'];
+    $id_post_pai = $post['id_post_pai'];
+    $id_usu = isset($_SESSION['id_usu']) ? $_SESSION['id_usu'] : $_SESSION("id_usu");
+    $data_post = date('Y-m-d H:i:s');
+
+    $sql_insert = "INSERT INTO posts (id_comentario , id_usu, conteudo_post) VALUES (?, ?, ?)";
+    $stmt_insert = $conn->prepare($sql_insert);
+    $stmt_insert->bind_param("iis", $id_post_pai, $id_usu, $comment);
+
+    if(isset($_SESSION['id_usu'])) {
+        
+    }
+    $stmt_insert->execute();
+}
 ?>
 
 <!DOCTYPE html>
@@ -131,8 +148,8 @@ $result_comments = $stmt_comments->get_result();
             <!-- Formulário para Comentar -->
             <?php if ($current_user_id > 0): ?>
                 <div class="reply-form-container">
-                    <form id="reply-form">
-                        <textarea name="conteudo_post" id="reply-textarea" placeholder="Poste sua resposta" required></textarea>
+                    <form id="reply-form" method="POST" target="post_view.php">
+                        <textarea name="conteudo_comentario" id="reply-textarea" placeholder="Poste sua resposta" required></textarea>
                         <input type="hidden" name="id_post_pai" value="<?php echo $id_post; ?>">
                         <button type="submit" class="btn btn-primary">Responder</button>
                     </form>
