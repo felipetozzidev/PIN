@@ -36,8 +36,8 @@ require_once('../config/conn.php');
                     <img src="../src/assets/icons/notification-line.svg" alt="" width="35px">
                 </a>
                 <?php if (isset($_SESSION['id_usu'])): ?>
-                    <div class="nav-item dropdown d-none d-md-block">
-                        <a class="nav-link dropdown-toggle" id="userDropdown" role="button" data-bs-toggle="dropdown"
+                    <div class="nav-item dropdown d-none d-md-block user_logged">
+                        <a class="nav-link" id="userDropdown" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             <?php
                             if (isset($_SESSION['imgperfil_usu'])) {
@@ -139,5 +139,4 @@ require_once('../config/conn.php');
         </div>
     </div>
 </body>
-
 </html>

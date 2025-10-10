@@ -18,7 +18,6 @@ $verification_error = "";
 if (isset($_POST['login'])) {
   $email = mysqli_real_escape_string($conn, trim($_POST['email']));
   $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
-  $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
 
   // Verifica se o email termina com os domínios permitidos (IF + siglas de estados com IF)
   if (!preg_match('/@(if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br|aluno\.if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br)$/i', $email)) {
@@ -214,6 +213,7 @@ if (isset($_POST['verify_email'])) {
   }
 }
 ?>
+
 
 <!doctype html>
 <html lang="pt-br">
@@ -812,6 +812,13 @@ if (isset($_POST['verify_email'])) {
   </div>
 
   <script>
+    <?php
+    session_start();
+    ?>
+    console.log("testew")
+    console.log("<?php 
+     echo $_SESSION('id_nvl'); 
+     ?>")
     // Listener para tornar a senha visível ou invisível
     document.addEventListener('DOMContentLoaded', function() {
       const passwordViewButtons = document.querySelectorAll('.passwordView, .passwordViewModal'); // Seleciona os botões de ver senhas
@@ -915,6 +922,7 @@ if (isset($_POST['verify_email'])) {
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
+    
     // Verifica se o DOM está completamente carregado
     document.addEventListener('DOMContentLoaded', function() {
       const verificationModal = document.getElementById('verificationModal'); // Obtém o modal de verificação
@@ -1048,6 +1056,9 @@ if (isset($_POST['verify_email'])) {
         verificationModalInstance.show();
       <?php endif; ?>
     });
+
+   
+
   </script>
 
       <style>
@@ -1061,6 +1072,8 @@ if (isset($_POST['verify_email'])) {
       /* Ajuste o tamanho do título conforme necessário */
     }
   </style>
+
+  
 </body>
 
 </html>

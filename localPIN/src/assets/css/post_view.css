@@ -210,17 +210,17 @@ div.post-card-full{
     
         & > div{
             display: inherit;
+            gap: 10px;
+
 
             & > button{
                 border: 0;
                 background-color: transparent;
-                margin-right: 10px;
             }
 
             & > button, & > div{
                 display: flex;
                 align-items: center;
-                font: 1em;
                 & > i{
                     font-size: 1.6rem;
                     margin-right: 5px;

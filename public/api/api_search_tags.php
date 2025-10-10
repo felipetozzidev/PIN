@@ -3,7 +3,7 @@
 header('Content-Type: application/json');
 
 // Inclui o arquivo de conexão com o banco de dados.
-require_once('../config/conn.php');
+require_once('../../config/conn.php');
 
 // Pega o termo de busca da URL (query string)
 $query = isset($_GET['query']) ? trim($_GET['query']) : '';

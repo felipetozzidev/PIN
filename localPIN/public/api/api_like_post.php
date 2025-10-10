@@ -1,5 +1,5 @@
 <?php
-require_once('../config/conn.php');
+require_once('../../config/conn.php');
 
 // Define o cabeçalho da resposta como JSON
 header('Content-Type: application/json');

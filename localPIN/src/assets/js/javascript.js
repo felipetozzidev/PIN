@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
             navbar: document.querySelector(".navbar_container"),
             nav: document.querySelector("nav"),
             main: document.querySelector("main"),
-            footer: document.querySelector("footer"), // Usar seletor genérico
+            footer: document.querySelector("footer.pag_footer"), // Usar seletor genérico
             body: document.querySelector("body"),
             community_cards_container: document.querySelector("div.community_cards_container"),
             tamanhoCabecalho: function() { return this.nav ? this.nav.clientHeight : 0; },
@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (objetos.footer) {
                 objetos.main.style.marginBottom = `${objetos.tamanhoFooter()}px`;
             }
+        }
+        console.log(objetos.tamanhoCabecalho() + " + " + objetos.tamanhoBody() + " < " + window.screen.height);
+        if(objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height){
+            objetos.footer.style.position = "absolute";
+            objetos.footer.style.bottom = "0px";
         }
         if (objetos.community_cards_container && objetos.nav) {
             objetos.community_cards_container.style.top = `calc(${objetos.tamanhoCabecalho()}px + 20px)`;

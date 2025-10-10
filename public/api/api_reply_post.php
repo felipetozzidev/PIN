@@ -1,5 +1,5 @@
 <?php
-require_once('../config/conn.php');
+require_once('../../config/conn.php');
 header('Content-Type: application/json');
 
 // Segurança: Verifica se o usuário está logado e se os dados foram enviados

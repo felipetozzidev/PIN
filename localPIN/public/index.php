@@ -4,65 +4,61 @@ include("../src/components/header.php");
 // Pega o ID do usuário logado, ou 0 se for um visitante
 $current_user_id = isset($_SESSION['id_usu']) ? $_SESSION['id_usu'] : 0;
 
-// Lógica 
-$search_query = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+// Lógica de busca e exibição de posts unificada
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 
+// SQL APRIMORADO: Unifica a busca e a verificação de likes
 $sql = "SELECT 
-            p.id_post, p.conteudo_post, p.data_post, p.stats_post, p.tipo_post, 
-            p.id_post_pai, p.aviso_conteudo,
-            p.cont_likes, p.cont_respostas, p.cont_reposts, p.cont_citacoes,
-            u.nome_usu, u.imgperfil_usu,
+            p.id_post,
+            p.conteudo_post,
+            p.data_post,
+            p.cont_visualizacoes,
+            p.cont_likes,
+            p.cont_respostas,
+            p.cont_reposts,
+            p.cont_citacoes,
+            u.id_usu,
+            u.nome_usu,
+            u.imgperfil_usu,
+            GROUP_CONCAT(DISTINCT pm.url_media SEPARATOR ';') as media_urls,
+            (SELECT COUNT(*) FROM likes l WHERE l.id_post = p.id_post AND l.id_usu = ?) AS user_has_liked,
             c.nome_com,
-            GROUP_CONCAT(DISTINCT t.nome_tag SEPARATOR ', ') as tags,
-            (SELECT GROUP_CONCAT(pm.url_media SEPARATOR ';') FROM post_media pm WHERE pm.id_post = p.id_post) as media_urls
-        FROM posts p 
-        LEFT JOIN usuarios u ON p.id_usu = u.id_usu
+            GROUP_CONCAT(DISTINCT t.nome_tag SEPARATOR ', ') as tags
+        FROM posts AS p
+        JOIN usuarios AS u ON p.id_usu = u.id_usu
+        LEFT JOIN post_media AS pm ON p.id_post = pm.id_post
         LEFT JOIN comunidades_posts cp ON p.id_post = cp.id_post
         LEFT JOIN comunidades c ON cp.id_com = c.id_com
         LEFT JOIN posts_tags pt ON p.id_post = pt.id_post
-        LEFT JOIN tags t ON pt.id_tag = t.id_tag
-        ";
+        LEFT JOIN tags t ON pt.id_tag = t.id_tag";
 
-$where_clauses = [];
+$where_clauses = ["p.tipo_post = 'padrao'", "p.stats_post = 'ativo'"];
+$params = [$current_user_id];
+$types = 'i';
+
 if (!empty($search_query)) {
-    $where_clauses[] = "(p.conteudo_post LIKE '%$search_query%' OR u.nome_usu LIKE '%$search_query%' OR c.nome_com LIKE '%$search_query%' OR t.nome_tag LIKE '%$search_query%')";
+    $search_term = "%" . $conn->real_escape_string($search_query) . "%";
+    $where_clauses[] = "(p.conteudo_post LIKE ? OR u.nome_usu LIKE ? OR c.nome_com LIKE ? OR t.nome_tag LIKE ?)";
+    array_push($params, $search_term, $search_term, $search_term, $search_term);
+    $types .= 'ssss';
 }
 
 if (!empty($where_clauses)) {
     $sql .= " WHERE " . implode(' AND ', $where_clauses);
 }
 
-$sql .= " GROUP BY p.id_post ORDER BY p.id_post DESC";
-$resultado = $conn->query($sql);
-
-// SQL APRIMORADO: Adiciona u.id_usu para o link do perfil
-$sql_posts = "SELECT 
-                p.id_post,
-                p.conteudo_post,
-                p.data_post,
-                p.cont_visualizacoes,
-                p.cont_likes,
-                p.cont_respostas,
-                p.cont_reposts,
-                p.cont_citacoes,
-                u.id_usu,
-                u.nome_usu,
-                u.imgperfil_usu,
-                GROUP_CONCAT(pm.url_media SEPARATOR ';') as media_urls,
-                (SELECT COUNT(*) FROM likes l WHERE l.id_post = p.id_post AND l.id_usu = ?) AS user_has_liked
-            FROM posts AS p
-            JOIN usuarios AS u ON p.id_usu = u.id_usu
-            LEFT JOIN post_media AS pm ON p.id_post = pm.id_post
-            WHERE p.tipo_post = 'padrao' AND p.stats_post = 'ativo'
-            GROUP BY p.id_post
-            ORDER BY p.data_post DESC
-            LIMIT 20";
+$sql .= " GROUP BY p.id_post ORDER BY p.data_post DESC LIMIT 20";
 
 // Usa prepared statements para segurança
-$stmt_posts = $conn->prepare($sql_posts);
-$stmt_posts->bind_param("i", $current_user_id);
-$stmt_posts->execute();
-$result_posts = $stmt_posts->get_result();
+$stmt = $conn->prepare($sql);
+if ($stmt) {
+    $stmt->bind_param($types, ...$params);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+} else {
+    // Tratar erro na preparação da query
+    $resultado = null;
+}
 
 
 // Busca as 5 comunidades mais populares (com mais membros)
@@ -89,10 +85,8 @@ $result_comunidades = $conn->query($sql_comunidades);
 <body data-is-logged-in="<?php echo ($current_user_id > 0) ? 'true' : 'false'; ?>">
 
     <main class="index-container">
-        <!-- Coluna 1: Navbar Lateral -->
         <?php include("../src/components/nav_bar.php"); ?>
 
-        <!-- Coluna 2: Conteúdo Principal -->
         <section class="main_container">
             <div class="main_content" data-pagina="pagina principal">
                 <div class="destaques">
@@ -106,6 +100,7 @@ $result_comunidades = $conn->query($sql_comunidades);
                         <h1 class="title">Postagens</h1>
                         <?php if ($resultado && $resultado->num_rows > 0): ?>
                             <?php while ($post = $resultado->fetch_assoc()):
+                                // Agora a variável $post['user_has_liked'] existe e tem o valor correto (0 ou 1)
                                 $user_has_liked = $post['user_has_liked'] > 0; ?>
                                 <div class="post_container" data-post-url="post_view.php?id_post=<?php echo $post['id_post']; ?>">
                                     <header class="post_header">
@@ -208,7 +203,6 @@ $result_comunidades = $conn->query($sql_comunidades);
         </section>
     </main>
 
-    <!-- Lightbox Modal para Visualização de Imagem -->
     <div id="imageLightbox" class="lightbox">
         <span class="lightbox-close">&times;</span>
         <a class="lightbox-nav prev">&#10094;</a>

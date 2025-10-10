@@ -2,7 +2,7 @@
 require_once('../../config/conn.php');
 
 // Verifica se o usuário NÃO está logado OU se o nível de acesso NÃO é de administrador (assumindo id_nvl = 1 para admin)
-if (!isset($_SESSION['id_usu']) || $_SESSION['id_nvl'] != 1 || $_SESSION['id_nvl'] != 2) {
+if (!isset($_SESSION['id_usu']) || $_SESSION['id_nvl'] != 1) {
     header("Location: ../../public/login.php"); // Redireciona para sua página de login
     exit();
 }

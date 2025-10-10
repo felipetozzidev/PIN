@@ -214,6 +214,29 @@ input:-webkit-autofill:focus {
     align-items: center;
     white-space: nowrap;
     /* Impede que o texto quebre em várias linhas */
+
+    &.user_logged{
+        & > a{
+            transition: all .2s ease-in-out;
+            &:hover{
+                scale: 1.1;
+            }
+        }
+
+        & > .dropdown-menu{
+            background-color: var(--primary);
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            & > *{
+                color: var(--white);
+                & > a, & > hr{
+                    color: inherit;
+                    &:hover{
+                        background-color: var(--secondary);
+                    }
+                }
+            }
+        }
+    }
 }
 
 .search form {
@@ -643,20 +666,28 @@ main {
                                         align-items: center;
                                     }
 
-                                    & > div, & > button{
+                                    && > div, & > button {
+    cursor: pointer; /* Adiciona um cursor de ponteiro para indicar que é clicável */
 
-                                        &:not(.liked){
-                                            opacity: 0.6;
-                                        }
-                                        & > i{
-                                            font-size: 1.6rem;
-                                            margin-right: 5px;
-                                        }
+    &:not(.liked) {
+        opacity: 0.6;
+    }
 
-                                        & > span{
-                                            font-size: 1.2rem;
-                                        }
-                                    }
+    /* Regra adicionada para o botão curtido */
+    &.liked {
+        color: #e74c3c; /* Define a cor vermelha para o ícone e o contador */
+        opacity: 1; /* Garante que a opacidade volte ao normal */
+    }
+
+    & > i {
+        font-size: 1.6rem;
+        margin-right: 5px;
+    }
+
+    & > span {
+        font-size: 1.2rem;
+    }
+}
                                 }
                             }
                         }
@@ -782,7 +813,7 @@ main {
             }
 
             &>div.main_content[data-pagina="comunidades"] {
-                width: 70%;
+                width: 80%;
 
                 &>h1 {
                     margin-bottom: 24px;
@@ -790,7 +821,7 @@ main {
 
                 &>.community_cards_container {
                     display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                    grid-template-columns: 1fr 1fr 1fr;
                     grid-template-rows: repeat(auto-fill, minmax(100px, 1fr));
                     gap: 24px;
 
@@ -802,7 +833,8 @@ main {
                         justify-content: space-between;
                         padding: 16px 24px;
                         border: var(--secondary) 1px solid;
-                        width: 350px;
+                        width: 100%;
+                        height: 100px;
 
                         &>div.container_icon_text {
                             display: flex;
@@ -824,7 +856,7 @@ main {
                                     margin: 0;
                                     word-break: keep-all;
                                     padding: 0;
-                                    width: 200px; /* Ou qualquer largura desejada */
+                                    width: 180px; /* Ou qualquer largura desejada */
                                     white-space: nowrap;
                                     overflow: hidden;
                                     text-overflow: ellipsis;
@@ -1110,91 +1142,99 @@ nav.navbar_mobile {
 /* ========== Responsividade ========= */
 
 @media only screen and (max-width: 720px) {
-    html{
-        max-width: 100vw;
+
+    /* --- ESTILOS GERAIS PARA MOBILE --- */
+    html, body, main {
         width: 100%;
-
-
-    }
-    
-    
-    body {
-        width: 100%;
+        max-width: 100vw; /* Garante que não haja overflow horizontal */
+        margin: 0;
+        padding: 0;
     }
 
-    main {
-        width: 100%;
-       
-        display: flex;
-         
-        &>section {
-            width: 100%;
-
-            &.main_container {
-                padding: 0;
-                margin: 0;
-                width: 100%;
-
-                /* &>div.main_content[data-pagina="destaques"] {
-                display: flex;
-                flex-direction: column;
-                gap: 24px;
-                width: 100%;
-
-                    &>.cardDestaque_container {
-                        display: flex; 
-                        flex-wrap: wrap; 
-                         gap: 1.5rem;
-                        &>div.cardDestaque{
-                            width: 100%;
-
-                        }
-                    }
-                } */
-                &>div.cardDestaque_container {
-                    display: flex;
-                    column-gap: 24px;
-
-                    &>div.cardDestaque {
-                        --padding_cardDestaque: 48px;
-                &>div.main_content {
-                     width: 100%;
-                    
-
-                    &>div.postagens_e_publicacoes {
-                        display: flex !important;
-                        flex-direction: column-reverse !important;
-
-                    }
-                }
-            }
-        }
-    }
-    }
-    }
-
-    nav.navbar_lateral {
-        display: none;
-    }
+    /* Oculta as navbars de desktop e o footer */
+    nav.navbar_lateral,
+    nav.navbar_conteiner,
     footer.pag_footer {
         display: none;
     }
-    nav.navbar_mobile{
-        display:block;
 
+    /* Mostra a navbar de mobile */
+    nav.navbar_mobile {
+        display: block;
     }
 
+    /* --- ESTILOS ESPECÍFICOS DA PÁGINA DE DESTAQUES --- */
+
+    /* Container principal da página de destaques */
+    main > section.main_container {
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Conteúdo principal, organizando os cards em coluna */
+    div.main_content[data-pagina="destaques"] {
+        display: flex;
+        flex-direction: column; /* Coloca os containers de cards um embaixo do outro */
+        gap: 24px;
+        width: 100%;
+    }
+
+    /* Container de uma ou mais cards */
+    div.main_content[data-pagina="destaques"] > div.cardDestaque_container {
+        display: flex;
+        flex-wrap: wrap; /* Permite que os cards quebrem a linha */
+        gap: 24px;
+    }
+
+    /* Estilo dos cards individuais */
+    div.cardDestaque_container > div.cardDestaque {
+      
+        flex-direction: column;
+        width: 100%; /* << FAZ CADA CARD OCUPAR 100% DA LARGURA */
+        
+     
+        
+        background-color: var(--accent);
+        color: white;
+        border-radius: 10px;
+        
+        position: relative;
+   
+        transition: all .2s ease-in-out;
+        align-items: center; /* Se for flex, senão pode remover */
+    }
+
+    div.cardDestaque_container > div.cardDestaque:hover {
+        transform: scale(1.01);
+    }
+
+    /* Título dentro do card */
+    div.cardDestaque_container > div.cardDestaque > h1 {
+        font-size: calc(1.5em + 1.5vw) !important;
+        z-index: 2;
+    }
+
+    /* Efeito de overlay no card */
+    div.cardDestaque_container > div.cardDestaque::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        background-color: #00000030;
+        clip-path: polygon(0 0, 0 0, 0% 100%, 0 100%);
+        transition: all .2s ease-in-out;
+    }
+
+    div.cardDestaque_container > div.cardDestaque:hover::after {
+        clip-path: polygon(0 0, 120px 0, 190px 100%, 0 100%);
+    }
+
+    /* Estilo do item de navegação no hover */
     .nav-item:hover {
         background-color: rgba(255, 255, 255, 0.1);
     }
-
-    .cardDestaque_container {
-        display: flex; /* Se você já usa flexbox aqui */
-        flex-wrap: wrap; /* ESSA É A LINHA MAIS IMPORTANTE! */
-    /* Outros estilos que você possa ter, como margem, etc. */
-    }
-    
-
-    
-
 }
