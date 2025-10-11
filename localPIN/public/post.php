@@ -1,71 +1,67 @@
 <?php
-
-// Inclui os arquivos de configuração e helpers.
-require_once('../config/conn.php');
+// O header agora inicia a sessão
+require_once('../src/components/header.php');
 require_once('../config/log_helper.php'); // Adicionado para usar a função de log
 
 // SEGURANÇA: Verifica se o usuário está logado. Se não, redireciona para o login.
-if (!isset($_SESSION['id_usu'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php?error=login_required");
     exit();
 }
 
 $feedback_message = '';
+$admin_user_name = $_SESSION['full_name'] ?? 'Usuário';
 
 // LÓGICA DE PROCESSAMENTO DO FORMULÁRIO
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Coleta e sanitiza os dados do formulário
-    $id_usu = $_SESSION['id_usu'];
-    $conteudo_post = trim($_POST['conteudo_post']);
-    // id_com agora é opcional, pode ser 0
-    $id_com = isset($_POST['id_com']) ? intval($_POST['id_com']) : 0;
+    // Coleta os dados do formulário
+    $user_id = $_SESSION['user_id'];
+    $content = trim($_POST['conteudo_post']);
+    $community_id = isset($_POST['id_com']) ? intval($_POST['id_com']) : 0;
     $tags_string = trim($_POST['tags']);
-    $aviso_conteudo = isset($_POST['aviso_conteudo']) ? 1 : 0;
+    $content_warning = isset($_POST['aviso_conteudo']) ? 1 : 0;
 
-    // Validação: o conteúdo é obrigatório, mas a comunidade não
-    if (empty($conteudo_post) && empty($_FILES['post_media']['name'][0])) {
+    // Validação: o conteúdo ou uma imagem são obrigatórios
+    if (empty($content) && empty($_FILES['post_media']['name'][0])) {
         $feedback_message = "<p class='error-message'>Você precisa escrever algo ou enviar uma imagem.</p>";
     } else {
-        $conn->begin_transaction();
         try {
+            $pdo->beginTransaction();
+
             // 1. INSERE O POST NA TABELA `posts`
-            $stmt_post = $conn->prepare("INSERT INTO posts (id_usu, conteudo_post, tipo_post, aviso_conteudo) VALUES (?, ?, 'padrao', ?)");
-            $stmt_post->bind_param("isi", $id_usu, $conteudo_post, $aviso_conteudo);
-            $stmt_post->execute();
-            $id_post = $conn->insert_id;
-            $stmt_post->close();
+            $stmt_post = $pdo->prepare("INSERT INTO posts (user_id, content, type, content_warning) VALUES (?, ?, 'padrao', ?)");
+            $stmt_post->execute([$user_id, $content, $content_warning]);
+            $post_id = $pdo->lastInsertId();
 
             // 2. ASSOCIA O POST À COMUNIDADE (SE UMA FOI ESCOLHIDA)
-            if ($id_com > 0) {
-                $stmt_com_post = $conn->prepare("INSERT INTO comunidades_posts (id_com, id_post) VALUES (?, ?)");
-                $stmt_com_post->bind_param("ii", $id_com, $id_post);
-                $stmt_com_post->execute();
-                $stmt_com_post->close();
+            if ($community_id > 0) {
+                $stmt_com_post = $pdo->prepare("INSERT INTO community_posts (community_id, post_id) VALUES (?, ?)");
+                $stmt_com_post->execute([$community_id, $post_id]);
             }
 
             // 3. PROCESSA E ASSOCIA AS TAGS
             if (!empty($tags_string)) {
                 $tags_array = array_map('trim', explode(',', $tags_string));
-                foreach ($tags_array as $nome_tag) {
-                    if (empty($nome_tag)) continue;
-                    $stmt_find_tag = $conn->prepare("SELECT id_tag FROM tags WHERE nome_tag = ?");
-                    $stmt_find_tag->bind_param("s", $nome_tag);
-                    $stmt_find_tag->execute();
-                    $result_tag = $stmt_find_tag->get_result();
-                    if ($result_tag->num_rows > 0) {
-                        $id_tag = $result_tag->fetch_assoc()['id_tag'];
+                foreach ($tags_array as $tag_name) {
+                    if (empty($tag_name)) continue;
+
+                    // Verifica se a tag já existe
+                    $stmt_find_tag = $pdo->prepare("SELECT tag_id FROM tags WHERE name = ?");
+                    $stmt_find_tag->execute([$tag_name]);
+                    $tag = $stmt_find_tag->fetch();
+
+                    if ($tag) {
+                        $tag_id = $tag['tag_id'];
                     } else {
-                        $stmt_create_tag = $conn->prepare("INSERT INTO tags (nome_tag) VALUES (?)");
-                        $stmt_create_tag->bind_param("s", $nome_tag);
-                        $stmt_create_tag->execute();
-                        $id_tag = $conn->insert_id;
-                        $stmt_create_tag->close();
+                        // Se não existir, cria a tag
+                        $stmt_create_tag = $pdo->prepare("INSERT INTO tags (name) VALUES (?)");
+                        $stmt_create_tag->execute([$tag_name]);
+                        $tag_id = $pdo->lastInsertId();
                     }
-                    $stmt_find_tag->close();
-                    $stmt_post_tag = $conn->prepare("INSERT INTO posts_tags (id_post, id_tag) VALUES (?, ?)");
-                    $stmt_post_tag->bind_param("ii", $id_post, $id_tag);
-                    $stmt_post_tag->execute();
-                    $stmt_post_tag->close();
+
+                    // Associa o post à tag
+                    $stmt_post_tag = $pdo->prepare("INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)");
+                    $stmt_post_tag->execute([$post_id, $tag_id]);
                 }
             }
 
@@ -84,45 +80,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $destination = $upload_dir . $unique_name;
 
                         if (move_uploaded_file($tmp_name, $destination)) {
-                            $stmt_media = $conn->prepare("INSERT INTO post_media (id_post, tipo_media, url_media, ordem) VALUES (?, 'imagem', ?, ?)");
-                            $stmt_media->bind_param("isi", $id_post, $destination, $order);
-                            $stmt_media->execute();
-                            $stmt_media->close();
+                            $stmt_media = $pdo->prepare("INSERT INTO post_media (post_id, type, media_url, sort_order) VALUES (?, 'imagem', ?, ?)");
+                            $stmt_media->execute([$post_id, $destination, $order]);
                             $order++;
                         }
                     }
                 }
             }
 
-            // 5. REGISTRA A ATIVIDADE NO LOG
-            $user_name_for_log = $_SESSION['nome_usu'] ?? 'Usuário Desconhecido';
-            log_activity($conn, 'Novo Post', $user_name_for_log, "Usuário criou o post ID #{$id_post}.");
+            // 5. REGISTRA A ATIVIDADE NO LOG (CORRIGIDO)
+            logAction($pdo, 'Novo Post', $admin_user_name, "Usuário criou o post ID #{$post_id}.", $user_id);
 
             // Se tudo deu certo, confirma as alterações e redireciona
-            $conn->commit();
+            $pdo->commit();
             $_SESSION['feedback_message'] = "<p class='success-message'>Post publicado com sucesso!</p>";
             header("Location: index.php");
             exit();
-        } catch (mysqli_sql_exception $exception) {
-            $conn->rollback();
-            $feedback_message = "<p class='error-message'>Ocorreu um erro ao publicar seu post: " . $exception->getMessage() . "</p>";
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $feedback_message = "<p class='error-message'>Ocorreu um erro ao publicar seu post: " . $e->getMessage() . "</p>";
         }
     }
 }
 
 // Busca as comunidades para preencher o campo de seleção
-$comunidades = $conn->query("SELECT id_com, nome_com FROM comunidades ORDER BY nome_com ASC");
+$communities_query = $pdo->query("SELECT community_id, name FROM communities ORDER BY name ASC");
+$communities = $communities_query->fetchAll(PDO::FETCH_ASSOC);
 
 // Busca as tags mais usadas para recomendação
-$popular_tags_query = "SELECT t.nome_tag, COUNT(pt.id_post) AS tag_count 
+$popular_tags_query = "SELECT t.name, COUNT(pt.post_id) AS tag_count 
                        FROM tags t 
-                       JOIN posts_tags pt ON t.id_tag = pt.id_tag 
-                       GROUP BY t.id_tag 
+                       JOIN post_tags pt ON t.tag_id = pt.tag_id 
+                       GROUP BY t.tag_id 
                        ORDER BY tag_count DESC 
                        LIMIT 10";
-$popular_tags = $conn->query($popular_tags_query);
+$popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
 
-include('../src/components/header.php');
 ?>
 
 <main class="">
@@ -135,7 +128,7 @@ include('../src/components/header.php');
         <form action="post.php" method="POST" class="post-form" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="conteudo_post">Sua Mensagem</label>
-                <textarea name="conteudo_post" id="conteudo_post" rows="6" placeholder="No que você está pensando, <?php echo htmlspecialchars($_SESSION['nome_usu']); ?>?"></textarea>
+                <textarea name="conteudo_post" id="conteudo_post" rows="6" placeholder="No que você está pensando, <?php echo htmlspecialchars($_SESSION['full_name']); ?>?"></textarea>
             </div>
 
             <div class="form-group col-12">
@@ -143,10 +136,10 @@ include('../src/components/header.php');
                     <label for="id_com">Publicar em uma Comunidade (Opcional)</label>
                     <select name="id_com" id="id_com">
                         <option value="0">Nenhuma (Post Geral)</option>
-                        <?php if ($comunidades && $comunidades->num_rows > 0): ?>
-                            <?php while ($com = $comunidades->fetch_assoc()): ?>
-                                <option value="<?php echo $com['id_com']; ?>"><?php echo htmlspecialchars($com['nome_com']); ?></option>
-                            <?php endwhile; ?>
+                        <?php if ($communities): ?>
+                            <?php foreach ($communities as $com): ?>
+                                <option value="<?php echo $com['community_id']; ?>"><?php echo htmlspecialchars($com['name']); ?></option>
+                            <?php endforeach; ?>
                         <?php endif; ?>
                     </select>
                 </div>
@@ -161,10 +154,10 @@ include('../src/components/header.php');
                     <div id="tag-suggestions"></div>
                     <div class="recommended-tags">
                         <strong>Tags Populares:</strong>
-                        <?php if ($popular_tags && $popular_tags->num_rows > 0): ?>
-                            <?php while ($tag = $popular_tags->fetch_assoc()): ?>
-                                <button type="button" class="recommended-tag"><?php echo htmlspecialchars($tag['nome_tag']); ?></button>
-                            <?php endwhile; ?>
+                        <?php if ($popular_tags): ?>
+                            <?php foreach ($popular_tags as $tag): ?>
+                                <button type="button" class="recommended-tag"><?php echo htmlspecialchars($tag['name']); ?></button>
+                            <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -238,7 +231,9 @@ include('../src/components/header.php');
                     suggestionsContainer.style.display = 'none';
                     return;
                 }
-                const response = await fetch(`api_search_tags.php?query=${encodeURIComponent(query)}`);
+                // NOTE: A API para buscar tags precisa ser criada ou ajustada se o nome mudou.
+                // Assumindo que api_search_tags.php será criado/ajustado.
+                const response = await fetch(`api/api_search_tags.php?query=${encodeURIComponent(query)}`);
                 const suggestions = await response.json();
                 suggestionsContainer.innerHTML = '';
                 if (suggestions.length > 0) {
@@ -274,9 +269,7 @@ include('../src/components/header.php');
         let filesStore = new DataTransfer();
 
         imageInput.addEventListener('change', () => {
-            // Adiciona novos arquivos ao nosso "depósito"
             Array.from(imageInput.files).forEach(file => filesStore.items.add(file));
-            // Atualiza o input real com os arquivos do depósito
             imageInput.files = filesStore.files;
             renderPreviews();
         });
@@ -288,18 +281,15 @@ include('../src/components/header.php');
                 reader.onload = (e) => {
                     const container = document.createElement('div');
                     container.className = 'preview-image-container';
-
                     const img = document.createElement('img');
                     img.className = 'preview-image';
                     img.src = e.target.result;
-
                     const removeBtn = document.createElement('div');
                     removeBtn.className = 'remove-image-btn';
                     removeBtn.textContent = 'x';
                     removeBtn.onclick = () => {
                         removeFile(index);
                     };
-
                     container.appendChild(img);
                     container.appendChild(removeBtn);
                     previewContainer.appendChild(container);
@@ -311,13 +301,10 @@ include('../src/components/header.php');
         function removeFile(index) {
             const newFiles = new DataTransfer();
             const currentFiles = Array.from(filesStore.files);
-            currentFiles.splice(index, 1); // Remove o arquivo pelo índice
+            currentFiles.splice(index, 1);
             currentFiles.forEach(file => newFiles.items.add(file));
-
-            // Atualiza o depósito e o input
             filesStore = newFiles;
             imageInput.files = filesStore.files;
-
             renderPreviews();
         }
     });
@@ -325,5 +312,4 @@ include('../src/components/header.php');
 
 <?php
 include('../src/components/footer.php');
-$conn->close();
 ?>

@@ -1,29 +1,100 @@
 <?php
-    require_once("../config/conn.php");
+// O header.php já inicia a sessão e faz a conexão com o banco de dados.
+require_once('../src/components/header.php');
+
+// Se o usuário não estiver logado, redireciona para o login.
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// Pega o ID do perfil a ser visualizado (pela URL) ou do usuário logado (pela sessão).
+$profile_user_id = $_GET['id'] ?? $_SESSION['user_id'];
+
+// --- BUSCA DADOS DO USUÁRIO DO PERFIL ---
+$stmt_user = $pdo->prepare("SELECT * FROM users WHERE user_id = ?");
+$stmt_user->execute([$profile_user_id]);
+$profile_user = $stmt_user->fetch(PDO::FETCH_ASSOC);
+
+// Se o usuário não for encontrado, encerra a execução.
+if (!$profile_user) {
+    echo "<main class='container'><p class='error-message'>Usuário não encontrado.</p></main>";
+    include("../src/components/footer.php");
+    exit();
+}
+
+// --- BUSCA POSTS DO USUÁRIO DO PERFIL ---
+$stmt_posts = $pdo->prepare("
+    SELECT p.*, u.full_name, u.profile_image_url
+    FROM posts p
+    JOIN users u ON p.user_id = u.user_id
+    WHERE p.user_id = ?
+    ORDER BY p.created_at DESC
+");
+$stmt_posts->execute([$profile_user_id]);
+$posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil</title>
-</head>
-<body>
-    <?php include_once("../src/components/header.php"); ?>
+<!-- Adiciona a folha de estilo específica para esta página -->
+<link rel="stylesheet" href="../src/assets/css/perfil.css">
 
-    <div class="index-container">
-        <?php include("../src/components/nav_bar.php"); ?>
+<main class="profile-container">
+    <div class="profile-header">
+        <img src="<?php echo htmlspecialchars($profile_user['cover_image_url'] ?? 'https://via.placeholder.com/900x300'); ?>" alt="Capa do Perfil" class="cover-image">
+        <img src="<?php echo htmlspecialchars($profile_user['profile_image_url']); ?>" alt="Foto de Perfil" class="profile-image">
+        <div class="profile-info">
+            <h2><?php echo htmlspecialchars($profile_user['full_name']); ?></h2>
+            <p><?php echo htmlspecialchars($profile_user['bio'] ?? 'Nenhuma biografia disponível.'); ?></p>
+
+            <?php if ($profile_user_id == $_SESSION['user_id']): ?>
+                <a href="edit_profile.php" class="btn btn-secondary">Editar Perfil</a>
+            <?php endif; ?>
+        </div>
     </div>
 
-    <!-- Lightbox para visualização de imagem -->
-    <div id="imageLightbox" class="lightbox">
-        <span class="lightbox-close">&times;</span>
-        <a class="lightbox-nav prev">&#10094;</a>
-        <img class="lightbox-content" id="lightboxImage">
-        <a class="lightbox-nav next">&#10095;</a>
+    <div class="profile-content">
+        <h3>Posts de <?php echo htmlspecialchars($profile_user['full_name']); ?></h3>
+        <div class="feed">
+            <?php if ($posts && count($posts) > 0): ?>
+                <?php foreach ($posts as $post): ?>
+                    <div class="post_container" data-post-url="post_view.php?id=<?php echo $post['post_id']; ?>">
+                        <header class="post_header">
+                            <div class="user_info">
+                                <div class="user_icon">
+                                    <img src="<?php echo htmlspecialchars($post['profile_image_url']); ?>" alt="Foto de Perfil">
+                                </div>
+                                <div class="user-details">
+                                    <span class="user-name"><?php echo htmlspecialchars($post['full_name']); ?></span><br>
+                                    <span class="user-tag">@<?php echo strtolower(explode(' ', $post['full_name'])[0]); ?></span>
+                                </div>
+                            </div>
+                            <div class="post-date">
+                                <span><?php echo date('d/m/Y H:i', strtotime($post['created_at'])); ?></span>
+                            </div>
+                        </header>
+                        <section class="post_main">
+                            <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
+                        </section>
+                        <footer class="post_footer">
+                            <div class="post-stats-left">
+                                <div class="post-icon">
+                                    <i class="ri-heart-line"></i>
+                                    <span class="post-cont"><?php echo $post['like_count']; ?></span>
+                                </div>
+                                <div class="post-icon">
+                                    <i class="ri-chat-3-line"></i>
+                                    <span class="post-cont"><?php echo $post['reply_count']; ?></span>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p><?php echo htmlspecialchars($profile_user['full_name']); ?> ainda não fez nenhuma publicação.</p>
+            <?php endif; ?>
+        </div>
     </div>
+</main>
 
-    <?php include("../src/components/footer.php"); ?>
-</body>
-</html>
+<?php require_once '../src/components/footer.php'; ?>

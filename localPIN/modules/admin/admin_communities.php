@@ -65,9 +65,9 @@ if (isset($_GET['action'])) {
         $stmt->bind_param("i", $id_para_deletar);
         if ($stmt->execute()) {
             log_activity($conn, 'Comunidade Excluída', $admin_user_name, "Comunidade '{$comm_name_for_log}' (ID: #{$id_para_deletar}) foi excluída.");
-            header("Location: admin_comms.php?feedback=deleted_ok");
+            header("Location: admin_communities.php?feedback=deleted_ok");
         } else {
-            header("Location: admin_comms.php?feedback=error");
+            header("Location: admin_communities.php?feedback=error");
         }
         $stmt->close();
         exit();
@@ -91,9 +91,9 @@ if (isset($_GET['action'])) {
         $stmt->bind_param("ii", $user_id, $comm_id);
         if ($stmt->execute()) {
             log_activity($conn, 'Membro Removido', $admin_user_name, "Usuário '{$user_name_for_log}' (ID: #{$user_id}) foi removido da comunidade '{$comm_name_for_log}' (ID: #{$comm_id}).");
-            header("Location: admin_comms.php?edit_id=$comm_id&feedback=member_removed");
+            header("Location: admin_communities.php?edit_id=$comm_id&feedback=member_removed");
         } else {
-            header("Location: admin_comms.php?edit_id=$comm_id&feedback=error");
+            header("Location: admin_communities.php?edit_id=$comm_id&feedback=error");
         }
         $stmt->close();
         exit();
@@ -119,9 +119,9 @@ if (isset($_GET['action'])) {
             $stmt->bind_param("sii", $role, $user_id, $comm_id);
             if ($stmt->execute()) {
                 log_activity($conn, 'Cargo Alterado', $admin_user_name, "Cargo do usuário '{$user_name_for_log}' (ID: #{$user_id}) alterado para '{$role}' na comunidade '{$comm_name_for_log}' (ID: #{$comm_id}).");
-                header("Location: admin_comms.php?edit_id=$comm_id&feedback=role_changed");
+                header("Location: admin_communities.php?edit_id=$comm_id&feedback=role_changed");
             } else {
-                header("Location: admin_comms.php?edit_id=$comm_id&feedback=error");
+                header("Location: admin_communities.php?edit_id=$comm_id&feedback=error");
             }
             $stmt->close();
             exit();
@@ -211,10 +211,10 @@ $resultado = $conn->query($sql_lista);
                             <td><?php echo htmlspecialchars($com['nome_criador']); ?></td>
                             <td><?php echo $com['total_membros']; ?></td>
                             <td class="actions">
-                                <a href="admin_comms.php?edit_id=<?php echo $com['id_com']; ?>#form-comunidade" class="btn btn-icon btn-edit" title="Editar">
+                                <a href="admin_communities.php?edit_id=<?php echo $com['id_com']; ?>#form-comunidade" class="btn btn-icon btn-edit" title="Editar">
                                     <i class="ri-pencil-line"></i>
                                 </a>
-                                <a href="admin_comms.php?action=delete&id=<?php echo $com['id_com']; ?>" onclick="return confirm('Tem a certeza? A comunidade e todas as suas associações serão removidas.');" class="btn btn-icon btn-delete" title="Apagar">
+                                <a href="admin_communities.php?action=delete&id=<?php echo $com['id_com']; ?>" onclick="return confirm('Tem a certeza? A comunidade e todas as suas associações serão removidas.');" class="btn btn-icon btn-delete" title="Apagar">
                                     <i class="ri-delete-bin-line"></i>
                                 </a>
                             </td>
@@ -231,7 +231,7 @@ $resultado = $conn->query($sql_lista);
 
     <div class="form-container" id="form-comunidade">
         <h2><?php echo $comunidade_para_editar ? 'Editar Comunidade' : 'Adicionar Nova Comunidade'; ?></h2>
-        <form action="admin_comms.php" method="POST">
+        <form action="admin_communities.php" method="POST">
             <?php if ($comunidade_para_editar): ?>
                 <input type="hidden" name="id_com" value="<?php echo $comunidade_para_editar['id_com']; ?>">
             <?php endif; ?>
@@ -287,10 +287,10 @@ $resultado = $conn->query($sql_lista);
                                             <div class="profile-dropdown">
                                                 <button type="button" class="btn btn-icon" title="Mais Ações"><i class="ri-settings-line"></i></button>
                                                 <div class="dropdown-content">
-                                                    <a href="admin_comms.php?action=change_role&comm_id=<?php echo $id_para_editar; ?>&user_id=<?php echo $member['id_usu']; ?>&role=admin">Promover a Admin</a>
-                                                    <a href="admin_comms.php?action=change_role&comm_id=<?php echo $id_para_editar; ?>&user_id=<?php echo $member['id_usu']; ?>&role=moderador">Promover a Moderador</a>
-                                                    <a href="admin_comms.php?action=change_role&comm_id=<?php echo $id_para_editar; ?>&user_id=<?php echo $member['id_usu']; ?>&role=membro">Rebaixar a Membro</a>
-                                                    <a href="admin_comms.php?action=remove_member&comm_id=<?php echo $id_para_editar; ?>&user_id=<?php echo $member['id_usu']; ?>" onclick="return confirm('Tem certeza que deseja remover este membro da comunidade?');" style="color: var(--danger-color);">Remover Membro</a>
+                                                    <a href="admin_communities.php?action=change_role&comm_id=<?php echo $id_para_editar; ?>&user_id=<?php echo $member['id_usu']; ?>&role=admin">Promover a Admin</a>
+                                                    <a href="admin_communities.php?action=change_role&comm_id=<?php echo $id_para_editar; ?>&user_id=<?php echo $member['id_usu']; ?>&role=moderador">Promover a Moderador</a>
+                                                    <a href="admin_communities.php?action=change_role&comm_id=<?php echo $id_para_editar; ?>&user_id=<?php echo $member['id_usu']; ?>&role=membro">Rebaixar a Membro</a>
+                                                    <a href="admin_communities.php?action=remove_member&comm_id=<?php echo $id_para_editar; ?>&user_id=<?php echo $member['id_usu']; ?>" onclick="return confirm('Tem certeza que deseja remover este membro da comunidade?');" style="color: var(--danger-color);">Remover Membro</a>
                                                 </div>
                                             </div>
                                         </td>
@@ -309,7 +309,7 @@ $resultado = $conn->query($sql_lista);
                 <i class="ri-save-line"></i> Salvar Comunidade
             </button>
             <?php if ($comunidade_para_editar): ?>
-                <a href="admin_comms.php" class="btn">Cancelar Edição</a>
+                <a href="admin_communities.php" class="btn">Cancelar Edição</a>
             <?php endif; ?>
 
         </form>

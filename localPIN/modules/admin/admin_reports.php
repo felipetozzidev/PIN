@@ -85,9 +85,9 @@ $resultado = $conn->query($sql);
     <div class="page-header">
         <h1>Denúncias</h1>
         <div class="filters">
-            <a href="admin_denns.php?filter=pendente" class="btn <?php echo ($filter == 'pendente') ? 'btn-primary' : ''; ?>">Pendentes</a>
-            <a href="admin_denns.php?filter=resolvida" class="btn <?php echo ($filter == 'resolvida') ? 'btn-primary' : ''; ?>">Resolvidas</a>
-            <a href="admin_denns.php?filter=all" class="btn <?php echo ($filter == 'all') ? 'btn-primary' : ''; ?>">Todas</a>
+            <a href="admin_reports.php?filter=pendente" class="btn <?php echo ($filter == 'pendente') ? 'btn-primary' : ''; ?>">Pendentes</a>
+            <a href="admin_reports.php?filter=resolvida" class="btn <?php echo ($filter == 'resolvida') ? 'btn-primary' : ''; ?>">Resolvidas</a>
+            <a href="admin_reports.php?filter=all" class="btn <?php echo ($filter == 'all') ? 'btn-primary' : ''; ?>">Todas</a>
         </div>
     </div>
 
@@ -122,10 +122,10 @@ $resultado = $conn->query($sql);
                             </td>
                             <td class="actions">
                                 <?php if ($denuncia['status_denn'] == 'pendente'): ?>
-                                    <a href="admin_denns.php?action=resolve&id_denn=<?php echo $denuncia['id_denn']; ?>" class="btn btn-icon btn-edit" title="Marcar como Resolvida">
+                                    <a href="admin_reports.php?action=resolve&id_denn=<?php echo $denuncia['id_denn']; ?>" class="btn btn-icon btn-edit" title="Marcar como Resolvida">
                                         <i class="ri-check-line"></i>
                                     </a>
-                                    <a href="admin_denns.php?action=delete_content&id_denn=<?php echo $denuncia['id_denn']; ?>&tipoalvo_denn=<?php echo $denuncia['tipoalvo_denn']; ?>&idalvo_denn=<?php echo $denuncia['idalvo_denn']; ?>" onclick="return confirm('Tem certeza que deseja DELETAR o conteúdo denunciado e resolver esta denúncia?');" class="btn btn-icon btn-delete" title="Deletar Conteúdo e Resolver">
+                                    <a href="admin_reports.php?action=delete_content&id_denn=<?php echo $denuncia['id_denn']; ?>&tipoalvo_denn=<?php echo $denuncia['tipoalvo_denn']; ?>&idalvo_denn=<?php echo $denuncia['idalvo_denn']; ?>" onclick="return confirm('Tem certeza que deseja DELETAR o conteúdo denunciado e resolver esta denúncia?');" class="btn btn-icon btn-delete" title="Deletar Conteúdo e Resolver">
                                         <i class="ri-delete-bin-2-line"></i>
                                     </a>
                                 <?php endif; ?>

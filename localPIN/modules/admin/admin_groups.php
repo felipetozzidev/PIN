@@ -114,10 +114,10 @@ if (isset($_GET['action'])) {
         $stmt->bind_param("ii", $user_id, $group_id);
         if ($stmt->execute()) {
             log_activity($conn, 'Membro Removido', $admin_user_name, "Usuário '{$user_name_for_log}' foi removido do grupo '{$group_name_for_log}'.");
-            header("Location: admin_gps.php?action=edit&id=$group_id&feedback=member_removed");
+            header("Location: admin_groups.php?action=edit&id=$group_id&feedback=member_removed");
             exit();
         } else {
-            header("Location: admin_gps.php?action=edit&id=$group_id&feedback=error");
+            header("Location: admin_groups.php?action=edit&id=$group_id&feedback=error");
             exit();
         }
     }
@@ -148,7 +148,7 @@ $resultado = $conn->query($sql);
 <main class="container">
     <div class="page-header">
         <h1>Grupos</h1>
-        <form action="admin_gps.php" method="GET" class="search-form">
+        <form action="admin_groups.php" method="GET" class="search-form">
             <input type="search" name="search" placeholder="Buscar por nome ou descrição..." value="<?php echo htmlspecialchars($search_query); ?>">
             <button type="submit" class="btn btn-primary"><i class="ri-search-line"></i></button>
         </form>
@@ -179,10 +179,10 @@ $resultado = $conn->query($sql);
                             <td><?php echo $grupo['total_membros']; ?></td>
                             <td><?php echo date("d/m/Y H:i", strtotime($grupo['data_criacao'])); ?></td>
                             <td class="actions">
-                                <a href="admin_gps.php?action=edit&id=<?php echo $grupo['id_gp']; ?>#form-gp" class="btn btn-icon btn-edit" title="Editar Grupo">
+                                <a href="admin_groups.php?action=edit&id=<?php echo $grupo['id_gp']; ?>#form-gp" class="btn btn-icon btn-edit" title="Editar Grupo">
                                     <i class="ri-pencil-line"></i>
                                 </a>
-                                <a href="admin_gps.php?action=delete&id=<?php echo $grupo['id_gp']; ?>" onclick="return confirm('Tem certeza que deseja deletar este grupo? Esta ação é irreversível.');" class="btn btn-icon btn-delete" title="Deletar Grupo">
+                                <a href="admin_groups.php?action=delete&id=<?php echo $grupo['id_gp']; ?>" onclick="return confirm('Tem certeza que deseja deletar este grupo? Esta ação é irreversível.');" class="btn btn-icon btn-delete" title="Deletar Grupo">
                                     <i class="ri-delete-bin-line"></i>
                                 </a>
                             </td>
@@ -199,7 +199,7 @@ $resultado = $conn->query($sql);
 
     <div class="form-container" id="form-gp">
         <h2><?php echo $edit_mode ? 'Editar Grupo' : 'Adicionar Novo Grupo'; ?></h2>
-        <form action="admin_gps.php" method="POST">
+        <form action="admin_groups.php" method="POST">
             <?php if ($edit_mode): ?>
                 <input type="hidden" name="id_gp" value="<?php echo $grupo_para_editar['id_gp']; ?>">
             <?php endif; ?>
@@ -245,7 +245,7 @@ $resultado = $conn->query($sql);
                                     <td><?php echo htmlspecialchars($member['email_usu']); ?></td>
                                     <td><?php echo date("d/m/Y", strtotime($member['data_entrada'])); ?></td>
                                     <td class="actions">
-                                        <a href="admin_gps.php?action=remove_member&user_id=<?php echo $member['id_usu']; ?>&group_id=<?php echo $grupo_para_editar['id_gp']; ?>" onclick="return confirm('Tem certeza que deseja remover este membro do grupo?');" class="btn btn-icon btn-delete" title="Remover Membro">
+                                        <a href="admin_groups.php?action=remove_member&user_id=<?php echo $member['id_usu']; ?>&group_id=<?php echo $grupo_para_editar['id_gp']; ?>" onclick="return confirm('Tem certeza que deseja remover este membro do grupo?');" class="btn btn-icon btn-delete" title="Remover Membro">
                                             <i class="ri-user-unfollow-line"></i>
                                         </a>
                                     </td>
@@ -263,7 +263,7 @@ $resultado = $conn->query($sql);
 
             <button type="submit" name="save_group" class="btn btn-primary"><?php echo $edit_mode ? 'Salvar Alterações' : 'Adicionar Grupo'; ?></button>
             <?php if ($edit_mode): ?>
-                <a href="admin_gps.php" class="btn">Cancelar Edição</a>
+                <a href="admin_groups.php" class="btn">Cancelar Edição</a>
             <?php endif; ?>
         </form>
     </div>
