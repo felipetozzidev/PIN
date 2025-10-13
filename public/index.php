@@ -1,77 +1,65 @@
 <?php
+// O header agora inicia a sessão
 include("../src/components/header.php");
 
 // Pega o ID do usuário logado, ou 0 se for um visitante
-$current_user_id = isset($_SESSION['id_usu']) ? $_SESSION['id_usu'] : 0;
+$current_user_id = $_SESSION['user_id'] ?? 0;
 
 // Lógica de busca e exibição de posts unificada
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-// SQL APRIMORADO: Unifica a busca e a verificação de likes
+// SQL APRIMORADO com os novos nomes e PDO
 $sql = "SELECT 
-            p.id_post,
-            p.conteudo_post,
-            p.data_post,
-            p.cont_visualizacoes,
-            p.cont_likes,
-            p.cont_respostas,
-            p.cont_reposts,
-            p.cont_citacoes,
-            u.id_usu,
-            u.nome_usu,
-            u.imgperfil_usu,
-            GROUP_CONCAT(DISTINCT pm.url_media SEPARATOR ';') as media_urls,
-            (SELECT COUNT(*) FROM likes l WHERE l.id_post = p.id_post AND l.id_usu = ?) AS user_has_liked,
-            c.nome_com,
-            GROUP_CONCAT(DISTINCT t.nome_tag SEPARATOR ', ') as tags
+            p.post_id,
+            p.content,
+            p.created_at,
+            p.view_count,
+            p.like_count,
+            p.reply_count,
+            u.user_id,
+            u.full_name,
+            u.profile_image_url,
+            GROUP_CONCAT(DISTINCT pm.media_url SEPARATOR ';') as media_urls,
+            (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id AND l.user_id = :current_user_id) AS user_has_liked,
+            c.name as community_name,
+            GROUP_CONCAT(DISTINCT t.name SEPARATOR ', ') as tags
         FROM posts AS p
-        JOIN usuarios AS u ON p.id_usu = u.id_usu
-        LEFT JOIN post_media AS pm ON p.id_post = pm.id_post
-        LEFT JOIN comunidades_posts cp ON p.id_post = cp.id_post
-        LEFT JOIN comunidades c ON cp.id_com = c.id_com
-        LEFT JOIN posts_tags pt ON p.id_post = pt.id_post
-        LEFT JOIN tags t ON pt.id_tag = t.id_tag";
+        JOIN users AS u ON p.user_id = u.user_id
+        LEFT JOIN post_media AS pm ON p.post_id = pm.post_id
+        LEFT JOIN community_posts cp ON p.post_id = cp.post_id
+        LEFT JOIN communities c ON cp.community_id = c.community_id
+        LEFT JOIN post_tags pt ON p.post_id = pt.post_id
+        LEFT JOIN tags t ON pt.tag_id = t.tag_id";
 
-$where_clauses = ["p.tipo_post = 'padrao'", "p.stats_post = 'ativo'"];
-$params = [$current_user_id];
-$types = 'i';
+$where_clauses = ["p.type = 'padrao'", "p.status = 'ativo'"];
+$params = [':current_user_id' => $current_user_id];
 
 if (!empty($search_query)) {
-    $search_term = "%" . $conn->real_escape_string($search_query) . "%";
-    $where_clauses[] = "(p.conteudo_post LIKE ? OR u.nome_usu LIKE ? OR c.nome_com LIKE ? OR t.nome_tag LIKE ?)";
-    array_push($params, $search_term, $search_term, $search_term, $search_term);
-    $types .= 'ssss';
+    $where_clauses[] = "(p.content LIKE :search OR u.full_name LIKE :search OR c.name LIKE :search OR t.name LIKE :search)";
+    $params[':search'] = "%" . $search_query . "%";
 }
 
 if (!empty($where_clauses)) {
     $sql .= " WHERE " . implode(' AND ', $where_clauses);
 }
 
-$sql .= " GROUP BY p.id_post ORDER BY p.data_post DESC LIMIT 20";
+$sql .= " GROUP BY p.post_id ORDER BY p.created_at DESC LIMIT 20";
 
-// Usa prepared statements para segurança
-$stmt = $conn->prepare($sql);
-if ($stmt) {
-    $stmt->bind_param($types, ...$params);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-} else {
-    // Tratar erro na preparação da query
-    $resultado = null;
-}
-
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Busca as 5 comunidades mais populares (com mais membros)
 $sql_comunidades = "SELECT 
-                        c.nome_com,
-                        COUNT(uc.id_usu) as total_membros
-                    FROM comunidades c
-                    LEFT JOIN usuarios_comunidades uc ON c.id_com = uc.id_com
-                    GROUP BY c.id_com
+                        c.name as community_name,
+                        COUNT(uc.user_id) as total_membros
+                    FROM communities c
+                    LEFT JOIN user_communities uc ON c.community_id = uc.community_id
+                    GROUP BY c.community_id
                     ORDER BY total_membros DESC
                     LIMIT 5";
 
-$result_comunidades = $conn->query($sql_comunidades);
+$result_comunidades = $pdo->query($sql_comunidades);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -98,41 +86,40 @@ $result_comunidades = $conn->query($sql_comunidades);
                 <div class="postagens_e_publicacoes">
                     <div class="postagens">
                         <h1 class="title">Postagens</h1>
-                        <?php if ($resultado && $resultado->num_rows > 0): ?>
-                            <?php while ($post = $resultado->fetch_assoc()):
-                                // Agora a variável $post['user_has_liked'] existe e tem o valor correto (0 ou 1)
+                        <?php if ($posts && count($posts) > 0): ?>
+                            <?php foreach ($posts as $post):
                                 $user_has_liked = $post['user_has_liked'] > 0; ?>
-                                <div class="post_container" data-post-url="post_view.php?id_post=<?php echo $post['id_post']; ?>">
+                                <div class="post_container" data-post-url="post_view.php?id=<?php echo $post['post_id']; ?>">
                                     <header class="post_header">
-                                        <div class="user_info" data-user-id="<?php echo $post['id_usu']; ?>">
+                                        <div class="user_info" data-user-id="<?php echo $post['user_id']; ?>">
                                             <div class="user_icon">
-                                                <img src="<?php echo htmlspecialchars($post['imgperfil_usu']); ?>"
+                                                <img src="<?php echo htmlspecialchars($post['profile_image_url']); ?>"
                                                     alt="Foto de Perfil">
                                             </div>
                                             <div class="user-details">
                                                 <span
-                                                    class="user-name"><a href="perfil.php?id=<?php echo $post['id_usu']; ?>"><?php echo htmlspecialchars($post['nome_usu']); ?></a></span><br>
+                                                    class="user-name"><a href="perfil.php?id=<?php echo $post['user_id']; ?>"><?php echo htmlspecialchars($post['full_name']); ?></a></span><br>
                                                 <span
-                                                    class="user-tag">@<?php echo strtolower(explode(' ', $post['nome_usu'])[0]); ?></span>
+                                                    class="user-tag">@<?php echo strtolower(explode(' ', $post['full_name'])[0]); ?></span>
                                             </div>
                                         </div>
                                         <div class="post-info">
                                             <div class="post-date">
                                                 <div class="post-hour">
-                                                    <?php echo "" . date("H:i", strtotime(($post['data_post']))); ?>
+                                                    <?php echo date("H:i", strtotime(($post['created_at']))); ?>
                                                 </div>
                                                 <div class="post-calendar">
-                                                    <?php echo date("d/m/Y", strtotime($post['data_post'])); ?>
+                                                    <?php echo date("d/m/Y", strtotime($post['created_at'])); ?>
                                                 </div>
                                             </div>
                                             <div class="post-views">
                                                 <i class="ri-bar-chart-grouped-line"></i>
-                                                <span><?php echo $post['cont_visualizacoes']; ?></span>
+                                                <span><?php echo $post['view_count']; ?></span>
                                             </div>
                                         </div>
                                     </header>
                                     <section class="post_main">
-                                        <p><?php echo nl2br(htmlspecialchars($post['conteudo_post'])); ?></p>
+                                        <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
                                         <?php
                                         $media_urls = !empty($post['media_urls']) ? explode(';', $post['media_urls']) : [];
                                         $media_count = count($media_urls);
@@ -147,28 +134,28 @@ $result_comunidades = $conn->query($sql_comunidades);
                                     <footer class="post_footer">
                                         <div class="post-stats-left">
                                             <button class="post-icon like-btn <?php echo $user_has_liked ? 'liked' : ''; ?>"
-                                                data-post-id="<?php echo $post['id_post']; ?>">
+                                                data-post-id="<?php echo $post['post_id']; ?>">
                                                 <i class="ri-heart-<?php echo $user_has_liked ? 'fill' : 'line'; ?>"></i>
-                                                <span class="post-cont"><?php echo $post['cont_likes']; ?></span>
+                                                <span class="post-cont"><?php echo $post['like_count']; ?></span>
                                             </button>
                                             <div class="post-icon">
                                                 <i class="ri-chat-3-line"></i>
-                                                <span class="post-cont"><?php echo $post['cont_respostas']; ?></span>
+                                                <span class="post-cont"><?php echo $post['reply_count']; ?></span>
                                             </div>
                                         </div>
                                         <div class="post-stats-right">
                                             <div class="post-icon">
                                                 <i class="ri-repeat-line"></i>
-                                                <span class="post-cont"><?php echo $post['cont_reposts']; ?></span>
+                                                <span class="post-cont">0</span> <!-- Placeholder para reposts -->
                                             </div>
                                             <div class="post-icon">
                                                 <i class="ri-chat-quote-line"></i>
-                                                <span class="post-cont"><?php echo $post['cont_citacoes']; ?></span>
+                                                <span class="post-cont">0</span> <!-- Placeholder para citações -->
                                             </div>
                                         </div>
                                     </footer>
                                 </div>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         <?php else: ?>
                             <div class="post-card">
                                 <section class="post-main">
@@ -180,13 +167,13 @@ $result_comunidades = $conn->query($sql_comunidades);
                     <div class="comunidades_populares">
                         <h1 class="title">Comunidades Populares</h1>
                         <div class="community_cards_container">
-                            <?php if ($result_comunidades && $result_comunidades->num_rows > 0): ?>
-                                <?php while ($comunidade = $result_comunidades->fetch_assoc()): ?>
+                            <?php if ($result_comunidades && $result_comunidades->rowCount() > 0): ?>
+                                <?php while ($comunidade = $result_comunidades->fetch(PDO::FETCH_ASSOC)): ?>
                                     <div class="community_card">
                                         <div class="community_icon"><i class="ri-group-line"></i></div>
                                         <p>
                                             <span
-                                                class="community_name"><?php echo htmlspecialchars($comunidade['nome_com']); ?></span>
+                                                class="community_name"><?php echo htmlspecialchars($comunidade['community_name']); ?></span>
                                             <span class="community_followers"><?php echo $comunidade['total_membros']; ?>
                                                 seguidores</span>
                                         </p>

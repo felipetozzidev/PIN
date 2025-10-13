@@ -1,23 +1,31 @@
 <?php
+// Garante que a sessão seja iniciada apenas uma vez.
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-$host = '127.0.0.1';     // Endereço do servidor do banco de dados.
-$db_name = 'ifapoia';    // Nome do banco de dados.
-$username = 'root';      // Nome de usuário para acesso ao banco.
-$password = '';          // Senha para acesso ao banco.
-$port = 3306;            // Porta de conexão. É importante especificar, pois pode variar.
+// --- CONFIGURAÇÕES DO BANCO DE DADOS LOCAL (XAMPP) ---
+$db_host = '127.0.0.1';                 // Host padrão do XAMPP
+$db_name = 'ifapoia';                   // O nome do seu banco de dados local
+$db_user = 'root';                      // Usuário padrão do XAMPP
+$db_pass = '';                          // Senha padrão do XAMPP (vazia)
+$db_port = '3306';                      // Porta padrão do MySQL no XAMPP
+$charset = 'utf8';
+
+// Data Source Name (DSN) para a conexão PDO.
+$dsn = "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=$charset";
+
+// Opções do PDO para um comportamento mais seguro e previsível.
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
 
 try {
-    // Cria a string de conexão (DSN - Data Source Name)
-    $dsn = "mysql:host=$host;port=$port;dbname=$db_name;charset=utf8";
-
-    // Cria uma nova instância de PDO para a conexão
-    $pdo = new PDO($dsn, $username, $password);
-
-    // Define o modo de erro do PDO para exceção, para que erros de SQL sejam lançados
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    // Em caso de falha na conexão, exibe uma mensagem de erro genérica e termina o script.
-    // Em produção, é recomendado logar o erro em um arquivo em vez de exibi-lo na tela.
-    // error_log("Erro de conexão: " . $e->getMessage());
-    die("Não foi possível conectar ao banco de dados. Por favor, tente mais tarde.");
+    // Tenta criar a instância do PDO (a conexão com o banco).
+    $pdo = new PDO($dsn, $db_user, $db_pass, $options);
+} catch (\PDOException $e) {
+    // Falha na conexão, exibe uma mensagem de erro detalhada (seguro para ambiente local).
+    die("Erro de conexão com o banco de dados local: " . $e->getMessage());
 }

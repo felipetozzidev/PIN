@@ -3,15 +3,16 @@
     flex-direction: column;
     max-width: 80%;
     margin: 0 auto;
-    padding: 60px 1rem 2rem 1rem;
+    padding: 80px 1rem 2rem 1rem;
 }
 
 .post-card-full {
-    background-color: transparent;
+    background-color: var(--white);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     display: flex;
     flex-direction: column;
+    padding: 20px;
 }
 
 .post-card-full .post-main p {
@@ -19,23 +20,123 @@
     line-height: 1.6;
 }
 
-.post-timestamp {
-    color: var(--text-muted);
-    font-size: 0.9rem;
+/* --- ESTILOS UNIFICADOS (HEADER, MAIN, FOOTER DO POST) --- */
+
+.post-card-full .post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.post-card-full .post-header .user-info {
+    display: flex;
+    align-items: center;
+}
+
+.post-card-full .post-header .user-info .user-icon img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.post-card-full .post-header .user-info .user-details .user-name {
+    font-weight: bold;
+}
+
+.post-card-full .post-header .user-info .user-details .user-tag {
+    font-size: .9em;
+    opacity: .8;
+}
+
+.post-card-full .post-header .post-info {
+    display: flex;
+    opacity: 0.8;
+}
+
+.post-card-full .post-header .post-info .post-views {
+    margin-left: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.post-card-full .post-main {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.post-card-full .post-main .post-media-grid {
+    display: grid;
+    gap: 2px;
+    margin-top: 12px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e1e8ed;
+}
+
+.post-card-full .post-main .post-media-grid .img_container img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.post-card-full footer.post-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e8ed;
+}
+
+.post-card-full footer.post-footer>div {
+    display: flex;
+    gap: 20px;
+}
+
+.post-card-full footer.post-footer .post-icon {
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+    opacity: 0.6;
+    cursor: pointer;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.post-card-full footer.post-footer .post-icon.like-btn {
+    border: 0;
+    background-color: transparent;
+    padding: 0;
+}
+
+.post-card-full footer.post-footer .post-icon.liked {
+    opacity: 1;
+}
+
+/* CORREÇÃO: Aplica a cor vermelha diretamente ao ícone quando o botão tem a classe 'liked' */
+.post-card-full footer.post-footer .post-icon.liked i {
+    color: #E74C3C;
+}
+
+.post-card-full footer.post-footer .post-icon i {
+    font-size: 1.6rem;
+    margin-right: 5px;
 }
 
 /* --- Formulário de Resposta --- */
 .reply-form-container {
-    padding: 1.5rem 1rem;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 1rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border-color);
+    margin-top: 1rem;
 }
 
 #reply-form {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    /* Alinha o botão à direita */
 }
 
 #reply-textarea {
@@ -82,150 +183,25 @@
 
 /* --- Card de Comentário Individual --- */
 .comment-card {
-    background-color: transparent;
+    background-color: var(--white);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     display: flex;
     flex-direction: column;
+    padding: 1rem;
 }
 
-/* O header do comentário é um pouco mais compacto */
 .comment-card .post-header {
-    padding-bottom: 0.5rem; 
+    padding-bottom: 0.5rem;
 }
 
-.comment-card .user-icon img {
+.comment-card .user-info .user-icon img {
     width: 40px;
     height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .comment-card .post-main {
     padding-top: 0;
-}
-
-/* --- Fim do Post_view Breno --- */
-
-div.post-card-full{
-    padding: 20px;
-
-    &>.post-header{
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        &>.user-info{
-            display: inherit;
-            align-items: center;
-
-            & > .user-details{
-                & > span.user-name{
-                    font-weight: bold;
-                }
-            }
-
-            &>.user-icon{
-                &>img{
-                    width: 50px;
-                    height: 50px;
-                    margin-right: 10px;
-                }
-            }
-        }
-
-
-        &>.post-info{
-            display: flex;
-            opacity: 0.8;
-
-            & > .post-views{
-                margin-left: 10px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
-        }
-    }
-
-    &>.post-main{
-        width: 100%;
-
-        &>.post-media-grid{
-
-            &[data-count="3"]{
-                grid-template-columns: 1fr 1fr;
-                /* grid-template-rows: 1fr 1fr; */
-                grid-template-areas: "side_image img"
-                "side_image img_2";
-                & > div.img_container{
-                    height: 300px;
-                    
-                    &:first-child{
-                        grid-area: side_image;
-                        height: 100%;
-                    }
-    
-                    &:not(:first-child){
-                        height: 400px;
-                        &:nth-child(1){
-                            grid-area: img;
-                        }
-                        &:nth-child(2){
-                            grid-area: img_2;
-                        }
-    
-                    }
-    
-                    &:last-child{
-                        grid-column: 2 / span 1;
-                    }
-    
-                }
-            }
-            
-            &[data-count="4"]{
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: 1fr 1fr;
-            }
-            display: grid;
-            height: 100%;
-            width: 100%;
-            gap: 10px;
-            overflow: hidden;
-            
-            & > div.img_container{
-                &>img{
-                    height: 100%;
-                    width: 100%;
-                    border-radius: 10px;
-                    object-fit: cover;
-                }
-            }
-        }
-    }
-
-    &>footer.post-footer{
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-    
-        & > div{
-            display: inherit;
-            gap: 10px;
-
-
-            & > button{
-                border: 0;
-                background-color: transparent;
-            }
-
-            & > button, & > div{
-                display: flex;
-                align-items: center;
-                & > i{
-                    font-size: 1.6rem;
-                    margin-right: 5px;
-                }
-            }
-        }
-    }
 }

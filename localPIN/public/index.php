@@ -1,6 +1,11 @@
 <?php
-// O header agora inicia a sessão
-include("../src/components/header.php");
+// Habilita a exibição de todos os erros para diagnóstico no ambiente local.
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// O header agora inicia a sessão e faz a conexão via PDO.
+// A utilização de __DIR__ torna o caminho mais robusto e à prova de erros.
+require_once(__DIR__ . '/../src/components/header.php');
 
 // Pega o ID do usuário logado, ou 0 se for um visitante
 $current_user_id = $_SESSION['user_id'] ?? 0;
@@ -16,6 +21,8 @@ $sql = "SELECT
             p.view_count,
             p.like_count,
             p.reply_count,
+            p.repost_count, 
+            p.quote_count,
             u.user_id,
             u.full_name,
             u.profile_image_url,
@@ -61,6 +68,7 @@ $sql_comunidades = "SELECT
 
 $result_comunidades = $pdo->query($sql_comunidades);
 ?>
+<!-- O restante do seu HTML continua aqui, sem alterações -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -73,7 +81,7 @@ $result_comunidades = $pdo->query($sql_comunidades);
 <body data-is-logged-in="<?php echo ($current_user_id > 0) ? 'true' : 'false'; ?>">
 
     <main class="index-container">
-        <?php include("../src/components/nav_bar.php"); ?>
+        <?php require_once(__DIR__ . '/../src/components/nav_bar.php'); ?>
 
         <section class="main_container">
             <div class="main_content" data-pagina="pagina principal">
@@ -146,11 +154,11 @@ $result_comunidades = $pdo->query($sql_comunidades);
                                         <div class="post-stats-right">
                                             <div class="post-icon">
                                                 <i class="ri-repeat-line"></i>
-                                                <span class="post-cont">0</span> <!-- Placeholder para reposts -->
+                                                <span class="post-cont"><?php echo $post['repost_count']; ?></span>
                                             </div>
                                             <div class="post-icon">
                                                 <i class="ri-chat-quote-line"></i>
-                                                <span class="post-cont">0</span> <!-- Placeholder para citações -->
+                                                <span class="post-cont"><?php echo $post['quote_count']; ?></span>
                                             </div>
                                         </div>
                                     </footer>
@@ -197,7 +205,7 @@ $result_comunidades = $pdo->query($sql_comunidades);
         <a class="lightbox-nav next">&#10095;</a>
     </div>
 
-    <?php include("../src/components/footer.php"); ?>
+    <?php require_once(__DIR__ . '/../src/components/footer.php'); ?>
 </body>
 
 </html>

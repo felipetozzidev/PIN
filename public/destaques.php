@@ -13,10 +13,10 @@
 </head>
 
 <body>
-    
+
     <main class="index-container">
-       
-         <?php include("../src/components/nav_bar.php"); ?>
+
+        <?php include("../src/components/nav_bar.php"); ?>
         <section class="main_container">
             <div class="main_content" data-pagina="destaques">
                 <div class="cardDestaque_container">

@@ -1,9 +1,14 @@
 <?php
+// Garante que a sessão seja iniciada
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once('../../config/conn.php');
 
-// Verifica se o usuário NÃO está logado OU se o nível de acesso NÃO é de administrador (assumindo id_nvl = 1 para admin)
-if (!isset($_SESSION['id_usu']) || $_SESSION['id_nvl'] != 1) {
-    header("Location: ../../public/login.php"); // Redireciona para sua página de login
+// CORREÇÃO: Verifica as novas variáveis de sessão ('user_id' e 'role_id')
+if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] != 1) {
+    header("Location: ../../public/login.php"); // Redireciona se não for admin
     exit();
 }
 
@@ -29,24 +34,26 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
             </div>
             <nav class="admin-nav">
                 <ul>
+                    <!-- ATUALIZAÇÃO: Links para os novos nomes de arquivos -->
                     <li><a href="admin.php" class="<?php echo ($pagina_atual == 'admin.php') ? 'active' : ''; ?>">Dashboard</a></li>
                     <li><a href="admin_users.php" class="<?php echo ($pagina_atual == 'admin_users.php') ? 'active' : ''; ?>">Usuários</a></li>
-                    <li><a href="admin_niveis.php" class="<?php echo ($pagina_atual == 'admin_niveis.php') ? 'active' : ''; ?>">Níveis</a></li>
+                    <li><a href="admin_roles.php" class="<?php echo ($pagina_atual == 'admin_roles.php') ? 'active' : ''; ?>">Níveis</a></li>
                     <li><a href="admin_posts.php" class="<?php echo ($pagina_atual == 'admin_posts.php') ? 'active' : ''; ?>">Posts</a></li>
                     <li><a href="admin_tags.php" class="<?php echo ($pagina_atual == 'admin_tags.php') ? 'active' : ''; ?>">Tags</a></li>
-                    <li><a href="admin_comms.php" class="<?php echo ($pagina_atual == 'admin_comms.php') ? 'active' : ''; ?>">Comunidades</a></li>
-                    <li><a href="admin_gps.php" class="<?php echo ($pagina_atual == 'admin_gps.php') ? 'active' : ''; ?>">Grupos</a></li>
-                    <li><a href="admin_denns.php" class="<?php echo ($pagina_atual == 'admin_denns.php') ? 'active' : ''; ?>">Denúncias</a></li>
+                    <li><a href="admin_communities.php" class="<?php echo ($pagina_atual == 'admin_communities.php') ? 'active' : ''; ?>">Comunidades</a></li>
+                    <li><a href="admin_groups.php" class="<?php echo ($pagina_atual == 'admin_groups.php') ? 'active' : ''; ?>">Grupos</a></li>
+                    <li><a href="admin_reports.php" class="<?php echo ($pagina_atual == 'admin_reports.php') ? 'active' : ''; ?>">Reports</a></li>
                 </ul>
             </nav>
             <div class="admin-profile">
                 <div class="profile-dropdown">
                     <button class="profile-btn">
-                        <span>Olá, <?php echo htmlspecialchars($_SESSION['nome_usu']); ?></span>
+                        <!-- CORREÇÃO: Usa a nova variável de sessão 'full_name' -->
+                        <span>Olá, <?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
                         <i class="ri-arrow-down-s-line"></i>
                     </button>
                     <div class="dropdown-content-header">
-                        <a href="../../public/"><i class="ri-arrow-go-back-line"></i> Voltar</a>
+                        <a href="../../public/"><i class="ri-arrow-go-back-line"></i> Voltar ao site</a>
                         <a href="../../public/logout.php"><i class="ri-logout-box-line"></i> Sair</a>
                     </div>
                 </div>

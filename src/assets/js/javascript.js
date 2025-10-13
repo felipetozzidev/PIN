@@ -1,21 +1,21 @@
 // Espera o conteúdo da página carregar completamente antes de executar qualquer script.
 document.addEventListener('DOMContentLoaded', function () {
 
-    const isPublicPage = document.querySelector('.index-container, .view-post-container');
+    const isPublicPage = document.querySelector('.index-container, .view-post-container, .profile-container');
     if (isPublicPage) {
 
         const objetos = {
             navbar: document.querySelector(".navbar_container"),
             nav: document.querySelector("nav"),
             main: document.querySelector("main"),
-            footer: document.querySelector("footer.pag_footer"), // Usar seletor genérico
+            footer: document.querySelector("footer.pag_footer"),
             body: document.querySelector("body"),
             community_cards_container: document.querySelector("div.community_cards_container"),
-            tamanhoCabecalho: function() { return this.nav ? this.nav.clientHeight : 0; },
+            tamanhoCabecalho: function () { return this.nav ? this.nav.clientHeight : 0; },
             tamanhoBody: function () { return this.body ? this.body.clientHeight : 0; },
-            paddingCabecalho: function() { return this.main ? getComputedStyle(this.main).paddingTop : '0px'; },
-            tamanhoFooter: function() { return this.footer ? this.footer.clientHeight : 0; },
-            dropdownItens: function() { return document.querySelectorAll(".dropdown_item"); }
+            paddingCabecalho: function () { return this.main ? getComputedStyle(this.main).paddingTop : '0px'; },
+            tamanhoFooter: function () { return this.footer ? this.footer.clientHeight : 0; },
+            dropdownItens: function () { return document.querySelectorAll(".dropdown_item"); }
         };
 
         // --- Ajustes de Layout ---
@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 objetos.main.style.marginBottom = `${objetos.tamanhoFooter()}px`;
             }
         }
-        console.log(objetos.tamanhoCabecalho() + " + " + objetos.tamanhoBody() + " < " + window.screen.height);
-        if(objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height){
+
+        if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {
             objetos.footer.style.position = "absolute";
             objetos.footer.style.bottom = "0px";
         }
@@ -36,13 +36,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (objetos.navbar && objetos.nav && objetos.footer && objetos.main) {
             objetos.navbar.style.height = `calc(100% - ${objetos.tamanhoCabecalho()}px - ${objetos.tamanhoFooter()}px - ${objetos.paddingCabecalho()})`;
         }
-        
+
         // --- Dropdown arrows (automação) ---
         const dropdownItens = objetos.dropdownItens();
         if (dropdownItens.length > 0) {
             dropdownItens.forEach(element => {
                 const tag_a_selection = element.querySelector("a");
-                // Adiciona verificação para evitar erros em separadores <hr>
                 if (tag_a_selection) {
                     const createIconDropdown = document.createElement("img");
                     createIconDropdown.setAttribute("src", "../src/assets/icons/arrow_down.svg");
@@ -96,23 +95,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
         viewBtns.forEach(btn => {
             btn.addEventListener('click', function () {
-                document.getElementById('modal-post-id').textContent = this.dataset.id;
-                document.getElementById('modal-author').textContent = this.dataset.author;
-                document.getElementById('modal-date').textContent = this.dataset.date;
-                document.getElementById('modal-community').textContent = this.dataset.community;
+                document.getElementById('modal-post-id').textContent = this.dataset.postId;
+                document.getElementById('modal-author').textContent = this.dataset.authorName;
+                document.getElementById('modal-date').textContent = this.dataset.createdAt;
+                document.getElementById('modal-community').textContent = this.dataset.communityName;
                 document.getElementById('modal-content').textContent = this.dataset.content;
-                document.getElementById('modal-likes').textContent = this.dataset.likes;
-                document.getElementById('modal-respostas').textContent = this.dataset.respostas;
-                document.getElementById('modal-reposts').textContent = this.dataset.reposts;
-                document.getElementById('modal-citacoes').textContent = this.dataset.citacoes;
+                document.getElementById('modal-likes').textContent = this.dataset.likeCount;
+                document.getElementById('modal-replies').textContent = this.dataset.replyCount;
+                document.getElementById('modal-reposts').textContent = this.dataset.repostCount;
+                document.getElementById('modal-quotes').textContent = this.dataset.quoteCount;
 
                 const statusContainer = document.getElementById('modal-status');
                 statusContainer.innerHTML = '';
-                const tipo = this.dataset.tipo;
-                if (tipo !== 'padrao') {
-                    statusContainer.innerHTML += `<span class="status-badge status-info">${tipo.charAt(0).toUpperCase() + tipo.slice(1)} de #${this.dataset.pai}</span> `;
+                const type = this.dataset.type;
+                if (type !== 'padrao') {
+                    statusContainer.innerHTML += `<span class="status-badge status-info">${type.charAt(0).toUpperCase() + type.slice(1)} de #${this.dataset.parentId}</span> `;
                 }
-                if (this.dataset.aviso === '1') {
+                if (this.dataset.contentWarning === '1') {
                     statusContainer.innerHTML += `<span class="status-badge status-warning">Aviso de Conteúdo</span>`;
                 }
                 if (statusContainer.innerHTML === '') {
@@ -153,62 +152,16 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        closeBtn.onclick = function () {
-            postModal.style.display = 'none';
+        if (closeBtn) {
+            closeBtn.onclick = function () {
+                postModal.style.display = 'none';
+            }
         }
 
         window.addEventListener('click', function (event) {
             if (event.target == postModal) {
                 postModal.style.display = 'none';
             }
-        });
-    }
-
-    // --- LÓGICA DE LIKES (para index.php e post_view.php) ---
-    const likeButtons = document.querySelectorAll('.like-btn');
-    if (likeButtons.length > 0) {
-        const isUserLoggedIn = document.body.dataset.isLoggedIn === 'true';
-        likeButtons.forEach(button => {
-            button.addEventListener('click', function (event) {
-                // Impede que o clique no botão de like acione o link do card pai.
-                event.stopPropagation();
-
-                if (!isUserLoggedIn) {
-                    window.location.href = 'login.php';
-                    return;
-                }
-                const postId = this.dataset.postId;
-                const icon = this.querySelector('i');
-                const countSpan = this.querySelector('.post-cont');
-                const data = new URLSearchParams();
-                data.append('id_post', postId);
-                fetch('api_like_post.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: data
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Erro na resposta da rede.');
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            countSpan.textContent = data.new_like_count;
-                            if (data.liked) {
-                                this.classList.add('liked');
-                                icon.classList.remove('ri-heart-line');
-                                icon.classList.add('ri-heart-fill');
-                            } else {
-                                this.classList.remove('liked');
-                                icon.classList.remove('ri-heart-fill');
-                                icon.classList.add('ri-heart-line');
-                            }
-                        } else {
-                            console.error('Erro ao curtir:', data.error);
-                        }
-                    })
-                    .catch(error => console.error('Erro na requisição:', error));
-            });
         });
     }
 
@@ -265,40 +218,81 @@ document.addEventListener('DOMContentLoaded', function () {
                 else if (e.key === 'Escape') closeLightbox();
             }
         });
-
-        // Adiciona o listener de clique ao corpo do documento para delegar o evento
-        document.body.addEventListener('click', function (event) {
-            const clickedImage = event.target;
-            if (clickedImage.tagName === 'IMG' && clickedImage.closest('.post-media-grid')) {
-                const mediaGrid = clickedImage.closest('.post-media-grid');
-                const allImages = mediaGrid.querySelectorAll('img');
-                const imagesSrc = Array.from(allImages).map(img => img.src);
-                const startIndex = imagesSrc.indexOf(clickedImage.src);
-                openLightbox(imagesSrc, startIndex);
-            }
-        });
     }
 
-    // --- HIERARQUIA DE CLIQUES (CORRIGIDO) ---
+    // --- GERENCIADOR DE CLIQUES GERAL (DELEGAÇÃO DE EVENTOS) ---
     document.body.addEventListener('click', function (event) {
         const target = event.target;
+        const likeButton = target.closest('.like-btn');
 
-        // Elementos que têm ações próprias e não devem redirecionar o card.
-        const isInteractive = target.closest('.like-btn, .post-media-grid, a, button');
+        // --- LÓGICA DE LIKES ---
+        if (likeButton) {
+            event.preventDefault();
+            event.stopPropagation();
 
-        // // Click no .user_info (redireciona para o perfil)
-        // const userInfo = target.closest('.user_info');
-        // if (userInfo) {
-        //     const userId = userInfo.dataset.userId;
-        //     if (userId) {
-        //         window.location.href = `perfil.php?id=${userId}`;
-        //     }
-        //     return; // Encerra a função aqui, pois a ação principal foi executada.
-        // }
+            const isUserLoggedIn = document.body.dataset.isLoggedIn === 'true';
+            if (!isUserLoggedIn) {
+                window.location.href = 'login.php';
+                return;
+            }
 
-        // Ação: Clicou em um card de post no index.php
+            const postId = likeButton.dataset.postId;
+            const icon = likeButton.querySelector('i');
+            const countSpan = likeButton.querySelector('.post-cont');
+
+            const data = new URLSearchParams();
+            data.append('post_id', postId);
+
+            fetch('api/api_like_post.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: data
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Erro na resposta da rede.');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        countSpan.textContent = data.new_like_count;
+                        if (data.liked) {
+                            likeButton.classList.add('liked');
+                            icon.classList.remove('ri-heart-line');
+                            icon.classList.add('ri-heart-fill');
+                        } else {
+                            likeButton.classList.remove('liked');
+                            icon.classList.remove('ri-heart-fill');
+                            icon.classList.add('ri-heart-line');
+                        }
+                    } else {
+                        console.error('Erro ao curtir:', data.error);
+                    }
+                })
+                .catch(error => console.error('Erro na requisição:', error));
+            return; // Encerra após a ação de like
+        }
+
+        // --- LÓGICA DO LIGHTBOX ---
+        const clickedImage = target.closest('.post-media-grid img');
+        if (clickedImage) {
+            const mediaGrid = clickedImage.closest('.post-media-grid');
+            const allImages = mediaGrid.querySelectorAll('img');
+            const imagesSrc = Array.from(allImages).map(img => img.src);
+            const startIndex = imagesSrc.indexOf(clickedImage.src);
+
+            // Reutiliza a função openLightbox se ela existir
+            if (typeof openLightbox === 'function') {
+                openLightbox(imagesSrc, startIndex);
+            }
+            return; // Encerra após abrir o lightbox
+        }
+
+        // --- HIERARQUIA DE CLIQUES PARA NAVEGAÇÃO ---
         const postCard = target.closest('.post_container[data-post-url]');
-        if (postCard && !isInteractive) { // Só redireciona se não for um elemento interativo
+        // A condição a seguir já previne o clique em botões, links, etc.
+        const isInteractive = target.closest('a, button');
+
+        if (postCard && !isInteractive) {
             const postUrl = postCard.dataset.postUrl;
             if (postUrl) {
                 window.location.href = postUrl;
@@ -306,3 +300,4 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+

@@ -1,12 +1,18 @@
 <?php
+session_start();
+
+// Se o usuário já estiver logado, redireciona para a página principal
+if (isset($_SESSION['user_id'])) {
+  header('Location: index.php');
+  exit;
+}
 
 // Incluir o autoload do Composer e a conexão com o banco de dados
 require('../vendor/autoload.php');
-require_once('../config/conn.php');
+require_once('../config/conn.php'); // Usando PDO
 
 // Importar classes necessárias do PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 // Inicializar variáveis
@@ -14,142 +20,116 @@ $login_error = "";
 $signup_success = "";
 $verification_needed = false;
 $verification_error = "";
+$login_success = false;
+$email_for_verification = ''; // Para exibir no modal de verificação
 
 if (isset($_POST['login'])) {
-  $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-  $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
+  $email = trim($_POST['email']);
+  $password = trim($_POST['senha']);
 
-  // Verifica se o email termina com os domínios permitidos (IF + siglas de estados com IF)
-  if (!preg_match('/@(if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br|aluno\.if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br)$/i', $email)) {
+  // Verifica se o email termina com os domínios permitidos
+  if (!preg_match('/@(if[a-z]{2}\.edu\.br|aluno\.if[a-z]{2}\.edu\.br)$/i', $email)) {
     $login_error = "Apenas emails institucionais (IF) são permitidos";
   } else {
-    // Verifica na tabela usuarios usando prepared statement
-    $query = "SELECT id_usu, senha_usu, nome_usu, imgperfil_usu, id_nvl FROM usuarios WHERE email_usu = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    // Verifica na tabela 'users' usando PDO
+    $stmt = $pdo->prepare("SELECT user_id, password_hash, full_name, profile_image_url, role_id FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Verifica se o email existe no banco de dados
-    if (mysqli_num_rows($result) > 0) {
-      $row = mysqli_fetch_assoc($result);
-      $senha_banco = $row['senha_usu']; // Obtém a senha criptografada do banco de dados
-
-      // Verifica se a senha informada corresponde à senha armazenada no banco de dados
-      if (password_verify($senha, $senha_banco)) {
-        session_regenerate_id(true); // Segurança: regenera o ID da sessão
-        $_SESSION['id_usu'] = $row['id_usu']; // Salva o ID do usuário na sessão
-        $_SESSION['nome_usu'] = $row['nome_usu']; // Salva o nome do usuário na sessão
-        $_SESSION['imgperfil_usu'] = $row['imgperfil_usu']; // Salva o caminho da foto de perfil na sessão
-        $_SESSION['id_nvl'] = $row['id_nvl']; // Salva o nível de acesso do usuário na sessão
-        $login_success = true;
-      } else {
-        $login_error = "Sua senha está incorreta";
-      }
+    // Verifica se o usuário foi encontrado e se a senha está correta
+    if ($user && password_verify($password, $user['password_hash'])) {
+      session_regenerate_id(true);
+      $_SESSION['user_id'] = $user['user_id'];
+      $_SESSION['full_name'] = $user['full_name'];
+      $_SESSION['profile_image_url'] = $user['profile_image_url'];
+      $_SESSION['role_id'] = $user['role_id'];
+      $login_success = true;
     } else {
-      $login_error = "Seu email não foi encontrado";
+      $login_error = "Seu email ou senha estão incorretos";
     }
-    $stmt->close();
   }
 }
 
 if (isset($_POST['signup'])) {
-  $nome = mysqli_real_escape_string($conn, trim($_POST['nome']));
-  $email = mysqli_real_escape_string($conn, trim($_POST['email']));
-  $senha = mysqli_real_escape_string($conn, trim($_POST['senha']));
-  $conf_senha = mysqli_real_escape_string($conn, trim($_POST['conf-senha']));
-  $estado = mysqli_real_escape_string($conn, trim($_POST['uf']));             // Usando o campo de estado do formulário
-  $campus = mysqli_real_escape_string($conn, trim($_POST['campus']));         // Campo "campus" selecionado no formulário
-  $sexo = mysqli_real_escape_string($conn, trim($_POST['sexo']));
-  $orsex = mysqli_real_escape_string($conn, trim($_POST['orsex']));           // Nova informação: orientação sexual
-  $senha_criptografada = password_hash($senha, PASSWORD_DEFAULT);
-  $data_criacao = date("Y-m-d H:i:s");                                        // Define a data de criação
+  $full_name = trim($_POST['nome']);
+  $email = trim($_POST['email']);
+  $password = $_POST['senha'];
+  $conf_password = $_POST['conf-senha'];
+  $state = trim($_POST['uf']);
+  $campus = trim($_POST['campus']);
+  $gender = trim($_POST['sexo']);
+  $sexual_orientation = trim($_POST['orsex']);
 
   // Verifica se as senhas coincidem
-  if ($senha !== $conf_senha) {
+  if ($password !== $conf_password) {
     $login_error = "As senhas não coincidem.";
   }
-  // Verifica se o email termina com os domínios permitidos (IF + siglas de estados com IF)
-  elseif (!preg_match('/@(if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br|aluno\.if(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SE|SP|TO)\.edu\.br)$/i', $email)) {
+  // Verifica se o email termina com os domínios permitidos
+  elseif (!preg_match('/@(if[a-z]{2}\.edu\.br|aluno\.if[a-z]{2}\.edu\.br)$/i', $email)) {
     $login_error = "Apenas emails institucionais (IF) são permitidos";
   } else {
-    // Gera o código de verificação alfanumérico de 6 caracteres
+    // Gera o código de verificação
     $verification_code = strtoupper(bin2hex(random_bytes(3)));
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
     // Armazena os dados do cadastro e o código na sessão
     $_SESSION['signup_data'] = [
-      'nome' => $nome,
+      'full_name' => $full_name,
       'email' => $email,
-      'senha' => $senha_criptografada,
-      'estado' => $estado,
+      'password_hash' => $password_hash,
+      'state' => $state,
       'campus' => $campus,
-      'sexo' => $sexo,
-      'orsex' => $orsex,
-      'datacriacao' => $data_criacao,
+      'gender' => $gender,
+      'sexual_orientation' => $sexual_orientation,
       'verification_code' => $verification_code
     ];
+    $email_for_verification = $email;
 
     // Envia o email de verificação usando PHPMailer
     $mail = new PHPMailer(true);
-    $mail->CharSet = 'UTF-8'; // Define o charset para UTF-8
+    $mail->CharSet = 'UTF-8';
 
     try {
-      // Configurações do servidor SMTP do Gmail
-      $mail->SMTPDebug = 0;                                 // Habilita o debug para desenvolvimento (0 para desabilitar em produção)
-      $mail->isSMTP();                                      // Define o uso de SMTP
-      $mail->SMTPAuth = true;                               // Habilita a autenticação SMTP
-
-      // Desabilita a verificação de certificado SSL (não recomendado para produção)
-      // $mail->SMTPOptions = array(
-      //   'ssl' => array(
-      //     'verify_peer' => false,
-      //     'verify_peer_name' => false,
-      //     'allow_self_signed' => true
-      //   )
-      // );
-
-      $mail->Host = '172.217.194.108';                      // IP direto para smtp.gmail.com para evitar erro de DNS
-      $mail->Username = 'brenosilveiradomingues@gmail.com'; // Username do email
-      $mail->Password = 'cqtddhaewkwhtqhr';                 // Senha de app do email usado para enviar
-      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // Habilita a encriptação TLS; `PHPMailer::ENCRYPTION_SMTPS` também pode ser usado
-      $mail->Port = 587;                                    // Porta TCP para conectar com o servidor
-
-
-      $to = $email; // Email do destinatário
+      // Configurações do servidor SMTP
+      $mail->SMTPDebug = 0;
+      $mail->isSMTP();
+      $mail->Host = 'smtp.gmail.com';
+      $mail->SMTPAuth = true;
+      $mail->Username = 'brenosilveiradomingues@gmail.com'; // SEU EMAIL GMAIL
+      $mail->Password = 'cqtddhaewkwhtqhr'; // SUA SENHA DE APLICATIVO
+      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+      $mail->Port = 587;
 
       // Remetente e Destinatário
-      $mail->setFrom('brenosilveiradomingues@gmail.com', 'IFApoia');    // Seu endereço de email e nome
-      $mail->addAddress($to, $nome);                                    // Email e nome do destinatário
+      $mail->setFrom('brenosilveiradomingues@gmail.com', 'IFApoia');
+      $mail->addAddress($email, $full_name);
 
       // Conteúdo do Email
-      $mail->isHTML(true); // Define o formato do email para HTML
+      $mail->isHTML(true);
       $mail->Subject = 'Código de verificação de Email - Rede IFApoia';
       $mail->Body    = '<div style="font-family: Arial, sans-serif; color: #333; margin: 0 auto; max-width: 600px;">
-      <div style="background-color: #f8f9fa; padding: 20px 0; text-align: center;">
-        <img src="../src/assets/img/Logotipo_antiga.png" alt="IFApoia" style="max-width: 150px; height: auto;">
-      </div>
-      <div style="padding: 20px;">
-        <h2 style="color: #305F2C;">Bem-vindo(a) ao IFApoia!</h2>
-        <p style="font-size: 16px;">Obrigado por se cadastrar no IFApoia. Para completar seu cadastro, por favor, utilize o seguinte código de verificação:</p>
-        <div style="background-color: #A0BF9F; color: #fff; text-align: center; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <strong style="font-size: 30px;">' . $verification_code . '</strong>
-        </div>
-        <p style="font-size: 16px;">Insira este código na página de cadastro para verificar seu email e começar a usar o IFApoia.</p>
-        <p style="font-size: 16px;">Se você não se cadastrou no IFApoia, por favor, ignore este email.</p>
-      </div>
-      <div style="background-color: #f8f9fa; padding: 10px; text-align: center; font-size: 14px; color: #777;">
-        <p>Atenciosamente,<br>A Equipe IFApoia</p>
-      </div>
-    </div>';
-
-      // Texto alternativo para clientes de email que não suportam HTML
-      $mail->AltBody = "Bem-vindo(a) ao IFApoia!\r\n\r\nObrigado por se cadastrar no IFApoia. Para completar seu cadastro, utilize o seguinte código de verificação:\r\n\r\n" . $verification_code . "\r\n\r\nInsira este código na página de cadastro para verificar seu email e começar a usar o IFApoia.\r\n\r\nSe você não se cadastrou no IFApoia, por favor, ignore este email.\r\n\r\nAtenciosamente,\r\nA Equipe IFApoia";
+            <div style="background-color: #f8f9fa; padding: 20px 0; text-align: center;">
+              <img src="https://i.imgur.com/your-logo.png" alt="IFApoia" style="max-width: 150px; height: auto;">
+            </div>
+            <div style="padding: 20px;">
+              <h2 style="color: #305F2C;">Bem-vindo(a) ao IFApoia!</h2>
+              <p style="font-size: 16px;">Obrigado por se cadastrar no IFApoia. Para completar seu cadastro, por favor, utilize o seguinte código de verificação:</p>
+              <div style="background-color: #A0BF9F; color: #fff; text-align: center; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <strong style="font-size: 30px;">' . $verification_code . '</strong>
+              </div>
+              <p style="font-size: 16px;">Insira este código na página de cadastro para verificar seu email e começar a usar o IFApoia.</p>
+              <p style="font-size: 16px;">Se você não se cadastrou no IFApoia, por favor, ignore este email.</p>
+            </div>
+            <div style="background-color: #f8f9fa; padding: 10px; text-align: center; font-size: 14px; color: #777;">
+              <p>Atenciosamente,<br>A Equipe IFApoia</p>
+            </div>
+          </div>';
+      $mail->AltBody = "Seu código de verificação é: " . $verification_code;
 
       $mail->send();
       $verification_needed = true;
     } catch (Exception $e) {
       $login_error = "Erro ao enviar o email de verificação: {$mail->ErrorInfo}";
-      echo '<script>console.log("' . addslashes($login_error) . '");</script>'; // Adicione esta linha para logar no console
     }
   }
 }
@@ -159,57 +139,52 @@ if (isset($_POST['verify_email'])) {
   if (isset($_SESSION['signup_data'])) {
     $stored_code = $_SESSION['signup_data']['verification_code'];
     $entered_code = $_POST['verification_code'];
-    $email = $_SESSION['signup_data']['email']; // Recupera o email da sessão
+    $email_for_verification = $_SESSION['signup_data']['email'];
 
-    // Verifica se o campo de código de verificação está vazio
     if (empty($entered_code)) {
       $verification_error = "Campo vazio, insira o código de verificação";
-      $verification_needed = true; // Mantém o modal aberto se o código estiver vazio
-
-      // Verifica se o código tem 6 caracteres alfanuméricos
+      $verification_needed = true;
     } elseif (!preg_match('/^[A-Z0-9]{6}$/', $entered_code)) {
       $verification_error = "Código de verificação inválido!";
-      $verification_needed = true; // Mantém o modal aberto se o código for inválido
-
-      // Verifica se o código inserido corresponde ao código armazenado na sessão
+      $verification_needed = true;
     } elseif ($stored_code == $entered_code) {
       $signup_data = $_SESSION['signup_data'];
-      $id_nvl_padrao = 4; // Nível de acesso padrão (Discente)
-      // Usar prepared statement para a inserção
-      $query = "INSERT INTO usuarios (nome_usu, email_usu, senha_usu, estado_usu, campus_usu, sexo_usu, orsex_usu, datacriacao_usu, id_nvl)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      $default_role_id = 4; // Nível padrão (Discente)
 
-      $stmt = $conn->prepare($query);
-      $stmt->bind_param(
-        "ssssssssi",
-        $signup_data['nome'],
-        $signup_data['email'],
-        $signup_data['senha'],
-        $signup_data['estado'],
-        $signup_data['campus'],
-        $signup_data['sexo'],
-        $signup_data['orsex'],
-        $signup_data['datacriacao'],
-        $id_nvl_padrao
-      );
+      try {
+        // Usar PDO para a inserção
+        $stmt = $pdo->prepare(
+          "INSERT INTO users (full_name, email, password_hash, state, campus, gender, sexual_orientation, role_id, created_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+        );
+        $stmt->execute([
+          $signup_data['full_name'],
+          $signup_data['email'],
+          $signup_data['password_hash'],
+          $signup_data['state'],
+          $signup_data['campus'],
+          $signup_data['gender'],
+          $signup_data['sexual_orientation'],
+          $default_role_id
+        ]);
 
-      // Executa a consulta de inserção
-      if ($stmt->execute()) {
         $signup_success = "Cadastro realizado com sucesso. Faça login!";
-        unset($_SESSION['signup_data']); // Limpa os dados da sessão após o cadastro
-      } else {
-        $verification_error = "Erro ao finalizar o cadastro: " . $stmt->error;
-        $verification_needed = true; // Mantém o modal aberto em caso de erro
+        unset($_SESSION['signup_data']);
+      } catch (PDOException $e) {
+        if ($e->getCode() == 23000) { // Erro de chave duplicada (email já existe)
+          $verification_error = "Este email já está cadastrado.";
+        } else {
+          $verification_error = "Erro ao finalizar o cadastro.";
+        }
+        $verification_needed = true;
       }
-
-      $stmt->close();
     } else {
       $verification_error = "Código de verificação incorreto!";
-      $verification_needed = true; // Mantém o modal aberto em caso de erro
+      $verification_needed = true;
     }
-  } else if (!isset($_SESSION['signup_data'])) {
+  } else {
     $verification_error = "Sessão de cadastro expirou.";
-    $verification_needed = true; // Mantém o modal aberto em caso de erro
+    $verification_needed = true;
   }
 }
 ?>
@@ -226,7 +201,6 @@ if (isset($_POST['verify_email'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  <!--<link rel="stylesheet" href="../assets/css/style.css">-->
 
   <style>
     :root {
@@ -348,7 +322,7 @@ if (isset($_POST['verify_email'])) {
     .form-control:focus,
     select.form-control:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(98, 28, 212, 0.1);
+      box-shadow: 0 0 0 4px rgba(48, 95, 44, 0.1);
     }
 
     .form-floating label {
@@ -377,7 +351,6 @@ if (isset($_POST['verify_email'])) {
       border: none;
       background-color: transparent;
       position: absolute;
-      /* Absolute para definir o posicionamento do botão via css */
       top: 50%;
       right: 1rem;
       transform: translateY(-50%);
@@ -388,12 +361,11 @@ if (isset($_POST['verify_email'])) {
       align-items: center;
       justify-content: center;
       z-index: 2;
-      /* Z-index para garantir que o botão fique acima do input */
+    }
 
-      &>i {
-        font-size: 1.2rem;
-        color: var(--text-muted);
-      }
+    .passwordView>i {
+      font-size: 1.2rem;
+      color: var(--text-muted);
     }
 
     .btn-primary {
@@ -410,7 +382,7 @@ if (isset($_POST['verify_email'])) {
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(98, 28, 212, 0.2);
+      box-shadow: 0 4px 12px rgba(48, 95, 44, 0.2);
       background-position: right center;
     }
 
@@ -437,8 +409,6 @@ if (isset($_POST['verify_email'])) {
       padding: 1rem;
     }
 
-    /* Estilos do modal de cadastro */
-
     .modal-content {
       border-radius: 16px;
       border: none;
@@ -457,7 +427,7 @@ if (isset($_POST['verify_email'])) {
     }
 
     .modal-body {
-      padding: 3rem 3rem;
+      padding: 2rem 2.5rem;
     }
 
     .modal-dialog {
@@ -473,7 +443,6 @@ if (isset($_POST['verify_email'])) {
       font-weight: 500;
     }
 
-    /* Igual ao .passwordView, mas para o modal de cadastro */
     .passwordViewModal {
       border: none;
       background-color: transparent;
@@ -488,11 +457,11 @@ if (isset($_POST['verify_email'])) {
       align-items: center;
       justify-content: center;
       z-index: 2;
+    }
 
-      &>i {
-        color: var(--text-muted);
-        font-size: 1rem;
-      }
+    .passwordViewModal>i {
+      color: var(--text-muted);
+      font-size: 1rem;
     }
 
     .form-floating .labelsenha,
@@ -514,8 +483,6 @@ if (isset($_POST['verify_email'])) {
     .btn-close:focus {
       box-shadow: none;
     }
-
-    /* Estilos do modal de verificação */
 
     .modal#verificationModal .modal-content {
       border-radius: 10px;
@@ -547,7 +514,6 @@ if (isset($_POST['verify_email'])) {
 
     .modal#verificationModal .form-control:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 0.25rem rgba(var(--primary-rgb), 0.25);
     }
 
     .modal#verificationModal .btn-close-white {
@@ -570,70 +536,27 @@ if (isset($_POST['verify_email'])) {
       }
 
       .modal-body {
-        padding: 1rem;
+        padding: 1.5rem;
       }
     }
 
-    @media (max-height: 800px) {
-      body {
-        align-items: flex-start;
-        padding: 1rem 0;
-      }
-
-      .form-signin {
-        margin: 1rem auto;
-      }
-    }
-
-    /* Estilos personalizados para o SweetAlert2 */
     .swal2-popup {
       background: var(--white);
       border-radius: 15px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       color: var(--text-color);
     }
 
     .swal2-title {
       color: var(--primary);
-      font-size: 1.5rem;
-      font-weight: 700;
     }
 
     .swal2-content {
       color: var(--text-muted);
-      font-size: 1rem;
     }
 
     .swal2-confirm {
       background: linear-gradient(135deg, var(--primary), var(--secondaryButton)) !important;
       border: none !important;
-      border-radius: 8px !important;
-      padding: 0.75rem 1.5rem !important;
-      font-size: 1rem !important;
-      font-weight: 500 !important;
-      transition: all 0.3s ease !important;
-    }
-
-    .swal2-confirm:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(98, 28, 212, 0.2) !important;
-    }
-
-    .swal2-cancel {
-      background: var(--background) !important;
-      border: 1px solid var(--border-color) !important;
-      border-radius: 8px !important;
-      padding: 0.75rem 1.5rem !important;
-      font-size: 1rem !important;
-      font-weight: 500 !important;
-      color: var(--text-color) !important;
-      transition: all 0.3s ease !important;
-    }
-
-    .swal2-cancel:hover {
-      background: var(--background) !important;
-      border-color: var(--primary) !important;
-      color: var(--primary) !important;
     }
   </style>
 </head>
@@ -656,12 +579,12 @@ if (isset($_POST['verify_email'])) {
       </div>
       <div class="form-floating mb-2">
         <input type="password" class="form-control" id="floatingPassword" placeholder="Senha" name="senha" required>
-        <button class="passwordView"><i class="ri-eye-line"></i></button>
+        <button type="button" class="passwordView"><i class="ri-eye-line"></i></button>
         <label for="floatingPassword">Senha</label>
       </div>
 
       <button class="btn btn-primary" type="submit" name="login">
-        Entrar <i class="fas fa-arrow-right ms-2"></i>
+        Entrar <i class="ri-arrow-right-line ms-2"></i>
       </button>
 
       <p class="signup-link">
@@ -714,12 +637,12 @@ if (isset($_POST['verify_email'])) {
             <div class="row mb-2 form-floating">
               <div class="col-md-6 col-sm-6 mb-2 form-floating">
                 <input type="password" class="form-control" id="senha" name="senha" placeholder="Senha" required>
-                <button class="passwordViewModal"><i class="ri-eye-line"></i></button>
+                <button type="button" class="passwordViewModal"><i class="ri-eye-line"></i></button>
                 <label class="labelsenha" for="senha">Senha</label>
               </div>
               <div class="col-md-6 col-sm-6 mb-2 form-floating">
                 <input type="password" class="form-control" id="conf-senha" name="conf-senha" placeholder="Confirmar Senha" required>
-                <button class="passwordViewModal"><i class="ri-eye-line"></i></button>
+                <button type="button" class="passwordViewModal"><i class="ri-eye-line"></i></button>
                 <label class="labelconf-senha" for="conf-senha">Confirmar Senha</label>
               </div>
             </div>
@@ -765,7 +688,7 @@ if (isset($_POST['verify_email'])) {
             </div>
 
             <button type="submit" class="btn btn-primary" name="signup">
-              Criar sua conta <i class="fas fa-user-plus ms-2"></i>
+              Criar sua conta <i class="ri-user-add-line ms-2"></i>
             </button>
           </form>
         </div>
@@ -774,8 +697,7 @@ if (isset($_POST['verify_email'])) {
   </div>
 
   <div class="modal fade <?php if ($verification_needed) echo 'show'; ?>" id="verificationModal" tabindex="-1"
-    aria-labelledby="verificationModalLabel" aria-hidden="<?php if ($verification_needed) echo 'false';
-                                                          else echo 'true'; ?>"
+    aria-labelledby="verificationModalLabel" aria-hidden="<?php echo !$verification_needed ? 'true' : 'false'; ?>"
     style="<?php if ($verification_needed) echo 'display: block;'; ?>">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -787,16 +709,16 @@ if (isset($_POST['verify_email'])) {
           <?php
           function obfuscateEmail($email)
           {
+            if (empty($email)) return '';
             $parts = explode('@', $email);
+            if (count($parts) != 2) return "email inválido";
             $localPart = $parts[0];
-            $domainPart = $parts[1] ?? ''; // Usar ?? para definir um valor padrão caso $parts[1] não exista
+            $domainPart = $parts[1];
             $obfuscatedLocalPart = substr($localPart, 0, 2) . str_repeat('*', max(0, strlen($localPart) - 4)) . substr($localPart, -2);
-            return '<strong class="">' . $obfuscatedLocalPart . '@' . $domainPart . '</strong>';
+            return '<strong>' . $obfuscatedLocalPart . '@' . $domainPart . '</strong>';
           }
           ?>
-          <p class="mb-3">Um código de verificação de 6 caracteres foi enviado para o email
-            <?php echo obfuscateEmail($email); ?>.
-            Por favor, insira o código abaixo para completar o seu cadastro.</p>
+          <p class="mb-3">Um código de verificação de 6 caracteres foi enviado para o email <?php echo obfuscateEmail($email_for_verification); ?>. Por favor, insira o código abaixo para completar o seu cadastro.</p>
           <form method="POST" action="login.php">
             <div class="mb-3">
               <label for="verification_code" class="form-label">Código de Verificação</label>
@@ -811,59 +733,25 @@ if (isset($_POST['verify_email'])) {
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
-    <?php
-    session_start();
-    ?>
-    console.log("testew")
-    console.log("<?php 
-     echo $_SESSION('id_nvl'); 
-     ?>")
-    // Listener para tornar a senha visível ou invisível
     document.addEventListener('DOMContentLoaded', function() {
-      const passwordViewButtons = document.querySelectorAll('.passwordView, .passwordViewModal'); // Seleciona os botões de ver senhas
+      const passwordViewButtons = document.querySelectorAll('.passwordView, .passwordViewModal');
       passwordViewButtons.forEach(button => {
         button.addEventListener('click', function(event) {
-          event.preventDefault(); // Previne o comportamento padrão do botão
-          // Encontra todos os inputs de senha e confirmação de senha dentro do modal
-          const form = this.closest('form'); // Encontra o formulário mais próximo do botão clicado
-          const senhaInput = form ? form.querySelector('input[name="senha"]') : null;
-          const confSenhaInput = form ? form.querySelector('input[name="conf-senha"]') : null;
-
-          // Se ambos os campos existem e estão preenchidos, alterna ambos juntos
-          if (senhaInput && confSenhaInput && senhaInput.value && confSenhaInput.value) {
-            const isSenha = senhaInput.type === 'password';
-            senhaInput.type = isSenha ? 'text' : 'password';
-            confSenhaInput.type = isSenha ? 'text' : 'password';
-            // Atualiza todos os botões do formulário/modal
-            const allButtons = form.querySelectorAll('.passwordView, .passwordViewModal');
-            allButtons.forEach(btn => {
-              btn.innerHTML = isSenha ?
-                '<i class="ri-eye-close-line"></i>' :
-                '<i class="ri-eye-line"></i>';
-            });
-          } else {
-            // Alterna apenas o campo relacionado ao botão clicado
-            const input = this.previousElementSibling || this.parentElement.previousElementSibling;
-            if (input && input.type === 'password') {
-              input.type = 'text';
-              this.innerHTML = '<i class="ri-eye-close-line"></i>';
-            } else if (input) {
-              input.type = 'password';
-              this.innerHTML = '<i class="ri-eye-line"></i>';
-            }
+          event.preventDefault();
+          const input = this.previousElementSibling;
+          if (input && (input.type === 'password' || input.type === 'text')) {
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            this.innerHTML = isPassword ? '<i class="ri-eye-off-line"></i>' : '<i class="ri-eye-line"></i>';
           }
         });
       });
-    });
 
-
-    // Listener para atualizar os campi com base no estado selecionado
-    document.addEventListener('DOMContentLoaded', function() {
       const estadoSelect = document.getElementById('uf');
       const campusSelect = document.getElementById('campus');
-
-      // Array com os campi dos Institutos Federais por estado
       const campiPorEstado = {
         "AC": ["IFAC Campus Rio Branco", "IFAC Campus Cruzeiro do Sul", "IFAC Campus Sena Madureira", "IFAC Campus Tarauacá", "IFAC Campus Xapuri"],
         "AL": ["IFAL Campus Maceió", "IFAL Campus Arapiraca", "IFAL Campus Marechal Deodoro", "IFAL Campus Palmeira dos Índios", "IFAL Campus Satuba", "IFAL Campus Santana do Ipanema", "IFAL Campus Penedo", "IFAL Campus Murici", "IFAL Campus Batalha"],
@@ -891,189 +779,68 @@ if (isset($_POST['verify_email'])) {
         "SC": ["IFSC Campus Florianópolis", "IFSC Campus Araranguá", "IFSC Campus Canoinhas", "IFSC Campus Chapecó", "IFSC Campus Criciúma", "IFSC Campus Gaspar", "IFSC Campus Itajaí", "IFSC Campus Jaraguá do Sul", "IFSC Campus Joinville", "IFSC Campus Lages", "IFSC Campus Mafra", "IFSC Campus Palhoça", "IFSC Campus São Carlos", "IFSC Campus São Miguel do Oeste", "IFSC Campus Tubarão", "IFSC Campus Urupema", "IFSC Campus Xanxerê"],
         "SE": ["IFS Campus Aracaju", "IFS Campus Lagarto", "IFS Campus Itabaiana", "IFS Campus Glória", "IFS Campus Propriá", "IFS Campus São Cristóvão"],
         "SP": ["IFSP Campus Araraquara", "IFSP Campus Avaré", "IFSP Campus Barretos", "IFSP Campus Bauru", "IFSP Campus Birigui", "IFSP Campus Boituva", "IFSP Campus Bragança Paulista", "IFSP Campus Campinas", "IFSP Campus Campos do Jordão", "IFSP Campus Capivari", "IFSP Campus Caraguatatuba", "IFSP Campus Catanduva", "IFSP Campus Cubatão", "IFSP Campus Guarulhos", "IFSP Campus Hortolândia", "IFSP Campus Ilha Solteira", "IFSP Campus Itapetininga", "IFSP Campus Itaquaquecetuba", "IFSP Campus Jacareí", "IFSP Campus Jundiaí", "IFSP Campus Matão", "IFSP Campus Miracatu", "IFSP Campus Piracicaba", "IFSP Campus Pirituba", "IFSP Campus Presidente Epitácio", "IFSP Campus Presidente Prudente", "IFSP Campus Registro", "IFSP Campus Rio Claro", "IFSP Campus Salto", "IFSP Campus São Carlos", "IFSP Campus São João da Boa Vista", "IFSP Campus São José do Rio Preto", "IFSP Campus São José dos Campos", "IFSP Campus São Miguel Paulista", "IFSP Campus São Paulo", "IFSP Campus São Roque", "IFSP Campus Sertãozinho", "IFSP Campus Sorocaba", "IFSP Campus Suzano", "IFSP Campus Tupã", "IFSP Campus Votuporanga"],
-        "TO": ["IFTO Campus Palmas", "IFTO Campus Araguaína", "IFTO Campus Araguatins", "IFTO Campus Colinas do Tocantins", "IFTO Campus Dianópolis", "IFTO Campus Gurupi", "IFTO Campus Itaporã do Tocantins", "IFTO Campus Miracema do Tocantins", "IFTO Campus Paraíso do Tocantins", "IFTO Campus Porto Nacional", "IFTO Campus Tocantinópolis"],
+        "TO": ["IFTO Campus Palmas", "IFTO Campus Araguaína", "IFTO Campus Araguatins", "IFTO Campus Colinas do Tocantins", "IFTO Campus Dianópolis", "IFTO Campus Gurupi", "IFTO Campus Itaporã do Tocantins", "IFTO Campus Miracema do Tocantins", "IFTO Campus Paraíso do Tocantins", "IFTO Campus Porto Nacional", "IFTO Campus Tocantinópolis"]
       };
-
-      // Preenche o select de campus com os campi do primeiro estado
       estadoSelect.addEventListener('change', function() {
-        const selectedEstado = this.value; // Obtém o estado selecionado
-        // Limpa o select de campus
+        const selectedEstado = this.value;
         campusSelect.innerHTML = '<option value="" disabled selected>Selecione seu Campus</option>';
         campusSelect.disabled = true;
-
-        // Verifica se o estado selecionado tem campi definidos
         if (campiPorEstado[selectedEstado]) {
           campiPorEstado[selectedEstado].forEach(function(campus) {
-            const option = document.createElement('option'); // Cria um novo elemento option
-            option.value = campus; // Define o valor do option como o nome do campus
-            // Divide o nome do campus para exibir apenas a parte após "Campus "
+            const option = document.createElement('option');
+            option.value = campus;
             const parts = campus.split('Campus ');
-            option.textContent = parts[1] ? parts[1] : campus;
+            option.textContent = parts.length > 1 ? parts[1] : campus;
             campusSelect.appendChild(option);
           });
           campusSelect.disabled = false;
         }
       });
-    });
-  </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <script>
-    
-    // Verifica se o DOM está completamente carregado
-    document.addEventListener('DOMContentLoaded', function() {
-      const verificationModal = document.getElementById('verificationModal'); // Obtém o modal de verificação
-      const verificationForm = verificationModal.querySelector('form'); // Obtém o formulário dentro do modal
-      const verificationCodeInput = document.getElementById('verification_code'); // Obtém o input do código de verificação
-      const verificationModalCloseButton = verificationModal.querySelector('.btn-close'); // Obtém o botão de fechar do modal
-
-      // Caso o código esteja incorreto (após o envio e retorno do PHP)
-      <?php if ($verification_error): ?>
-        Swal.fire({
-          position: 'top',
-          icon: 'error',
-          title: '<?= $verification_error ?>',
-          toast: true,
-          showConfirmButton: false,
-          timer: 3000
-        });
-      <?php endif; ?>
-
-      // Adiciona um listener para o evento de submit do formulário de verificação
-      if (verificationForm) {
-        verificationForm.addEventListener('submit', function(event) { // Impede o envio se o código estiver vazio/inválido
-          if (verificationCodeInput.value.trim() === '') { // Verifica se o campo está vazio
-            event.preventDefault(); // Impede o envio do formulário
-            Swal.fire({
-              position: 'top',
-              icon: 'error',
-              title: 'Campo vazio!',
-              text: 'Nada inserido. Por favor, insira o código de verificação',
-              toast: true,
-              showConfirmButton: false,
-              timer: 3000,
-              customClass: {
-                icon: 'swal2.icon',
-                title: 'swal2.title'
-              }
-            });
-            return;
-          }
-
-          // Regex para validar o código de verificação
-          const codeRegex = /^[A-Z0-9]{6}$/;
-          // Verifica se o código de verificação corresponde ao padrão esperado
-          // (6 caracteres alfanuméricos em caixa alta)
-          if (!codeRegex.test(verificationCodeInput.value)) {
-            event.preventDefault();
-            Swal.fire({
-              position: 'top',
-              icon: 'error',
-              title: 'Código Inválido!',
-              text: 'O código de verificação deve conter 6 caracteres alfanuméricos',
-              toast: true,
-              showConfirmButton: false,
-              timer: 3000,
-              customClass: {
-                icon: 'swal2.icon',
-                title: 'swal2.title'
-              }
-            });
-            return;
-          }
-        });
-      }
-
-      // Forçar o uso de letras em caixa alta no input e permitir apenas números e letras
-      if (verificationCodeInput) {
-        verificationCodeInput.addEventListener('input', function() {
-          this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); // Converte para caixa alta e remove caracteres não alfanuméricos
-        });
-      }
-
-      // Listener para o botão de fechar do modal de verificação
-      if (verificationModalCloseButton) {
-        verificationModalCloseButton.addEventListener('click', function() {
-          Swal.fire({
-            icon: 'info',
-            iconColor: '#203f1d',
-            title: 'Verificação cancelada',
-            text: 'Você pode solicitar um novo código se necessário',
-            timer: 2500,
-            timerProgressBar: true,
-            showConfirmButton: false
-          });
-        });
-      }
-
-      // Verifica se há uma mensagem de erro de login
       <?php if ($login_error): ?>
         Swal.fire({
-          title: 'Houve um erro!',
-          text: '<?= $login_error ?>',
+          title: 'Erro!',
+          text: '<?php echo $login_error; ?>',
           icon: 'error',
           confirmButtonText: 'OK'
         });
       <?php endif; ?>
-
-      // Verifica se o login foi bem-sucedido
-      <?php if (isset($login_success) && $login_success): ?>
+      <?php if ($login_success): ?>
         Swal.fire({
-          title: 'Login concluído com sucesso!',
+          title: 'Login bem-sucedido!',
           text: 'Redirecionando...',
           icon: 'success',
-          iconColor: '#203f1d',
-          timer: 3000, // Timer de 3 segundos
+          timer: 2000,
           showConfirmButton: false
         }).then(() => {
-          window.location.href = "index.php"; // Redireciona para a página anterior
+          window.location.href = "index.php";
         });
       <?php endif; ?>
-
-      // Verifica se o cadastro foi bem-sucedido
       <?php if ($signup_success): ?>
         Swal.fire({
           title: 'Cadastro completo!',
-          text: '<?= $signup_success ?>',
+          text: '<?php echo $signup_success; ?>',
           icon: 'success',
-          iconColor: '#203f1d',
-          timer: 2000, // Timer de 2 segundos
-          timerProgressBar: true,
-          showConfirmButton: false
+          confirmButtonText: 'OK'
         });
       <?php endif; ?>
-
+      <?php if ($verification_error): ?>
+        Swal.fire({
+          title: 'Erro na verificação!',
+          text: '<?php echo $verification_error; ?>',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      <?php endif; ?>
       <?php if ($verification_needed): ?>
-        const signupModal = new bootstrap.Modal(document.getElementById('signupModal'));
-        signupModal.hide();
         const verificationModalInstance = new bootstrap.Modal(document.getElementById('verificationModal'), {
-          backdrop: 'static', // Impede que o modal seja fechado ao clicar fora
-          keyboard: false // Impede que o modal seja fechado ao pressionar a tecla Esc
+          backdrop: 'static',
+          keyboard: false
         });
         verificationModalInstance.show();
       <?php endif; ?>
     });
-
-   
-
   </script>
-
-      <style>
-    .swal2.icon {
-      font-size: 3em !important;
-      /* Ajuste o tamanho do ícone conforme necessário */
-    }
-
-    .swal2.title {
-      font-size: 3em !important;
-      /* Ajuste o tamanho do título conforme necessário */
-    }
-  </style>
-
-  
 </body>
 
 </html>

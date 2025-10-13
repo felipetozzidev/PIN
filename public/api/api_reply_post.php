@@ -1,60 +1,56 @@
 <?php
-require_once('../../config/conn.php');
-header('Content-Type: application/json');
-
-// Segurança: Verifica se o usuário está logado e se os dados foram enviados
-if (!isset($_SESSION['id_usu'])) {
-    echo json_encode(['success' => false, 'error' => 'Usuário não autenticado.']);
-    exit();
-}
-if (!isset($_POST['id_post_pai']) || !isset($_POST['conteudo_post'])) {
-    echo json_encode(['success' => false, 'error' => 'Dados incompletos.']);
-    exit();
+// Garante que a sessão seja iniciada
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
 }
 
-$id_usu = $_SESSION['id_usu'];
-$id_post_pai = intval($_POST['id_post_pai']);
-$conteudo_post = trim($_POST['conteudo_post']);
+require_once '../../config/conn.php';
+require_once '../../config/log_helper.php';
 
-if (empty($conteudo_post)) {
-    echo json_encode(['success' => false, 'error' => 'A resposta não pode estar vazia.']);
-    exit();
+// Segurança: Verifica se o usuário está logado e se o método é POST
+if (!isset($_SESSION['user_id']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../login.php');
+    exit;
 }
 
-$conn->begin_transaction();
+// Valida e sanitiza os dados de entrada
+$user_id = $_SESSION['user_id'];
+$post_id = (int)($_POST['post_id'] ?? 0);
+$content = trim($_POST['content'] ?? '');
 
-try {
-    // 1. Insere o novo post (a resposta)
-    $stmt_insert = $conn->prepare("INSERT INTO posts (id_usu, conteudo_post, tipo_post, id_post_pai) VALUES (?, ?, 'resposta', ?)");
-    $stmt_insert->bind_param("isi", $id_usu, $conteudo_post, $id_post_pai);
-    $stmt_insert->execute();
-    $new_comment_id = $conn->insert_id;
-    $stmt_insert->close();
+// Garante que o post existe e o conteúdo não está vazio
+if ($post_id > 0 && !empty($content)) {
+    try {
+        $pdo->beginTransaction();
 
-    // 2. Atualiza o contador de respostas no post pai
-    $stmt_update = $conn->prepare("UPDATE posts SET cont_respostas = cont_respostas + 1 WHERE id_post = ?");
-    $stmt_update->bind_param("i", $id_post_pai);
-    $stmt_update->execute();
-    $stmt_update->close();
+        // 1. Insere o novo comentário na tabela 'comments'
+        $stmt = $pdo->prepare(
+            "INSERT INTO comments (post_id, user_id, content, created_at) VALUES (:post_id, :user_id, :content, NOW())"
+        );
+        $stmt->execute([
+            ':post_id' => $post_id,
+            ':user_id' => $user_id,
+            ':content' => $content
+        ]);
+        $comment_id = $pdo->lastInsertId();
 
-    // Confirma a transação
-    $conn->commit();
+        // 2. Atualiza o contador de respostas no post original
+        $stmt_update = $pdo->prepare("UPDATE posts SET reply_count = reply_count + 1 WHERE post_id = :post_id");
+        $stmt_update->execute([':post_id' => $post_id]);
 
-    // Prepara os dados para retornar ao frontend
-    $response_data = [
-        'success' => true,
-        'comment' => [
-            'id_post' => $new_comment_id,
-            'conteudo_post' => htmlspecialchars($conteudo_post),
-            'data_post' => date("H:i · d/m/Y"),
-            'nome_usu' => $_SESSION['nome_usu'],
-            'imgperfil_usu' => $_SESSION['imgperfil_usu'] // Assumindo que você salva isso na sessão
-        ]
-    ];
-    echo json_encode($response_data);
-} catch (mysqli_sql_exception $exception) {
-    $conn->rollback();
-    echo json_encode(['success' => false, 'error' => 'Erro no banco de dados: ' . $exception->getMessage()]);
+        // 3. Log da ação (com os parâmetros corretos)
+        $user_fullname = $_SESSION['full_name'] ?? 'Usuário Desconhecido';
+        logAction($pdo, 'Novo Comentário', $user_fullname, "Usuário comentou no post ID #{$post_id}. Comentário ID #{$comment_id}.", $user_id);
+
+        // Se tudo deu certo, confirma a transação
+        $pdo->commit();
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        // Em um ambiente de produção, seria ideal logar este erro em um arquivo de log.
+        // Por exemplo: error_log("Erro ao processar comentário: " . $e->getMessage());
+    }
 }
 
-$conn->close();
+// Redireciona de volta para a página do post, independentemente do resultado
+header('Location: ../post_view.php?id=' . $post_id);
+exit;

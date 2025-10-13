@@ -1,43 +1,41 @@
 <?php
-require_once('../../config/conn.php');
-require_once('../../config/log_helper.php'); // Adicionado para usar a função de log
+// O cabeçalho já inicia a sessão e faz a conexão via PDO
 include('admin_header.php');
+require_once('../../config/log_helper.php');
 
+// Inicializa variáveis
 $feedback_message = '';
 $edit_mode = false;
-$tag_para_editar = ['id_tag' => '', 'nome_tag' => ''];
+$tag_to_edit = ['tag_id' => '', 'name' => ''];
 $posts_with_tag = [];
+$admin_user_id = $_SESSION['user_id'];
+$admin_user_name = $_SESSION['full_name'] ?? 'Administrador';
 
 // --- LÓGICA PARA PROCESSAR AÇÕES (POST e GET) ---
-$admin_user_name = $_SESSION['nome_usu'] ?? 'Administrador';
 
 // 1. AÇÃO DE ADICIONAR OU ATUALIZAR (via POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome_tag = trim($_POST['nome_tag']);
+    $name = trim($_POST['name']);
+    $tag_id = isset($_POST['tag_id']) ? intval($_POST['tag_id']) : 0;
 
-    if (!empty($nome_tag)) {
-        if (isset($_POST['id_tag']) && !empty($_POST['id_tag'])) {
-            $id_tag = intval($_POST['id_tag']);
-            $stmt = $conn->prepare("UPDATE tags SET nome_tag = ? WHERE id_tag = ?");
-            $stmt->bind_param("si", $nome_tag, $id_tag);
-            if ($stmt->execute()) {
+    if (!empty($name)) {
+        if ($tag_id > 0) { // Atualizar
+            $stmt = $pdo->prepare("UPDATE tags SET name = ? WHERE tag_id = ?");
+            if ($stmt->execute([$name, $tag_id])) {
                 $feedback_message = "<p class='success-message'>Tag atualizada com sucesso!</p>";
-                log_activity($conn, 'Tag Editada', $admin_user_name, "Tag (ID: #{$id_tag}) foi atualizada para '{$nome_tag}'.");
+                logAction($pdo, 'Tag Editada', $admin_user_name, "Tag (ID: #{$tag_id}) foi atualizada para '{$name}'.", $admin_user_id);
             } else {
                 $feedback_message = "<p class='error-message'>Erro ao atualizar a tag. Ela já pode existir.</p>";
             }
-            $stmt->close();
-        } else {
-            $stmt = $conn->prepare("INSERT INTO tags (nome_tag) VALUES (?)");
-            $stmt->bind_param("s", $nome_tag);
-            if ($stmt->execute()) {
-                $new_id = $conn->insert_id;
+        } else { // Adicionar
+            $stmt = $pdo->prepare("INSERT INTO tags (name) VALUES (?)");
+            if ($stmt->execute([$name])) {
+                $new_id = $pdo->lastInsertId();
                 $feedback_message = "<p class='success-message'>Tag adicionada com sucesso!</p>";
-                log_activity($conn, 'Nova Tag', $admin_user_name, "Tag '{$nome_tag}' (ID: #{$new_id}) foi criada.");
+                logAction($pdo, 'Nova Tag', $admin_user_name, "Tag '{$name}' (ID: #{$new_id}) foi criada.", $admin_user_id);
             } else {
                 $feedback_message = "<p class='error-message'>Erro ao adicionar a tag. Ela já pode existir.</p>";
             }
-            $stmt->close();
         }
     } else {
         $feedback_message = "<p class='error-message'>O nome da tag não pode estar vazio.</p>";
@@ -45,71 +43,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // 2. AÇÃO DE DELETAR OU ENTRAR EM MODO DE EDIÇÃO (via GET)
-if (isset($_GET['action'])) {
-    $id_tag = intval($_GET['id']);
+if (isset($_GET['action']) && isset($_GET['id'])) {
+    $tag_id = intval($_GET['id']);
 
     if ($_GET['action'] == 'delete') {
-        // Buscar nome da tag antes de deletar para o log
-        $stmt_get_name = $conn->prepare("SELECT nome_tag FROM tags WHERE id_tag = ?");
-        $stmt_get_name->bind_param("i", $id_tag);
-        $stmt_get_name->execute();
-        $result_get_name = $stmt_get_name->get_result();
-        $tag_data = $result_get_name->fetch_assoc();
-        $tag_name_for_log = $tag_data ? $tag_data['nome_tag'] : 'Desconhecida';
-        $stmt_get_name->close();
+        $stmt_get_name = $pdo->prepare("SELECT name FROM tags WHERE tag_id = ?");
+        $stmt_get_name->execute([$tag_id]);
+        $tag_data = $stmt_get_name->fetch();
+        $tag_name_for_log = $tag_data ? $tag_data['name'] : 'Desconhecida';
 
-        $stmt_delete = $conn->prepare("DELETE FROM tags WHERE id_tag = ?");
-        $stmt_delete->bind_param("i", $id_tag);
-        if ($stmt_delete->execute()) {
+        $stmt_delete = $pdo->prepare("DELETE FROM tags WHERE tag_id = ?");
+        if ($stmt_delete->execute([$tag_id])) {
             $feedback_message = "<p class='success-message'>Tag deletada com sucesso!</p>";
-            log_activity($conn, 'Tag Excluída', $admin_user_name, "Tag '{$tag_name_for_log}' (ID: #{$id_tag}) foi excluída.");
+            logAction($pdo, 'Tag Excluída', $admin_user_name, "Tag '{$tag_name_for_log}' (ID: #{$tag_id}) foi excluída.", $admin_user_id);
         } else {
             $feedback_message = "<p class='error-message'>Erro ao deletar a tag.</p>";
         }
-        $stmt_delete->close();
     }
 
     if ($_GET['action'] == 'edit') {
         $edit_mode = true;
-        // Busca detalhes da tag
-        $stmt = $conn->prepare("SELECT * FROM tags WHERE id_tag = ?");
-        $stmt->bind_param("i", $id_tag);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->num_rows > 0) {
-            $tag_para_editar = $result->fetch_assoc();
-        }
-        $stmt->close();
+        $stmt = $pdo->prepare("SELECT * FROM tags WHERE tag_id = ?");
+        $stmt->execute([$tag_id]);
+        $tag_to_edit = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Busca posts que usam esta tag
-        $stmt_posts = $conn->prepare("
-            SELECT p.id_post, p.conteudo_post, u.nome_usu, u.imgperfil_usu
-            FROM posts_tags pt
-            JOIN posts p ON pt.id_post = p.id_post
-            LEFT JOIN usuarios u ON p.id_usu = u.id_usu
-            WHERE pt.id_tag = ?
-            ORDER BY p.data_post DESC
+        $stmt_posts = $pdo->prepare("
+            SELECT p.post_id, p.content, u.full_name, u.profile_image_url
+            FROM post_tags pt
+            JOIN posts p ON pt.post_id = p.post_id
+            LEFT JOIN users u ON p.user_id = u.user_id
+            WHERE pt.tag_id = ?
+            ORDER BY p.created_at DESC
         ");
-        $stmt_posts->bind_param("i", $id_tag);
-        $stmt_posts->execute();
-        $result_posts = $stmt_posts->get_result();
-        while ($row = $result_posts->fetch_assoc()) {
-            $posts_with_tag[] = $row;
-        }
-        $stmt_posts->close();
+        $stmt_posts->execute([$tag_id]);
+        $posts_with_tag = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 
 // --- CONSULTA PARA EXIBIR A TABELA DE TAGS ---
-$search_query = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
-$sql = "SELECT t.id_tag, t.nome_tag, COUNT(pt.id_post) as total_posts 
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+$sql = "SELECT t.tag_id, t.name, COUNT(pt.post_id) as total_posts 
         FROM tags t 
-        LEFT JOIN posts_tags pt ON t.id_tag = pt.id_tag";
+        LEFT JOIN post_tags pt ON t.tag_id = pt.tag_id";
+$params = [];
 if (!empty($search_query)) {
-    $sql .= " WHERE t.nome_tag LIKE '%$search_query%'";
+    $sql .= " WHERE t.name LIKE ?";
+    $params[] = "%$search_query%";
 }
-$sql .= " GROUP BY t.id_tag ORDER BY total_posts DESC, t.nome_tag ASC";
-$resultado = $conn->query($sql);
+$sql .= " GROUP BY t.tag_id ORDER BY total_posts DESC, t.name ASC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$tags_result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <main class="container">
@@ -135,22 +119,22 @@ $resultado = $conn->query($sql);
                 </tr>
             </thead>
             <tbody>
-                <?php if ($resultado && $resultado->num_rows > 0): ?>
-                    <?php while ($tag = $resultado->fetch_assoc()): ?>
+                <?php if ($tags_result && count($tags_result) > 0): ?>
+                    <?php foreach ($tags_result as $tag): ?>
                         <tr>
-                            <td><?php echo $tag['id_tag']; ?></td>
-                            <td><span class="status-badge tag"><?php echo htmlspecialchars($tag['nome_tag']); ?></span></td>
+                            <td><?php echo $tag['tag_id']; ?></td>
+                            <td><span class="status-badge tag"><?php echo htmlspecialchars($tag['name']); ?></span></td>
                             <td><?php echo $tag['total_posts']; ?></td>
                             <td class="actions">
-                                <a href="admin_tags.php?action=edit&id=<?php echo $tag['id_tag']; ?>#form-tag" class="btn btn-icon btn-edit" title="Editar Tag">
+                                <a href="admin_tags.php?action=edit&id=<?php echo $tag['tag_id']; ?>#form-tag" class="btn btn-icon btn-edit" title="Editar Tag">
                                     <i class="ri-pencil-line"></i>
                                 </a>
-                                <a href="admin_tags.php?action=delete&id=<?php echo $tag['id_tag']; ?>" onclick="return confirm('Tem certeza que deseja deletar esta tag? Todas as suas associações com posts serão removidas.');" class="btn btn-icon btn-delete" title="Deletar Tag">
+                                <a href="admin_tags.php?action=delete&id=<?php echo $tag['tag_id']; ?>" onclick="return confirm('Tem certeza que deseja deletar esta tag? Todas as suas associações com posts serão removidas.');" class="btn btn-icon btn-delete" title="Deletar Tag">
                                     <i class="ri-delete-bin-line"></i>
                                 </a>
                             </td>
                         </tr>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
                         <td colspan="4">Nenhuma tag encontrada.</td>
@@ -164,18 +148,17 @@ $resultado = $conn->query($sql);
         <h2><?php echo $edit_mode ? 'Editar Tag' : 'Adicionar Nova Tag'; ?></h2>
         <form action="admin_tags.php" method="POST">
             <?php if ($edit_mode): ?>
-                <input type="hidden" name="id_tag" value="<?php echo $tag_para_editar['id_tag']; ?>">
+                <input type="hidden" name="tag_id" value="<?php echo $tag_to_edit['tag_id']; ?>">
             <?php endif; ?>
 
             <div class="form-group">
-                <label for="nome_tag">Nome da Tag:</label>
-                <input type="text" id="nome_tag" name="nome_tag" value="<?php echo htmlspecialchars($tag_para_editar['nome_tag']); ?>" required>
+                <label for="name">Nome da Tag:</label>
+                <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($tag_to_edit['name']); ?>" required>
             </div>
 
-            <!-- Seção de Posts com a Tag (só aparece no modo de edição) -->
-            <?php if ($edit_mode): ?>
+            <?php if ($edit_mode && !empty($posts_with_tag)): ?>
                 <div class="form-group">
-                    <h2>Posts com a tag "<?php echo htmlspecialchars($tag_para_editar['nome_tag']); ?>"</h2>
+                    <h2>Posts com a tag "<?php echo htmlspecialchars($tag_to_edit['name']); ?>"</h2>
                     <table>
                         <thead>
                             <tr>
@@ -185,45 +168,46 @@ $resultado = $conn->query($sql);
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (!empty($posts_with_tag)): ?>
-                                <?php foreach ($posts_with_tag as $post): ?>
-                                    <tr>
-                                        <td>
-                                            <div class="user-info">
-                                                <?php
-                                                $db_path = $post['imgperfil_usu'];
-                                                $image_path = (substr($db_path, 0, 3) === '../') ? '../../' . substr($db_path, 3) : $db_path;
-                                                ?>
-                                                <img src="<?php echo htmlspecialchars($image_path); ?>" alt="Foto de Perfil">
-                                                <span><?php echo htmlspecialchars($post['nome_usu'] ?? 'Apagado'); ?></span>
-                                            </div>
-                                        </td>
-                                        <td><?php echo htmlspecialchars(substr($post['conteudo_post'], 0, 70)) . '...'; ?></td>
-                                        <td class="actions">
-                                            <a href="admin_posts.php?view_post_id=<?php echo $post['id_post']; ?>" class="btn btn-primary" target="_blank">
-                                                <i class="ri-eye-line"></i> Ver Post
-                                            </a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
+                            <?php foreach ($posts_with_tag as $post): ?>
                                 <tr>
-                                    <td colspan="3">Nenhum post encontrado com esta tag.</td>
+                                    <td>
+                                        <div class="user-info">
+                                            <?php
+                                            $db_path = $post['profile_image_url'];
+                                            $image_path = (substr($db_path, 0, 3) === '../') ? '../../' . substr($db_path, 3) : $db_path;
+                                            ?>
+                                            <img src="<?php echo htmlspecialchars($image_path); ?>" alt="Foto de Perfil">
+                                            <span><?php echo htmlspecialchars($post['full_name'] ?? 'Apagado'); ?></span>
+                                        </div>
+                                    </td>
+                                    <td><?php echo htmlspecialchars(substr($post['content'], 0, 70)) . '...'; ?></td>
+                                    <td class="actions">
+                                        <a href="admin_posts.php?view_post_id=<?php echo $post['post_id']; ?>" class="btn btn-primary" target="_blank">
+                                            <i class="ri-eye-line"></i> Ver Post
+                                        </a>
+                                    </td>
                                 </tr>
-                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
+            <?php elseif ($edit_mode): ?>
+                <div class="form-group">
+                    <h2>Posts com a tag "<?php echo htmlspecialchars($tag_to_edit['name']); ?>"</h2>
+                    <p>Nenhum post encontrado com esta tag.</p>
+                </div>
             <?php endif; ?>
-            <button type="submit" class="btn btn-primary"><?php echo $edit_mode ? 'Salvar Alterações' : 'Adicionar Tag'; ?></button>
-            <?php if ($edit_mode): ?>
-                <a href="admin_tags.php" class="btn">Cancelar Edição</a>
-            <?php endif; ?>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><?php echo $edit_mode ? 'Salvar Alterações' : 'Adicionar Tag'; ?></button>
+                <?php if ($edit_mode): ?>
+                    <a href="admin_tags.php" class="btn">Cancelar Edição</a>
+                <?php endif; ?>
+            </div>
         </form>
     </div>
 </main>
 
 <?php
 include('admin_footer.php');
-$conn->close();
 ?>
