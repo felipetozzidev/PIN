@@ -8,7 +8,7 @@ $host = 'srv1435.hstgr.io';     // Endereço do servidor do banco de dados.
 $db_name = 'u245002075_ifapoia2';    // Nome do banco de dados.
 $username = 'u245002075_admin_ifapoia';      // Nome de usuário para acesso ao banco.
 $password = 's|8WRsV@|v';          // Senha para acesso ao banco.
-$port = 3306;            // Porta de conexão. É importante especificar, pois pode variar.
+$port = 65002;            // Porta de conexão. É importante especificar, pois pode variar.
 
 // Opções do PDO para um comportamento mais seguro e previsível.
 $options = [
