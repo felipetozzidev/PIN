@@ -943,6 +943,14 @@ main {
                 }
             }
 
+            &> div.main_content[data-pagina="perfil de usuario"] {
+                width: 80%;
+
+                div.profile_header{
+                    
+                }
+            }
+
         }
 
         /* ========== Fim da Main Area ========= */
