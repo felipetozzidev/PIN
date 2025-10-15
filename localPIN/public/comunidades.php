@@ -13,12 +13,11 @@ $sql_comunidades = "SELECT
 $result_comunidades = $pdo->query($sql_comunidades);
 ?>
 
-<!-- O HTML começa diretamente com o conteúdo da página -->
 <main class="index-container">
     <?php include("../src/components/nav_bar.php"); ?>
     <section class="main_container">
         <div class="main_content" data-pagina="comunidades">
-            <h1>Comunidades</h1>
+            <h1 class="title">Comunidades</h1>
             <div class="community_cards_container">
                 <?php
                 if ($result_comunidades && $result_comunidades->rowCount() > 0) {

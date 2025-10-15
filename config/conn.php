@@ -17,7 +17,7 @@ $host = 'localhost';
 $db_name = 'u245002075_ifapoia2';
 $username = 'u245002075_admin_ifapoia';
 $password = 's|8WRsV@|v';
-$charset = 'utf8';
+$charset = 'utf8'; // É uma boa prática definir o charset.
 
 // Opções do PDO para um comportamento mais seguro e previsível.
 $options = [

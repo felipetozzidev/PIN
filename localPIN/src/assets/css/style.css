@@ -211,7 +211,6 @@ input:-webkit-autofill:focus {
 main {
     flex-grow: 1;
     /* Empurra o footer para baixo */
-    /* Espaço para o header fixo */
     --tamanho_navbar: 15%;
     display: grid;
     grid-template-areas: "navbar main";
@@ -238,7 +237,6 @@ main>section.main_container {
     padding-inline: 32px;
     width: 100%;
     align-self: start;
-    padding-top: 100px;
 }
 
 /* -------------------- FOOTER -------------------- */
@@ -385,7 +383,7 @@ nav.navbar_lateral {
     border-radius: 10px;
     --padding: 20px;
     margin-bottom: 10px;
-    background-color: var(--white);
+    background-color: transparent;
     overflow: hidden;
     /* Garante que os filhos não ultrapassem as bordas arredondadas */
 }
@@ -767,7 +765,7 @@ section.post_main {
             padding: 16px 24px;
             border: var(--secondary) 1px solid;
             transition: all .2s ease-in-out;
-            background-color: var(--white);
+            background-color: transparent;
 
             &:hover {
                 border-color: var(--primary);

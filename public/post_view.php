@@ -12,6 +12,23 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $post_id = intval($_GET['id']);
 $current_user_id = $_SESSION['user_id'] ?? 0;
 
+// LÓGICA PARA VISUALIZAÇÃO ÚNICA
+if (isset($_SESSION['user_id']) && isset($post_id)) {
+    $current_user_id = $_SESSION['user_id'];
+
+    // A chave UNIQUE no banco de dados (post_id, user_id) impede inserções duplicadas.
+    $sql_view = "INSERT IGNORE INTO post_views (post_id, user_id) VALUES (?, ?)";
+    $stmt_view = $pdo->prepare($sql_view);
+    $stmt_view->execute([$post_id, $current_user_id]);
+
+    // Se a inserção foi bem-sucedida, atualiza a contagem de visualizações na tabela de posts.
+    if ($stmt_view->rowCount() > 0) {
+        $sql_update_count = "UPDATE posts SET view_count = view_count + 1 WHERE post_id = ?";
+        $stmt_update_count = $pdo->prepare($sql_update_count);
+        $stmt_update_count->execute([$post_id]);
+    }
+}
+
 // --- BUSCA O POST PRINCIPAL ---
 $sql_post = "SELECT 
                 p.post_id, p.content, p.created_at, p.view_count, p.like_count, p.reply_count,

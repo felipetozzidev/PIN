@@ -34,7 +34,7 @@ function getCardClass($index)
 <main>
     <?php require_once('../src/components/nav_bar.php'); ?>
 
-    <section class="main_container">
+    <section class="index-container main_container">
         <div class="main_content" data-pagina="destaques">
 
             <h1 class="title">Destaques da Comunidade</h1>
