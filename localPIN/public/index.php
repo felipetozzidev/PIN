@@ -22,7 +22,7 @@ $sql = "SELECT
             p.like_count,
             p.reply_count,
             p.repost_count, 
-            p.quote_count,
+            p.bookmark_count,
             u.user_id,
             u.full_name,
             u.profile_image_url,
@@ -158,7 +158,7 @@ $result_comunidades = $pdo->query($sql_comunidades);
                                             </div>
                                             <div class="post-icon">
                                                 <i class="ri-chat-quote-line"></i>
-                                                <span class="post-cont"><?php echo $post['quote_count']; ?></span>
+                                                <span class="post-cont"><?php echo $post['bookmark_count']; ?></span>
                                             </div>
                                         </div>
                                     </footer>

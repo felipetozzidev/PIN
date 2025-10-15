@@ -1,4 +1,5 @@
 <?php
+$currentPage = 'comunidades';
 // O header.php já inicia a sessão e faz a conexão via PDO
 require_once("../src/components/header.php");
 

@@ -13,7 +13,7 @@ if (isset($_GET['view_post_id'])) {
     $post_id_to_view = intval($_GET['view_post_id']);
     $sql_single = "SELECT 
                         p.post_id, p.content, p.created_at, p.status, p.type, 
-                        p.content_warning, p.like_count, p.reply_count,
+                        p.content_warning, p.like_count, p.reply_count, p.repost_count, p.bookmark_count,
                         u.full_name,
                         c.name as community_name,
                         GROUP_CONCAT(DISTINCT t.name SEPARATOR ', ') as tags,
@@ -53,7 +53,7 @@ $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 
 $sql = "SELECT 
             p.post_id, p.content, p.created_at, p.status, p.type, 
-            p.content_warning, p.like_count, p.reply_count,
+            p.content_warning, p.like_count, p.reply_count, p.repost_count, p.bookmark_count,
             u.full_name,
             c.name as community_name,
             GROUP_CONCAT(DISTINCT t.name SEPARATOR ', ') as tags,
@@ -131,6 +131,8 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td>
                                 <i class="ri-heart-line" title="Likes"></i> <?php echo $post['like_count']; ?> |
                                 <i class="ri-chat-3-line" title="Respostas"></i> <?php echo $post['reply_count']; ?>
+                                <i class="ri-repeat-line" title="Reposts"></i> <?php echo $post['repost_count'] ?? 0; ?> |
+                                <i class="ri-bookmark-line" title="Salvos"></i> <?php echo $post['bookmark_count'] ?? 0; ?>
                             </td>
                             <td>
                                 <?php
@@ -155,7 +157,9 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     data-type="<?php echo htmlspecialchars($post['type']); ?>"
                                     data-content-warning="<?php echo $post['content_warning']; ?>"
                                     data-like-count="<?php echo $post['like_count']; ?>"
-                                    data-reply-count="<?php echo $post['reply_count']; ?>">
+                                    data-reply-count="<?php echo $post['reply_count']; ?>"
+                                    data-repost-count="<?php echo $post['repost_count'] ?? 0; ?>"
+                                    data-bookmark-count="<?php echo $post['bookmark_count'] ?? 0; ?>">
                                     <i class="ri-eye-line"></i>
                                 </button>
                                 <a href="admin_posts.php?delete_id=<?php echo $post['post_id']; ?>" onclick="return confirm('Tem a certeza que deseja apagar este post? Esta ação é irreversível.');" class="btn btn-icon btn-delete" title="Apagar">
@@ -198,6 +202,8 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="stats-list">
                     <span><i class="ri-heart-line" title="Likes"></i> <span id="modal-likes"></span></span>
                     <span><i class="ri-chat-3-line" title="Respostas"></i> <span id="modal-replies"></span></span>
+                    <span><i class="ri-repeat-line" title="Reposts"></i> <span id="modal-reposts"></span></span>
+                    <span><i class="ri-bookmark-line" title="Salvos"></i> <span id="modal-bookmarks"></span></span>
                 </div>
             </div>
         </div>
@@ -225,6 +231,8 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
             document.getElementById('modal-content').textContent = data.content;
             document.getElementById('modal-likes').textContent = data.likeCount;
             document.getElementById('modal-replies').textContent = data.replyCount;
+            document.getElementById('modal-reposts').textContent = data.repostCount;
+            document.getElementById('modal-bookmarks').textContent = data.bookmarkCount;
 
             const statusContainer = document.getElementById('modal-status');
             statusContainer.innerHTML = '';
@@ -288,6 +296,8 @@ $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 content: postDataFromUrl.content,
                 likeCount: postDataFromUrl.like_count,
                 replyCount: postDataFromUrl.reply_count,
+                repostCount: postDataFromUrl.repost_count,
+                bookmarkCount: postDataFromUrl.bookmark_count,
                 contentWarning: postDataFromUrl.content_warning,
                 tags: postDataFromUrl.tags,
                 mediaUrls: postDataFromUrl.media_urls,
