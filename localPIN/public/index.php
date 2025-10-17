@@ -50,7 +50,7 @@ if (!empty($where_clauses)) {
     $sql .= " WHERE " . implode(' AND ', $where_clauses);
 }
 
-$sql .= " GROUP BY p.post_id ORDER BY p.created_at DESC LIMIT 20";
+$sql .= " GROUP BY p.post_id, ifapoia.c.name ORDER BY p.created_at DESC LIMIT 20";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);

@@ -2,7 +2,7 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="../src/assets/css/style.css">
 <footer class="pag_footer">
-    <div class="container">
+    <div>
         <div class="row">
             <div class="col">
                 <p>&#169; Todos os direitos reservados | IFApoia <?php echo date("Y") ?></p>

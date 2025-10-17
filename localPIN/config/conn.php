@@ -8,7 +8,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $db_host = '127.0.0.1';                 // Host padrão do XAMPP
 $db_name = 'ifapoia';                   // O nome do seu banco de dados local
 $db_user = 'root';                      // Usuário padrão do XAMPP
-$db_pass = '';                          // Senha padrão do XAMPP (vazia)
+$db_pass = 'Omega9925!';                          // Senha padrão do XAMPP (vazia)
 $db_port = '3306';                      // Porta padrão do MySQL no XAMPP
 $charset = 'utf8';
 

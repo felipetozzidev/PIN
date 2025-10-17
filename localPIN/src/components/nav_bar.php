@@ -41,7 +41,7 @@ if ($currentPage === 'index' || $currentPage === '') {
                 <a class="nav-link">
                     <p>Suas comunidades</p>
                     <!-- O ícone da seta agora está aqui, e será controlado via CSS -->
-                    <img src="src/assets/icons/arrow_down.svg" alt="">
+                    <img src="../src/assets/icons/arrow_down.svg" alt="">
                 </a>
                 <ul class="dropdown_list">
                     <?php if ($isUserLoggedIn && isset($pdo)): ?>
