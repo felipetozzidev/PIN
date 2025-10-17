@@ -40,8 +40,7 @@ if ($currentPage === 'index' || $currentPage === '') {
             <li class="dropdown_item <?php echo $isDropdownActive ? 'active' : ''; ?>">
                 <a class="nav-link">
                     <p>Suas comunidades</p>
-                    <!-- O ícone da seta agora está aqui, e será controlado via CSS -->
-                    <img src="../src/assets/icons/arrow_down.svg" alt="">
+                    <!-- O icone é controlado por css porra nenhuma, deixa do jeito que tava pq ta dando problema -->
                 </a>
                 <ul class="dropdown_list">
                     <?php if ($isUserLoggedIn && isset($pdo)): ?>

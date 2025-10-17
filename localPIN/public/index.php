@@ -86,9 +86,9 @@ $result_comunidades = $pdo->query($sql_comunidades);
         <section class="main_container">
             <div class="main_content" data-pagina="pagina principal">
                 <div class="destaques">
-                    <h1 class="title">Destaques</h1>
+                    <h1 class="title">Mais vistos</h1>
                     <div class="cards">
-                        <span>Destaques</span>
+                        <span>Mais vistos</span>
                     </div>
                 </div>
                 <div class="postagens_e_publicacoes">

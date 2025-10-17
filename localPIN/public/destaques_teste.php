@@ -30,20 +30,33 @@ function getCardClass($index)
     }
 }
 ?>
-
 <body>
-    <main>
-        <?php include("../src/components/nav_bar.php"); ?>
+    <main class="index-container">
+        <?php include_once("../src/components/nav_bar.php"); ?>
         <section class="main_container">
-
             <div class="main_content">
-                <h1 class="title">Destaques da Comunidade</h1>
-
-
+                <div class="destaques">
+                    <h1 class="title">Destaques da Comunidade</h1>
+                    <div class="cardDestaque_container">
+                        <?php foreach ($popular_posts as $key => $post):?>
+    
+                            <a class="cardDestaque <?php echo getCardClass($key); ?>">
+                                <div class="cardDestaque_image">
+                                    <img src="<?php echo $post['post_image']; ?>" alt="Imagem do Post">
+                                </div>
+                                <div class="cardDestaque_content">
+                                    <p class="cardDestaque_content_text">
+                                        <?php echo $post['content']; ?>
+                                    </p>
+                                </div>
+                            </a>
+    
+                        <?php endforeach; ?>
+                    </div>
+                </div>
             </div>
-
         </section>
     </main>
-    <?php include("../src/components/footer.php"); ?>
+    <?php include_once("../src/components/footer.php"); ?>
 </body>
 </html>
