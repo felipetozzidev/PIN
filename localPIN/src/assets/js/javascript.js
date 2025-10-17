@@ -299,5 +299,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    objects.querySelector("#create_post").addEventListener("click", () => {
+        
+    });
 });
 

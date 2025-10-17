@@ -44,7 +44,7 @@ $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
                 </div>
             </div>
             <div class="col-4 actions navbar-nav justify-content-end">
-                <a class="nav-item d-none d-md-block me-2" href="post.php" title="Criar Post">
+                <a class="nav-item d-none d-md-block me-2 " id="create_post" title="Criar Post">
                     <img src="../src/assets/icons/add-large-line.svg" alt="Criar Post" width="35px">
                 </a>
                 <a class="nav-item d-none d-md-block me-2" href="#" title="Notificações">
@@ -135,3 +135,4 @@ $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
             </ul>
         </div>
     </div>
+
