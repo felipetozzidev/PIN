@@ -116,27 +116,49 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
-<main class="modal_container">
-    
-    <section class="modal_body">
-        <div class="form-group col-6">
-            <label for="tag-input">Tags</label>
-            <div class="tag-container">
-                <div id="selected-tags"></div>
-                <input type="text" id="tag-input" placeholder="Digite para buscar ou adicionar...">
-            </div>
-            <input type="hidden" name="tags" id="hidden-tags">
-            <div id="tag-suggestions"></div>
-            <div class="recommended-tags">
-                <strong>Tags Populares:</strong>
-                <?php if ($popular_tags): ?>
-                    <?php foreach ($popular_tags as $tag): ?>
-                        <button type="button" class="recommended-tag"><?php echo htmlspecialchars($tag['name']); ?></button>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+<main class="modal_container active">
+
+    <form action="#" method="POST" class="modal_body" enctype="multipart/form-data" id="modal_body">
+        <i class="ri-close-fill"></i>
+        <div class="main_content">
+            <img src="<?php echo $_SESSION['profile_image_url']; ?>" alt="">
+            <textarea name="content" id="content" rows="6"
+                placeholder="No que você está pensando, <?php echo htmlspecialchars($_SESSION['full_name']); ?>?"></textarea>
         </div>
-    </section>
+        <hr>
+
+        </div>
+        <div class="post_footer">
+            <div class="footer_left">
+                <div class="post_media">
+                    <label for="post_media">
+                        <i class="ri-image-add-fill"></i>
+                    </label>
+                    <input type="file" name="post_media" id="post_media" multiple accept="image/*" class="form-control">
+                </div>
+                <div class="post_tag">
+                    <div class="form-group col-6">
+                        <label for="tag-input">Tags</label>
+                        <div class="tag-container">
+                            <div id="selected-tags"></div>
+                            <input type="text" id="tag-input" placeholder="Digite para buscar ou adicionar...">
+                        </div>
+                        <input type="hidden" name="tags" id="hidden-tags">
+                        <div id="tag-suggestions"></div>
+                        <!-- <div class="recommended-tags">
+                            <strong>Tags Populares:</strong>
+                            <?php if ($popular_tags): ?>
+                                <?php foreach ($popular_tags as $tag): ?>
+                                    <button type="button"
+                                        class="recommended-tag"><?php echo htmlspecialchars($tag['name']); ?></button>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div> -->
+                    </div>
+            </div>
+                <button type="submit" class="publicar">Publicar</button>
+            </div>
+    </form>
 </main>
 
 <!-- <script>
