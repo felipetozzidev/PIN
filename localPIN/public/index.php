@@ -76,6 +76,7 @@ $result_comunidades = $pdo->query($sql_comunidades);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IFApoia - Início</title>
+
 </head>
 
 <body data-is-logged-in="<?php echo ($current_user_id > 0) ? 'true' : 'false'; ?>">
@@ -197,6 +198,8 @@ $result_comunidades = $pdo->query($sql_comunidades);
                 </div>
         </section>
     </main>
+
+    <?php include_once('../src/components/modal_postagem.php'); ?>
 
     <div id="imageLightbox" class="lightbox">
         <span class="lightbox-close">&times;</span>

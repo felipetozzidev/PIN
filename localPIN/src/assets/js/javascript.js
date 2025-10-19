@@ -300,8 +300,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    objects.querySelector("#create_post").addEventListener("click", () => {
-        
+    document.querySelector("#create_post").addEventListener("click", () => {
+        document.querySelector("main.modal_container").classList.add("active");
+        document.querySelector("main.modal_container").style.top = window.scrollY + "px";
+        document.querySelector("body").style.overflow = "hidden";
     });
 });
 
