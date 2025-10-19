@@ -39,62 +39,89 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
 <!-- Adiciona a folha de estilo específica para esta página -->
 <link rel="stylesheet" href="../src/assets/css/perfil.css">
 
-<main class="profile-container">
-    <div class="profile-header">
-        <img src="<?php echo htmlspecialchars($profile_user['cover_image_url'] ?? 'https://via.placeholder.com/900x300'); ?>" alt="Capa do Perfil" class="cover-image">
-        <img src="<?php echo htmlspecialchars($profile_user['profile_image_url']); ?>" alt="Foto de Perfil" class="profile-image">
-        <div class="profile-info">
-            <h2><?php echo htmlspecialchars($profile_user['full_name']); ?></h2>
-            <p><?php echo htmlspecialchars($profile_user['bio'] ?? 'Nenhuma biografia disponível.'); ?></p>
+<body>
+    <main class="index-container" data-pagina="user_profile">
+        <?php require_once(__DIR__ . '/../src/components/nav_bar.php'); ?>
 
-            <?php if ($profile_user_id == $_SESSION['user_id']): ?>
-                <a href="edit_profile.php" class="btn btn-secondary">Editar Perfil</a>
-            <?php endif; ?>
-        </div>
-    </div>
+        <section class="main_container">
+            <div class="main_content">
+                <div class="profile_cover">
+                    <img src="<?php echo htmlspecialchars($profile_user['cover_image_url'] ?? 'https://via.placeholder.com/900x300'); ?>" alt="Capa do Perfil" class="cover_image">
+                </div>
+                <div class="profile_header">
+                    <img src="<?php echo htmlspecialchars($profile_user['profile_image_url']); ?>" alt="Foto de Perfil" class="profile_image">
+                    <div class="profile_details">
+                        <div class="profile_info">
 
-    <div class="profile-content">
-        <h3>Posts de <?php echo htmlspecialchars($profile_user['full_name']); ?></h3>
-        <div class="feed">
-            <?php if ($posts && count($posts) > 0): ?>
-                <?php foreach ($posts as $post): ?>
-                    <div class="post_container" data-post-url="post_view.php?id=<?php echo $post['post_id']; ?>">
-                        <header class="post_header">
-                            <div class="user_info">
-                                <div class="user_icon">
-                                    <img src="<?php echo htmlspecialchars($post['profile_image_url']); ?>" alt="Foto de Perfil">
-                                </div>
-                                <div class="user-details">
-                                    <span class="user-name"><?php echo htmlspecialchars($post['full_name']); ?></span><br>
-                                    <span class="user-tag">@<?php echo strtolower(explode(' ', $post['full_name'])[0]); ?></span>
-                                </div>
+                            <h2><?php echo htmlspecialchars($profile_user['full_name']); ?></h2>
+                            <p><?php echo htmlspecialchars($profile_user['bio'] ?? 'Nenhuma biografia disponível.'); ?></p>
+                        </div>
+
+                        <?php if ($profile_user_id == $_SESSION['user_id']): ?>
+                            <div class="user_options">
+                                <a href="edit_profile.php" class="btn btn-secondary">Editar Perfil</a>
+                            <button class="btn btn-secondary" onclick="configButton()">Configurações</button>
+
+                            <script>
+                                function configButton() {
+                                    alert("Em breve, você poderá personalizar as configurações do seu perfil.");
+                                }
+                            </script>
                             </div>
-                            <div class="post-date">
-                                <span><?php echo date('d/m/Y H:i', strtotime($post['created_at'])); ?></span>
-                            </div>
-                        </header>
-                        <section class="post_main">
-                            <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
-                        </section>
-                        <footer class="post_footer">
-                            <div class="post-stats-left">
-                                <div class="post-icon">
-                                    <i class="ri-heart-line"></i>
-                                    <span class="post-cont"><?php echo $post['like_count']; ?></span>
-                                </div>
-                                <div class="post-icon">
-                                    <i class="ri-chat-3-line"></i>
-                                    <span class="post-cont"><?php echo $post['reply_count']; ?></span>
-                                </div>
-                            </div>
-                        </footer>
+                        <?php endif; ?>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p><?php echo htmlspecialchars($profile_user['full_name']); ?> ainda não fez nenhuma publicação.</p>
-            <?php endif; ?>
-        </div>
-    </div>
-</main>
+                </div>
 
-<?php require_once '../src/components/footer.php'; ?>
+                <div class="profilecontent">
+                    <h3>Posts de <?php echo htmlspecialchars($profile_user['full_name']); ?></h3>
+                    <div class="feed">
+                        <?php if ($posts && count($posts) > 0): ?>
+                            <?php foreach ($posts as $post): ?>
+                                <div class="post_container" data-post-url="post_view.php?id=<?php echo $post['post_id']; ?>">
+                                    <header class="post_header">
+                                        <div class="user_info">
+                                            <div class="user_icon">
+                                                <img src="<?php echo htmlspecialchars($post['profile_image_url']); ?>"
+                                                    alt="Foto de Perfil">
+                                            </div>
+                                            <div class="user-details">
+                                                <span
+                                                    class="user-name"><?php echo htmlspecialchars($post['full_name']); ?></span><br>
+                                                <span
+                                                    class="user-tag">@<?php echo strtolower(explode(' ', $post['full_name'])[0]); ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="post-date">
+                                            <span><?php echo date('d/m/Y H:i', strtotime($post['created_at'])); ?></span>
+                                        </div>
+                                    </header>
+                                    <section class="post_main">
+                                        <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
+                                    </section>
+                                    <footer class="post_footer">
+                                        <div class="post-stats-left">
+                                            <div class="post-icon">
+                                                <i class="ri-heart-line"></i>
+                                                <span class="post-cont"><?php echo $post['like_count']; ?></span>
+                                            </div>
+                                            <div class="post-icon">
+                                                <i class="ri-chat-3-line"></i>
+                                                <span class="post-cont"><?php echo $post['reply_count']; ?></span>
+                                            </div>
+                                        </div>
+                                    </footer>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p><?php echo htmlspecialchars($profile_user['full_name']); ?> ainda não fez nenhuma publicação.
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+    <?php require_once '../src/components/footer.php'; ?>
+</body>

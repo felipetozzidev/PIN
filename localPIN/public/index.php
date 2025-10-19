@@ -69,16 +69,6 @@ $sql_comunidades = "SELECT
 $result_comunidades = $pdo->query($sql_comunidades);
 ?>
 <!-- O restante do seu HTML continua aqui, sem alterações -->
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IFApoia - Início</title>
-
-</head>
-
 <body data-is-logged-in="<?php echo ($current_user_id > 0) ? 'true' : 'false'; ?>">
 
     <main class="index-container">
@@ -209,6 +199,3 @@ $result_comunidades = $pdo->query($sql_comunidades);
     </div>
 
     <?php require_once(__DIR__ . '/../src/components/footer.php'); ?>
-</body>
-
-</html>
