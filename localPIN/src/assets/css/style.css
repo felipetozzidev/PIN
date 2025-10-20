@@ -237,6 +237,7 @@ main>section.navbar_container {
 main>section.main_container {
     grid-area: main;
     display: flex;
+    align-items: center;
     flex-direction: column;
     justify-content: center;
     padding-inline: 32px;
@@ -1333,8 +1334,10 @@ main[data-pagina="user_profile"] {
 
     & > section.main_container{
         padding-inline: 30px 0;
+        height: 100%;
         & > div.main_content{
             background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             border-radius: 20px 20px 0 0;
             height: 100%;
@@ -1369,9 +1372,6 @@ main[data-pagina="user_profile"] {
                     align-items: flex-end;
 
                     & > .profile_info{
-                        & > h2 {
-                            
-                        }
 
                         & > p{
                             margin: 0;
@@ -1380,6 +1380,21 @@ main[data-pagina="user_profile"] {
 
                     & > .profile_options{
                         height: 50px;
+
+                        & > button, & > a{
+                            padding: 10px 20px;
+                            border-radius: 10px;
+                            border: 1px solid var(--primary);
+                            background-color: var(--background);
+                            color: var(--primary);
+                            
+                            transition: 0.2s ease-in-out;
+                            
+                            &:hover{
+                                background-color: var(--primary);
+                                color: var(--background);
+                            }
+                        }
                     }
                 }
             }
