@@ -1,10 +1,11 @@
 <?php
 require_once('../config/log_helper.php'); // Adicionado para usar a função de log
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php?error=login_required");
-    exit();
-}
+// if (!isset($_SESSION['user_id'])) {
+//     header('Location: login.php');
+//     echo "<script> console.log('Putaqueimepariu vtmnc esse sustema de nmerda'); </script>";
+//     exit();
+// }
 
 $feedback_message = '';
 $admin_user_name = $_SESSION['full_name'] ?? 'Usuário';
@@ -25,18 +26,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo->beginTransaction();
 
-            // 1. INSERE O POST NA TABELA `posts`
+            // // 1. INSERE O POST NA TABELA `posts`
             $stmt_post = $pdo->prepare("INSERT INTO posts (user_id, content, type, content_warning) VALUES (?, ?, 'padrao', ?)");
             $stmt_post->execute([$user_id, $content, $content_warning]);
             $post_id = $pdo->lastInsertId();
 
-            // 2. ASSOCIA O POST À COMUNIDADE (SE UMA FOI ESCOLHIDA)
+            // // 2. ASSOCIA O POST À COMUNIDADE (SE UMA FOI ESCOLHIDA)
             if ($community_id > 0) {
                 $stmt_com_post = $pdo->prepare("INSERT INTO community_posts (community_id, post_id) VALUES (?, ?)");
                 $stmt_com_post->execute([$community_id, $post_id]);
             }
 
-            // 3. PROCESSA E ASSOCIA AS TAGS
+            // // 3. PROCESSA E ASSOCIA AS TAGS
             if (!empty($tags_string)) {
                 $tags_array = array_map('trim', explode(',', $tags_string));
                 foreach ($tags_array as $tag_name) {
@@ -63,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // 4. PROCESSA O UPLOAD DE IMAGENS
+            // // 4. PROCESSA O UPLOAD DE IMAGENS
             if (isset($_FILES['post_media']) && !empty($_FILES['post_media']['name'][0])) {
                 $upload_dir = '../uploads/posts/';
                 if (!is_dir($upload_dir)) {
@@ -86,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // 5. REGISTRA A ATIVIDADE NO LOG (CORRIGIDO)
+            // // 5. REGISTRA A ATIVIDADE NO LOG (CORRIGIDO)
             logAction($pdo, 'Novo Post', $admin_user_name, "Usuário criou o post ID #{$post_id}.", $user_id);
 
             // Se tudo deu certo, confirma as alterações e redireciona
@@ -117,26 +118,61 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <main class="modal_container">
-    
-    <section class="modal_body">
-        <div class="form-group col-6">
-            <label for="tag-input">Tags</label>
-            <div class="tag-container">
-                <div id="selected-tags"></div>
-                <input type="text" id="tag-input" placeholder="Digite para buscar ou adicionar...">
-            </div>
-            <input type="hidden" name="tags" id="hidden-tags">
-            <div id="tag-suggestions"></div>
-            <div class="recommended-tags">
-                <strong>Tags Populares:</strong>
-                <?php if ($popular_tags): ?>
-                    <?php foreach ($popular_tags as $tag): ?>
-                        <button type="button" class="recommended-tag"><?php echo htmlspecialchars($tag['name']); ?></button>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+
+    <form action="#" method="POST" class="modal_body" enctype="multipart/form-data" id="modal_body">
+        <i class="ri-close-fill" id="close_modal"></i>
+        <div class="main_content">
+            <img src="<?php
+            if (isset($_SESSION['profile_image_url'])) {
+                echo $_SESSION['profile_image_url'];
+            } else {
+                echo '../src/assets/img/default-user.png';
+            }
+            ?>" alt="">
+            <textarea name="content" id="content" rows="6" placeholder="No que você está pensando, <?php
+            if (isset($_SESSION['full_name'])) {
+                echo htmlspecialchars($_SESSION['full_name']);
+            } else {
+                echo 'Usuário';
+            }
+            ?>?"></textarea>
         </div>
-    </section>
+        <hr>
+
+        </div>
+        <div class="post_footer">
+            <div class="footer_left">
+                <div class="post_media">
+                    <label for="post_media">
+                        <i class="ri-image-add-fill"></i>
+                    </label>
+                    <input type="file" name="post_media" id="post_media" multiple accept="image/*" class="form-control">
+                </div>
+                <div class="post_tag">
+                    <div class="form-group col-6">
+                        <label for="tag-input">Tags:</label>
+                        <div class="tag-container">
+                            <div id="selected-tags"></div>
+                            <input type="text" id="tag-input" placeholder="Digite para buscar ou adicionar...">
+                        </div>
+                        <input type="hidden" name="tags" id="hidden-tags">
+                        <div id="tag-suggestions"></div>
+                        <!-- <div class="recommended-tags">
+                            <strong>Tags Populares:</strong>
+                            <?php if ($popular_tags): ?>
+                                <?php foreach ($popular_tags as $tag): ?>
+                                    <button type="button"
+                                        class="recommended-tag"><?php echo htmlspecialchars($tag['name']); ?></button>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="footer_right">
+                <button type="submit" class="publicar">Publicar</button>
+            </div>
+    </form>
 </main>
 
 <!-- <script>
@@ -265,3 +301,11 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
         }
     });
 </script> -->
+
+<script>
+    document.querySelector("#close_modal").addEventListener("click", () => {
+        document.querySelector("main.modal_container").classList.remove("active");
+        document.querySelector("body").style.overflow = "auto";
+
+    });
+</script>

@@ -186,6 +186,10 @@ input:-webkit-autofill:focus {
     justify-content: flex-end;
 }
 
+#create_post>img {
+    cursor: pointer;
+}
+
 /* Offcanvas (Menu Mobile-like) */
 .offcanvas {
     justify-content: flex-end !important;
@@ -454,7 +458,7 @@ section.post_main {
     padding-bottom: calc(var(--padding)/2);
 }
 
-.post_footer {
+footer.post_footer {
     padding-inline: var(--padding);
     padding-block: var(--padding);
     display: flex;
@@ -1166,10 +1170,11 @@ section.post_main {
 main.modal_container {
     position: absolute;
     display: none;
+    /* display: none; */
 
     &.active {
+        display: flex;
         position: absolute;
-        top: 0;
         left: 0;
         width: 100%;
         height: 100%;
@@ -1179,14 +1184,178 @@ main.modal_container {
         align-items: center;
         z-index: 10000;
 
-        &>section {
-            background-color: var(--primary);
-            border-radius: 4px;
+        &>form.modal_body {
+            background-color: var(--secondary);
+            border-radius: 15px;
+            position: relative;
             padding: 1rem;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            width: 600px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+
+            &>i {
+                font-size: 2rem;
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                cursor: pointer;
+            }
+
+            &>div.main_content {
+                display: flex;
+                gap: 10px;
+
+                &>img {
+                    width: 40px;
+                    height: 40px;
+                    border: 2px solid var(--primary);
+                    border-radius: 50%;
+                }
+
+                &>textarea {
+                    padding: 8px 10px;
+                    width: 100%;
+                    background-color: transparent;
+                    border: none;
+                    border-radius: 10px;
+                    color: var(--primary);
+                    height: 150px;
+                    max-height: 150px;
+                    resize: none;
+
+                    &:focus {
+                        outline: none;
+                    }
+
+                    &::placeholder {
+                        color: var(--primary);
+                    }
+                }
+            }
+
+            &>hr {
+                border-color: var(--primary);
+                margin: 12px 0;
+            }
+
+            &>.post_footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                color: var(--primary);
+                height: 30px;
+
+                &>.footer_left {
+                    display: flex;
+                    gap: 10px;
+
+                    &>.post_media {
+                        &>label {
+                            &>i {
+                                font-size: 2.1rem;
+                                cursor: pointer;
+                            }
+                        }
+
+                        &>input {
+                            display: none;
+                        }
+                    }
+
+                    &>.post_tag {
+                        display: flex;
+                        align-items: center;
+
+                        &>.form-group {
+                            display: inherit;
+                            gap: 6px;
+                            width: 100%;
+
+                            &>.tag-container {
+                                &>input {
+                                    border: none;
+                                    border-bottom: 1px solid var(--primary);
+                                    background-color: transparent;
+                                    color: var(--primary);
+                                    width: 100%;
+
+                                    &::placeholder {
+                                        color: var(--primary);
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                        width: 100%;
+                                        content: "...";
+                                    }
+
+                                    &:focus {
+                                        outline: none;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                &>.footer_right {
+                    display: flex;
+                    gap: 10px;
+
+                    &>button {
+                        background-color: transparent;
+                        color: var(--primary);
+                        padding: 0 10px;
+                        height: 30px;
+                        border: 2px solid var(--primary);
+                        border-radius: 8px;
+                        transition: 0.2s ease-in-out;
+
+                        &:hover {
+                            background-color: var(--primary);
+                            color: var(--secondary);
+                        }
+                    }
+                }
+
+
+            }
         }
     }
 }
+
+/* ========================= PAGINA DE PERFIL ========================== */
+
+main[data-pagina="user_profile"] {
+
+    height: 100%;
+
+    &>section.main_container {
+        &>div.main_content {
+            width: 100%;
+            padding: 20px 60px;
+
+            &>div.profile_header {
+                display: flex;
+
+                &>img.profile_image {
+                    width: 100px;
+                }
+
+                &>div.profile_details {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+            }
+
+            &>div.profile_content {
+                background-color: red;
+            }
+        }
+    }
+}
+
 
 /* ==========================================================================
    6. NAVEGAÇÃO MOBILE
