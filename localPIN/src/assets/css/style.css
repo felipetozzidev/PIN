@@ -237,6 +237,7 @@ main>section.navbar_container {
 main>section.main_container {
     grid-area: main;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     padding-inline: 32px;
     width: 100%;
@@ -769,6 +770,7 @@ footer.post_footer {
 /* -------------------- PÁGINA COMUNIDADES -------------------- */
 .main_container>.main_content[data-pagina="comunidades"] {
     width: 80%;
+    flex-grow: 1;
 
     &>h1 {
         margin-bottom: 24px;
