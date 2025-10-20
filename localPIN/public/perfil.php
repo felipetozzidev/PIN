@@ -61,7 +61,7 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
                         <?php if ($profile_user_id == $_SESSION['user_id']): ?>
                             <div class="profile_options">
                                 <a href="edit_profile.php" class="btn btn-secondary">Editar Perfil</a>
-                            <button class="btn btn-secondary" onclick="configButton()">Configurações</button>
+                            <button onclick="configButton()"><i class="ri-settings-3-fill"></i></button>
 
                             <script>
                                 function configButton() {
