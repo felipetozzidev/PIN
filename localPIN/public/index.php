@@ -189,7 +189,7 @@ $result_comunidades = $pdo->query($sql_comunidades);
         </section>
     </main>
 
-    <?php include_once('../src/components/modal_postagem.php'); ?>
+    
 
     <div id="imageLightbox" class="lightbox">
         <span class="lightbox-close">&times;</span>

@@ -46,19 +46,21 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
         <section class="main_container">
             <div class="main_content">
                 <div class="profile_cover">
-                    <img src="<?php echo htmlspecialchars($profile_user['cover_image_url'] ?? 'https://via.placeholder.com/900x300'); ?>" alt="Capa do Perfil" class="cover_image">
+                    <img src="<?php echo htmlspecialchars($profile_user['cover_image_url'] ?? "../src/assets/img/Gemini_Generated_Image_g9d0kag9d0kag9d0.png"); ?>" alt="Capa do Perfil" class="cover_image">
                 </div>
                 <div class="profile_header">
                     <img src="<?php echo htmlspecialchars($profile_user['profile_image_url']); ?>" alt="Foto de Perfil" class="profile_image">
                     <div class="profile_details">
+                        
                         <div class="profile_info">
 
                             <h2><?php echo htmlspecialchars($profile_user['full_name']); ?></h2>
-                            <p><?php echo htmlspecialchars($profile_user['bio'] ?? 'Nenhuma biografia disponível.'); ?></p>
+                            <p><b>Contagem de seguidores em breve</b></p>
+                            
                         </div>
 
                         <?php if ($profile_user_id == $_SESSION['user_id']): ?>
-                            <div class="user_options">
+                            <div class="profile_options">
                                 <a href="edit_profile.php" class="btn btn-secondary">Editar Perfil</a>
                             <button class="btn btn-secondary" onclick="configButton()">Configurações</button>
 
@@ -71,9 +73,12 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
                         <?php endif; ?>
                     </div>
                 </div>
-
-                <div class="profilecontent">
+                <div class="user_bio">
+                    <p><?php echo htmlspecialchars($profile_user['bio']); ?></p>
+                </div>
+                <div class="profile_content">
                     <h3>Posts de <?php echo htmlspecialchars($profile_user['full_name']); ?></h3>
+                    <hr>
                     <div class="feed">
                         <?php if ($posts && count($posts) > 0): ?>
                             <?php foreach ($posts as $post): ?>

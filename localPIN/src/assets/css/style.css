@@ -1105,25 +1105,67 @@ main[data-pagina="user_profile"]{
     height: 100%;
 
     & > section.main_container{
+        padding-inline: 30px 0;
         & > div.main_content{
+            background-color: white;
             width: 100%;
-            padding: 20px 60px;
-            & > div.profile_header{
-                display: flex;
-
-                & > img.profile_image{
-                    width: 100px;
+            border-radius: 20px 20px 0 0;
+            height: 100%;
+            
+            & > .profile_cover{
+                width: 100%;
+                height: 300px;
+                background-color: var(--secondary);
+                border-radius: inherit;
+                & > img.cover_image{
+                    width: 100%;
+                    height: 300px;
+                    border-radius: inherit;
                 }
-
+            }
+            
+            & > div.profile_header{
+                padding-inline: 60px;
+                display: flex;
+                margin-top: -180px;
+                gap: 40px;
+                
+                & > img.profile_image{
+                    width: 300px;
+                }
+                
                 & > div.profile_details{
+                    margin-bottom: 20px;
                     width: 100%;
                     display: flex;
                     justify-content: space-between;
-                    align-items: center;
+                    align-items: flex-end;
+
+                    & > .profile_info{
+                        & > h2 {
+                            
+                        }
+
+                        & > p{
+                            margin: 0;
+                        }
+                    } 
+
+                    & > .profile_options{
+                        height: 50px;
+                    }
                 }
             }
+            & > .user_bio{
+                margin-top: 10px;
+                padding-inline: 60px;
+            }
             & > div.profile_content{
-                background-color: red;
+                padding-inline: 60px;
+                margin-top: 40px;
+                min-height: 100px;
+
+                
             }
         }
     }
