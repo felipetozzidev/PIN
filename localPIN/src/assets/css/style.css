@@ -186,9 +186,10 @@ input:-webkit-autofill:focus {
     justify-content: flex-end;
 }
 
-#create_post > img {
+#create_post>img {
     cursor: pointer;
 }
+
 /* Offcanvas (Menu Mobile-like) */
 .offcanvas {
     justify-content: flex-end !important;
@@ -226,7 +227,7 @@ main>section.navbar_container {
     grid-area: navbar;
     position: fixed;
     width: var(--tamanho_navbar);
-    height: calc(100vh - 100px);
+    height: calc(100vh - 148px);
     overflow-y: auto;
     z-index: 1;
     /* Abaixo do header */
@@ -379,7 +380,7 @@ nav.navbar_lateral {
     }
 }
 
-/* -------------------- CARDS DE POST (Página Principal) -------------------- */
+/* -------------------- CARDS DE POST -------------------- */
 .post_container {
     width: 100%;
     border: 1px solid var(--secondary);
@@ -431,6 +432,24 @@ header.post_header {
     &>.post-info {
         font-size: 0.8em;
         opacity: 0.85;
+        display: flex;
+        align-items: center;
+
+        &>.post-date {
+            text-align: right;
+        }
+
+        &>.post-views {
+            margin-left: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            &>i {
+                font-size: 1.2rem;
+            }
+        }
     }
 }
 
@@ -859,6 +878,205 @@ footer.post_footer {
     }
 }
 
+/* ---------------- PÁGINA PERFIL DE COMUNIDADE ---------------- */
+
+.main_container>.main_content[data-pagina="perfil-comunidade"] {
+    width: 100%;
+    max-width: 1200px;
+    /* Limita a largura para telas grandes */
+    margin: 0 auto;
+
+    /* --- Cabeçalho da Comunidade (Banner e Infos) --- */
+    &>.community-header {
+        width: 100%;
+        margin-bottom: 24px;
+
+        &>.community-banner {
+            height: 200px;
+            background-color: var(--secondary);
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            overflow: hidden;
+
+            &>img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        &>.community-info-bar {
+            background-color: var(--white);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            min-height: 70px;
+
+            &>.community-details {
+                display: flex;
+                align-items: center;
+
+                &>.community-profile-pic {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    border: 4px solid var(--white);
+                    margin-top: -35px;
+                    background-color: var(--background);
+                    object-fit: cover;
+                }
+
+                &>.community-name-members {
+                    margin-left: 16px;
+
+                    &>h1 {
+                        font-size: 28px;
+                        font-weight: 700;
+                        margin: 0;
+                        color: var(--text-color);
+                    }
+
+                    &>span {
+                        font-size: 14px;
+                        color: var(--text-muted);
+                    }
+                }
+            }
+
+            &>.community-actions {
+                &>.join-button {
+                    background-color: var(--primary);
+                    color: var(--white);
+                    border: none;
+                    padding: 10px 24px;
+                    border-radius: 50px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease;
+
+                    &:hover {
+                        opacity: 0.9;
+                    }
+                }
+            }
+        }
+    }
+
+    /* --- Corpo da Página (Feed e Sidebar) --- */
+    &>.community-body-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+        align-items: flex-start;
+
+        /* --- Coluna do Feed --- */
+        &>.feed-column {
+            &>.post-sort-bar {
+                display: flex;
+                gap: 16px;
+                padding: 8px;
+                background-color: var(--white);
+                border-radius: 8px;
+                margin-bottom: 16px;
+                border: 1px solid var(--border-color);
+
+                &>.sort-button {
+                    background: none;
+                    border: none;
+                    padding: 8px 12px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    color: var(--text-muted);
+                    border-radius: 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: background-color 0.2s ease, color 0.2s ease;
+
+                    &:hover {
+                        background-color: var(--backgroundContrast);
+                    }
+
+                    &.active {
+                        background-color: var(--secondary);
+                        color: var(--primary);
+                    }
+                }
+            }
+
+            &>.post-feed>.no-posts {
+                background-color: var(--white);
+                padding: 40px;
+                text-align: center;
+                border-radius: 8px;
+                color: var(--text-muted);
+                border: 1px solid var(--border-color);
+            }
+        }
+
+        /* --- Coluna da Sidebar (Widgets) --- */
+        &>.sidebar-column {
+            &>div {
+                /* Estilo base para todos os widgets */
+                background-color: var(--white);
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+                margin-bottom: 24px;
+                overflow: hidden;
+
+                &>h2 {
+                    font-size: 1rem;
+                    padding: 12px 16px;
+                    margin: 0;
+                    background-color: var(--primary);
+                    color: var(--white);
+                }
+
+                &>p,
+                &>ul {
+                    padding: 16px;
+                    margin: 0;
+                    font-size: 0.9rem;
+                    color: var(--text-color);
+                }
+
+                &>ul {
+                    list-style: none;
+
+                    &>li {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        margin-bottom: 8px;
+                        color: var(--text-muted);
+
+                        &>i {
+                            font-size: 1.2rem;
+                        }
+                    }
+                }
+            }
+
+            /* Estilos específicos para widgets de links */
+            &>.moderators-widget ul li,
+            &>.recommended-widget ul li {
+                margin-bottom: 10px;
+
+                &>a {
+                    text-decoration: none;
+                    color: var(--primary);
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+}
+
 /* -------------------- PÁGINA DESTAQUES -------------------- */
 .main_container>.main_content[data-pagina="destaques"] {
     width: 100%;
@@ -949,12 +1167,12 @@ footer.post_footer {
 
 /* ========================== MODAL POSTAGENS ========================== */
 
-main.modal_container{
+main.modal_container {
     position: absolute;
     display: none;
     /* display: none; */
 
-    &.active{
+    &.active {
         display: flex;
         position: absolute;
         left: 0;
@@ -965,8 +1183,8 @@ main.modal_container{
         justify-content: center;
         align-items: center;
         z-index: 10000;
-    
-        & > form.modal_body{
+
+        &>form.modal_body {
             background-color: var(--secondary);
             border-radius: 15px;
             position: relative;
@@ -974,7 +1192,7 @@ main.modal_container{
             width: 600px;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 
-            & > i{
+            &>i {
                 font-size: 2rem;
                 position: absolute;
                 right: 10px;
@@ -982,18 +1200,18 @@ main.modal_container{
                 cursor: pointer;
             }
 
-            &>div.main_content{
+            &>div.main_content {
                 display: flex;
                 gap: 10px;
 
-                &>img{
+                &>img {
                     width: 40px;
                     height: 40px;
                     border: 2px solid var(--primary);
                     border-radius: 50%;
                 }
-                
-                &>textarea{
+
+                &>textarea {
                     padding: 8px 10px;
                     width: 100%;
                     background-color: transparent;
@@ -1003,23 +1221,23 @@ main.modal_container{
                     height: 150px;
                     max-height: 150px;
                     resize: none;
-                    
-                    &:focus{
+
+                    &:focus {
                         outline: none;
                     }
 
-                    &::placeholder{
+                    &::placeholder {
                         color: var(--primary);
                     }
                 }
             }
 
-            & > hr{
+            &>hr {
                 border-color: var(--primary);
-                margin: 12px 0 ;
+                margin: 12px 0;
             }
 
-            & > .post_footer{
+            &>.post_footer {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
@@ -1027,37 +1245,41 @@ main.modal_container{
                 color: var(--primary);
                 height: 30px;
 
-                & > .footer_left{
+                &>.footer_left {
                     display: flex;
                     gap: 10px;
-                    & > .post_media{
-                        &> label{
-                            &>i{
+
+                    &>.post_media {
+                        &>label {
+                            &>i {
                                 font-size: 2.1rem;
                                 cursor: pointer;
                             }
                         }
-                        & > input{
+
+                        &>input {
                             display: none;
                         }
                     }
 
-                    & > .post_tag{
+                    &>.post_tag {
                         display: flex;
                         align-items: center;
-                        & > .form-group{
+
+                        &>.form-group {
                             display: inherit;
                             gap: 6px;
                             width: 100%;
 
-                            & > .tag-container{
-                                & > input{
+                            &>.tag-container {
+                                &>input {
                                     border: none;
                                     border-bottom: 1px solid var(--primary);
                                     background-color: transparent;
                                     color: var(--primary);
                                     width: 100%;
-                                    &::placeholder{
+
+                                    &::placeholder {
                                         color: var(--primary);
                                         overflow: hidden;
                                         text-overflow: ellipsis;
@@ -1065,7 +1287,8 @@ main.modal_container{
                                         width: 100%;
                                         content: "...";
                                     }
-                                    &:focus{
+
+                                    &:focus {
                                         outline: none;
                                     }
                                 }
@@ -1074,10 +1297,11 @@ main.modal_container{
                     }
                 }
 
-                & > .footer_right{
+                &>.footer_right {
                     display: flex;
                     gap: 10px;
-                    & > button{
+
+                    &>button {
                         background-color: transparent;
                         color: var(--primary);
                         padding: 0 10px;
@@ -1085,7 +1309,8 @@ main.modal_container{
                         border: 2px solid var(--primary);
                         border-radius: 8px;
                         transition: 0.2s ease-in-out;
-                        &:hover{
+
+                        &:hover {
                             background-color: var(--primary);
                             color: var(--secondary);
                         }
@@ -1100,7 +1325,7 @@ main.modal_container{
 
 /* ========================= PAGINA DE PERFIL ========================== */
 
-main[data-pagina="user_profile"]{
+main[data-pagina="user_profile"] {
 
     height: 100%;
 
@@ -1250,6 +1475,28 @@ nav.navbar_mobile {
     .main_container>.main_content[data-pagina="comunidades"] {
         width: 100%;
     }
+
+    .community-body-layout {
+        grid-template-columns: 1fr;
+        /* Empilha as colunas */
+    }
+
+    .sidebar-column {
+        grid-row: 2;
+        /* Garante que a sidebar vá para baixo do feed */
+    }
+
+    .main_container>.main_content[data-pagina="perfil-comunidade"] {
+        &>.community-body-layout {
+            grid-template-columns: 1fr;
+            /* Empilha as colunas de feed e sidebar */
+
+            &>.sidebar-column {
+                grid-row: 2;
+                /* Garante que a sidebar vá para baixo do feed */
+            }
+        }
+    }
 }
 
 @media only screen and (max-width: 720px) {
@@ -1281,6 +1528,29 @@ nav.navbar_mobile {
             grid-column: span 2;
             /* Para ocupar a largura toda */
             grid-row: span 1;
+        }
+    }
+
+    .main_container>.main_content[data-pagina="perfil-comunidade"] {
+        &>.community-header {
+            &>.community-info-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                padding-bottom: 20px;
+
+                &>.community-details {
+                    &>.community-profile-pic {
+                        width: 70px;
+                        height: 70px;
+                        margin-top: -30px;
+                    }
+
+                    &>.community-name-members h1 {
+                        font-size: 22px;
+                    }
+                }
+            }
         }
     }
 }
