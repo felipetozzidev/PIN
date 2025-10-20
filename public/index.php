@@ -205,6 +205,8 @@ $result_comunidades = $pdo->query($sql_comunidades);
         <a class="lightbox-nav next">&#10095;</a>
     </div>
 
+    <?php require_once(__DIR__ . '/../src/components/modal_postagem.php'); ?>
+
     <?php require_once(__DIR__ . '/../src/components/footer.php'); ?>
 </body>
 

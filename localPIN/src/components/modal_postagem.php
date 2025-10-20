@@ -1,11 +1,8 @@
 <?php
-require_once('../config/log_helper.php'); // Adicionado para usar a função de log
-
-// if (!isset($_SESSION['user_id'])) {
-//     header('Location: login.php');
-//     echo "<script> console.log('Putaqueimepariu vtmnc esse sustema de nmerda'); </script>";
-//     exit();
-// }
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+require_once(__DIR__ . '/../../config/conn.php');
+require_once(__DIR__ . '/../../config/log_helper.php');
 
 $feedback_message = '';
 $admin_user_name = $_SESSION['full_name'] ?? 'Usuário';
@@ -14,37 +11,30 @@ $admin_user_name = $_SESSION['full_name'] ?? 'Usuário';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Coleta os dados do formulário
     $user_id = $_SESSION['user_id'];
-    $content = trim($_POST['content']);
-    $community_id = isset($_POST['community_id']) ? intval($_POST['community_id']) : 0;
-    $tags_string = trim($_POST['tags']);
-    $content_warning = isset($_POST['content_warning']) ? 1 : 0;
+    $content = trim($_POST['content']); // Campo do seu textarea
+    $tags_string = trim($_POST['tags']); // Campo hidden das tags
+    // Os campos community_id e content_warning não existem no seu formulário, então foram removidos.
 
-    // Validação: o conteúdo ou uma imagem são obrigatórios
+    // Validação
     if (empty($content) && empty($_FILES['post_media']['name'][0])) {
         $feedback_message = "<p class='error-message'>Você precisa escrever algo ou enviar uma imagem.</p>";
     } else {
         try {
             $pdo->beginTransaction();
 
-            // // 1. INSERE O POST NA TABELA `posts`
-            $stmt_post = $pdo->prepare("INSERT INTO posts (user_id, content, type, content_warning) VALUES (?, ?, 'padrao', ?)");
-            $stmt_post->execute([$user_id, $content, $content_warning]);
+            // 1. INSERE O POST NA TABELA `posts`
+            // (Removido 'content_warning' pois não existe no form)
+            $stmt_post = $pdo->prepare("INSERT INTO posts (user_id, content, type) VALUES (?, ?, 'padrao')");
+            $stmt_post->execute([$user_id, $content]);
             $post_id = $pdo->lastInsertId();
 
-            // // 2. ASSOCIA O POST À COMUNIDADE (SE UMA FOI ESCOLHIDA)
-            if ($community_id > 0) {
-                $stmt_com_post = $pdo->prepare("INSERT INTO community_posts (community_id, post_id) VALUES (?, ?)");
-                $stmt_com_post->execute([$community_id, $post_id]);
-            }
-
-            // // 3. PROCESSA E ASSOCIA AS TAGS
+            // 3. PROCESSA E ASSOCIA AS TAGS
             if (!empty($tags_string)) {
                 $tags_array = array_map('trim', explode(',', $tags_string));
                 foreach ($tags_array as $tag_name) {
                     if (empty($tag_name))
                         continue;
 
-                    // Verifica se a tag já existe
                     $stmt_find_tag = $pdo->prepare("SELECT tag_id FROM tags WHERE name = ?");
                     $stmt_find_tag->execute([$tag_name]);
                     $tag = $stmt_find_tag->fetch();
@@ -52,19 +42,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($tag) {
                         $tag_id = $tag['tag_id'];
                     } else {
-                        // Se não existir, cria a tag
                         $stmt_create_tag = $pdo->prepare("INSERT INTO tags (name) VALUES (?)");
                         $stmt_create_tag->execute([$tag_name]);
                         $tag_id = $pdo->lastInsertId();
                     }
 
-                    // Associa o post à tag
                     $stmt_post_tag = $pdo->prepare("INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)");
                     $stmt_post_tag->execute([$post_id, $tag_id]);
                 }
             }
 
-            // // 4. PROCESSA O UPLOAD DE IMAGENS
+            // 4. PROCESSA O UPLOAD DE IMAGENS
+            // (Usando o name 'post_media[]')
             if (isset($_FILES['post_media']) && !empty($_FILES['post_media']['name'][0])) {
                 $upload_dir = '../uploads/posts/';
                 if (!is_dir($upload_dir)) {
@@ -86,25 +75,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
             }
-
-            // // 5. REGISTRA A ATIVIDADE NO LOG (CORRIGIDO)
+            
             logAction($pdo, 'Novo Post', $admin_user_name, "Usuário criou o post ID #{$post_id}.", $user_id);
 
-            // Se tudo deu certo, confirma as alterações e redireciona
             $pdo->commit();
             $_SESSION['feedback_message'] = "<p class='success-message'>Post publicado com sucesso!</p>";
             header("Location: post_view.php?id=" . $post_id);
             exit();
+
         } catch (Exception $e) {
             $pdo->rollBack();
             $feedback_message = "<p class='error-message'>Ocorreu um erro ao publicar seu post: " . $e->getMessage() . "</p>";
         }
     }
 }
-
-// Busca as comunidades para preencher o campo de seleção
-$communities_query = $pdo->query("SELECT community_id, name FROM communities ORDER BY name ASC");
-$communities = $communities_query->fetchAll(PDO::FETCH_ASSOC);
 
 // Busca as tags mais usadas para recomendação
 $popular_tags_query = "SELECT t.name, COUNT(pt.post_id) AS tag_count 
@@ -137,21 +121,21 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
                                                                                                     }
                                                                                                     ?>?"></textarea>
         </div>
+
+                <div id="image-preview"></div> 
+
         <hr>
-
-        <div id="image-preview"></div>
-
-        </div>
+        
         <div class="post_footer">
             <div class="footer_left">
                 <div class="post_media">
                     <label for="post_media">
                         <i class="ri-image-add-fill"></i>
                     </label>
-                    <input type="file" name="post_media" id="post_media" multiple accept="image/*" class="form-control">
+                    <input type="file" name="post_media[]" id="post_media" multiple accept="image/*" class="form-control">
                 </div>
                 <div class="post_tag">
-                    <div class="form-group col-6">
+                    <div class="form-group col-6"> 
                         <label for="tag-input">Tags:</label>
                         <div class="tag-container">
                             <div id="selected-tags"></div>
@@ -159,15 +143,7 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <input type="hidden" name="tags" id="hidden-tags">
                         <div id="tag-suggestions"></div>
-                        <!-- <div class="recommended-tags">
-                            <strong>Tags Populares:</strong>
-                            <?php if ($popular_tags): ?>
-                                <?php foreach ($popular_tags as $tag): ?>
-                                    <button type="button"
-                                        class="recommended-tag"><?php echo htmlspecialchars($tag['name']); ?></button>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div> -->
+                        <div class="recommended-tags"></div>
                     </div>
                 </div>
             </div>
@@ -179,135 +155,225 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- Sistema de Tags ---
+        
+        // --- Lógica de ABRIR E FECHAR o modal ---
+        const createPostButton = document.querySelector('#create_post');
+        const modalContainer = document.querySelector('main.modal_container');
+        const closeModalButton = document.querySelector('#close_modal');
+        const modalBody = document.querySelector('form.modal_body'); // Referência ao corpo do modal com scroll
+
+        // Função para fechar o modal
+        function hideModal() {
+            if (modalContainer) {
+                modalContainer.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                // Garante que a caixa de sugestões também feche
+                if (suggestionsContainer) {
+                    suggestionsContainer.style.display = 'none';
+                }
+            }
+        }
+
+        // Adiciona os "escutadores" de evento
+        if (createPostButton && modalContainer) {
+            createPostButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                modalContainer.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        }
+        if (closeModalButton) {
+            closeModalButton.addEventListener('click', hideModal);
+        }
+        if (modalContainer) {
+            modalContainer.addEventListener('click', (event) => {
+                // Fecha o modal se o clique for no fundo escuro
+                if (event.target === modalContainer) {
+                    hideModal();
+                }
+            });
+        }
+
+        // --- Sistema de Tags com POSICIONAMENTO CORRIGIDO ---
         const tagInput = document.getElementById('tag-input');
+        const tagContainer = document.querySelector('.tag-container');
         const selectedTagsContainer = document.getElementById('selected-tags');
         const hiddenTagsInput = document.getElementById('hidden-tags');
         const suggestionsContainer = document.getElementById('tag-suggestions');
-        const recommendedTagsContainer = document.querySelector('.recommended-tags');
         let selectedTags = new Set();
 
-        function updateHiddenInput() {
-            hiddenTagsInput.value = Array.from(selectedTags).join(',');
-        }
+        if (tagInput && tagContainer && hiddenTagsInput && suggestionsContainer) {
+            
+            // Move a caixa de sugestões para o body para escapar do overflow do modal
+            document.body.appendChild(suggestionsContainer);
 
-        function addTag(tagName) {
-            tagName = tagName.trim().toLowerCase();
-            if (tagName && !selectedTags.has(tagName)) {
-                selectedTags.add(tagName);
-                const tagPill = document.createElement('div');
-                tagPill.className = 'tag-pill';
-                tagPill.textContent = tagName;
-                const removeBtn = document.createElement('span');
-                removeBtn.className = 'remove-tag';
-                removeBtn.textContent = 'x';
-                removeBtn.onclick = () => {
-                    selectedTags.delete(tagName);
-                    tagPill.remove();
-                    updateHiddenInput();
-                };
-                tagPill.appendChild(removeBtn);
-                selectedTagsContainer.appendChild(tagPill);
-                updateHiddenInput();
+            // Função para calcular a posição da caixa de sugestões com base na janela
+            function updateSuggestionsPosition() {
+                const containerRect = tagContainer.getBoundingClientRect();
+                
+                // Posições são calculadas em relação à janela (viewport)
+                suggestionsContainer.style.top = `${containerRect.bottom + 5}px`; // 5px de espaço
+                suggestionsContainer.style.left = `${containerRect.left}px`;
+                suggestionsContainer.style.width = `${containerRect.width}px`;
             }
-            tagInput.value = '';
-            suggestionsContainer.innerHTML = '';
-            suggestionsContainer.style.display = 'none';
-        }
 
-        tagInput.addEventListener("keyup", async (e) => {
-            if (e.key === ',' || e.key === 'Enter') {
-                e.preventDefault();
-                addTag(tagInput.value.replace(/,/g, ''));
-            } else {
-                const query = tagInput.value.trim();
-                if (query.length < 1) {
+            // Função para buscar tags na API
+            async function fetchTags(query = '') {
+                try {
+                    const response = await fetch(`api/api_search_tags.php?query=${encodeURIComponent(query)}`);
+                    if (!response.ok) return [];
+                    return await response.json();
+                } catch (error) {
+                    console.error("Erro ao buscar tags:", error);
+                    return [];
+                }
+            }
+
+            // Função para exibir as sugestões no formato do Instagram
+            function displaySuggestions(tags) {
+                suggestionsContainer.innerHTML = '';
+                if (!Array.isArray(tags) || tags.length === 0) {
                     suggestionsContainer.style.display = 'none';
                     return;
                 }
-                // NOTE: A API para buscar tags precisa ser criada ou ajustada se o nome mudou.
-                // Assumindo que api_search_tags.php será criado/ajustado.
-                const response = await fetch(`api/api_search_tags.php?query=${encodeURIComponent(query)}`);
-                const suggestions = await response.json();
-                suggestionsContainer.innerHTML = '';
-                if (suggestions.length > 0) {
-                    suggestions.forEach(tag => {
-                        const item = document.createElement('div');
-                        item.className = 'suggestion-item';
-                        item.textContent = tag;
-                        item.onclick = () => addTag(tag);
-                        suggestionsContainer.appendChild(item);
+                tags.forEach(tag => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    
+                    const tagName = document.createElement('span');
+                    tagName.className = 'suggestion-name';
+                    tagName.textContent = tag.name;
+
+                    const tagCount = document.createElement('span');
+                    tagCount.className = 'suggestion-count';
+                    const count = parseInt(tag.post_count);
+                    tagCount.textContent = count > 1 ? `${count} posts` : `${count} post`;
+
+                    item.appendChild(tagName);
+                    item.appendChild(tagCount);
+                    
+                    item.addEventListener('click', () => {
+                        addTag(tag.name);
                     });
-                    suggestionsContainer.style.display = 'block';
-                } else {
+                    suggestionsContainer.appendChild(item);
+                });
+                
+                updateSuggestionsPosition();
+                suggestionsContainer.style.display = 'block';
+            }
+
+            // Mostra as tags populares ao focar no input
+            tagInput.addEventListener('focus', async () => {
+                const popularTags = await fetchTags('');
+                displaySuggestions(popularTags);
+            });
+            
+            // Busca por tags enquanto o usuário digita
+            tagInput.addEventListener('input', async () => {
+                const query = tagInput.value.trim();
+                const suggestedTags = await fetchTags(query);
+                displaySuggestions(suggestedTags);
+            });
+
+            // Adiciona a tag ao pressionar Enter
+            tagInput.addEventListener("keydown", (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addTag(tagInput.value);
+                }
+            });
+
+            // Esconde a caixa se clicar fora do campo de input
+            document.addEventListener('click', (e) => {
+                if (!tagContainer.contains(e.target)) {
                     suggestionsContainer.style.display = 'none';
                 }
+            });
+            
+            // Esconde as sugestões se o usuário rolar o modal
+            if (modalBody) {
+                modalBody.addEventListener('scroll', () => {
+                    suggestionsContainer.style.display = 'none';
+                });
             }
-        });
+            // Recalcula a posição se a janela for redimensionada
+            window.addEventListener('resize', () => {
+                if (suggestionsContainer.style.display === 'block') {
+                    updateSuggestionsPosition();
+                }
+            });
 
-        recommendedTagsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('recommended-tag')) {
-                addTag(e.target.textContent);
+            function updateHiddenInput() {
+                hiddenTagsInput.value = Array.from(selectedTags).join(',');
             }
-        });
 
-        document.addEventListener('click', (e) => {
-            if (!tagInput.contains(e.target)) {
+            function addTag(tagName) {
+                tagName = tagName.trim().toLowerCase();
+                if (tagName && !selectedTags.has(tagName)) {
+                    selectedTags.add(tagName);
+                    const tagPill = document.createElement('div');
+                    tagPill.className = 'tag-pill';
+                    tagPill.textContent = tagName;
+                    const removeBtn = document.createElement('span');
+                    removeBtn.className = 'remove-tag';
+                    removeBtn.textContent = 'x';
+                    removeBtn.onclick = () => {
+                        selectedTags.delete(tagName);
+                        tagPill.remove();
+                        updateHiddenInput();
+                    };
+                    tagPill.appendChild(removeBtn);
+                    selectedTagsContainer.appendChild(tagPill);
+                    updateHiddenInput();
+                }
+                tagInput.value = '';
                 suggestionsContainer.style.display = 'none';
             }
-        });
+        }
 
         // --- Sistema de Preview de Imagens ---
         const imageInput = document.getElementById('post_media');
         const previewContainer = document.getElementById('image-preview');
         let filesStore = new DataTransfer();
 
-        imageInput.addEventListener('change', () => {
-            Array.from(imageInput.files).forEach(file => filesStore.items.add(file));
-            imageInput.files = filesStore.files;
-            renderPreviews();
-        });
-
-        function renderPreviews() {
-            previewContainer.innerHTML = '';
-            Array.from(filesStore.files).forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const container = document.createElement('div');
-                    container.className = 'preview-image-container';
-                    const img = document.createElement('img');
-                    img.className = 'preview-image';
-                    img.src = e.target.result;
-                    const removeBtn = document.createElement('div');
-                    removeBtn.className = 'remove-image-btn';
-                    removeBtn.textContent = 'x';
-                    removeBtn.onclick = () => {
-                        removeFile(index);
-                    };
-                    container.appendChild(img);
-                    container.appendChild(removeBtn);
-                    previewContainer.appendChild(container);
-                };
-                reader.readAsDataURL(file);
+        if (imageInput && previewContainer) {
+            imageInput.addEventListener('change', () => {
+                Array.from(imageInput.files).forEach(file => filesStore.items.add(file));
+                imageInput.files = filesStore.files;
+                renderPreviews();
             });
+            function renderPreviews() {
+                previewContainer.innerHTML = '';
+                Array.from(filesStore.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const container = document.createElement('div');
+                        container.className = 'preview-image-container';
+                        const img = document.createElement('img');
+                        img.className = 'preview-image';
+                        img.src = e.target.result;
+                        const removeBtn = document.createElement('div');
+                        removeBtn.className = 'remove-image-btn';
+                        removeBtn.textContent = 'x';
+                        removeBtn.onclick = () => {
+                            removeFile(index);
+                        };
+                        container.appendChild(img);
+                        container.appendChild(removeBtn);
+                        previewContainer.appendChild(container);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            function removeFile(index) {
+                const newFiles = new DataTransfer();
+                const currentFiles = Array.from(filesStore.files);
+                currentFiles.splice(index, 1);
+                currentFiles.forEach(file => newFiles.items.add(file));
+                filesStore = newFiles;
+                imageInput.files = filesStore.files;
+                renderPreviews();
+            }
         }
-
-        function removeFile(index) {
-            const newFiles = new DataTransfer();
-            const currentFiles = Array.from(filesStore.files);
-            currentFiles.splice(index, 1);
-            currentFiles.forEach(file => newFiles.items.add(file));
-            filesStore = newFiles;
-            imageInput.files = filesStore.files;
-            renderPreviews();
-        }
-    });
-</script>
-
-<script>
-    document.querySelector("#close_modal").addEventListener("click", () => {
-        document.querySelector("main.modal_container").classList.remove("active");
-        document.querySelector("body").style.overflow = "auto";
-
     });
 </script>

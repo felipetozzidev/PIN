@@ -17,7 +17,10 @@ document.addEventListener('DOMContentLoaded', function () {
             paddingCabecalho: function () { return this.main ? getComputedStyle(this.main).paddingTop : '0px'; },
             tamanhoFooter: function () { return this.footer ? this.footer.clientHeight : 0; },
             dropdownItens: function () { return document.querySelectorAll(".dropdown_item"); },
-            tamanhoMain: function () { return this.main ? this.main.clientHeight : 0; }
+            tamanhoMain: function () { return this.main ? this.main.clientHeight : 0; },
+            // --- Adicionando os seletores do modal aqui ---
+            createPostButton: document.querySelector('#create_post'),     // <-- MUDANÇA AQUI
+            modalContainer: document.querySelector('main.modal_container') // <-- MUDANÇA AQUI
         };
 
         // --- Ajustes de Layout ---
@@ -28,13 +31,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        console.log(objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain());
-        
-        if (objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain()) {
-            console.log(objetos.main_perfil.querySelector("section.main_container > div.main_content"));
+        // --- Correção do Erro do Console ---
+        // O erro acontecia aqui. objetos.main_perfil só existe na página de perfil.
+        // Precisamos verificar se ele não é nulo antes de usá-lo.
+        if (objetos.main_perfil) { // <-- MUDANÇA AQUI (Início do IF)
+            console.log(objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain());
             
-            objetos.main_perfil.querySelector("section.main_container > div.main_content").classList.add("fixo");
-        }
+            if (objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain()) {
+                console.log(objetos.main_perfil.querySelector("section.main_container > div.main_content"));
+                
+                objetos.main_perfil.querySelector("section.main_container > div.main_content").classList.add("fixo");
+            }
+        } // <-- MUDANÇA AQUI (Fim do IF)
+
 
         if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {
             objetos.footer.style.position = "absolute";
@@ -69,7 +78,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-    }
+
+        // --- LÓGICA DE ABERTURA DO MODAL (Agora no lugar certo) ---
+        if (objetos.createPostButton && objetos.modalContainer) { // <-- MUDANÇA AQUI
+            objetos.createPostButton.addEventListener('click', function(event) {
+                event.preventDefault(); // Previne que o link <a> navegue
+                objetos.modalContainer.classList.add('active');
+                document.body.style.overflow = 'hidden'; 
+            });
+        }
+
+    } // Fim do if (isPublicPage)
 
     // --- DROPDOWNS DAS PÁGINAS ADMIN ---
     const adminDropdowns = document.querySelectorAll('.profile-dropdown');
@@ -310,12 +329,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    document.querySelector("#create_post").addEventListener("click", () => {
-        document.querySelector("main.modal_container").classList.add("active");
-        document.querySelector("main.modal_container").style.top = window.scrollY + "px";
-        document.querySelector("body").style.overflow = "hidden";
-    });
-
+    // --- BLOCOS DE CÓDIGO DUPLICADOS REMOVIDOS ---
+    // Os blocos de código que estavam aqui (linhas 329-348 do seu arquivo original)
+    // foram removidos para evitar conflitos. A lógica correta foi movida
+    // para dentro do objeto 'objetos' e do 'if (isPublicPage)' no topo do arquivo.
 
 });
-
