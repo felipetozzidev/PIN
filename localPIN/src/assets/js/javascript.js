@@ -30,8 +30,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         console.log(objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain());
         
-        if (objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() < objetos.tamanhoMain()) {
+        if (objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain()) {
+            console.log(objetos.main_perfil.querySelector("section.main_container > div.main_content"));
             
+            objetos.main_perfil.querySelector("section.main_container > div.main_content").classList.add("fixo");
         }
 
         if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {

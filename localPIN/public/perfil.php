@@ -37,7 +37,6 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!-- Adiciona a folha de estilo específica para esta página -->
-<link rel="stylesheet" href="../src/assets/css/perfil.css">
 
 <body>
     <main class="index-container" data-pagina="user_profile">
@@ -46,7 +45,7 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
         <section class="main_container">
             <div class="main_content">
                 <div class="profile_cover">
-                    <img src="<?php echo htmlspecialchars($profile_user['cover_image_url'] ?? "../src/assets/img/Gemini_Generated_Image_g9d0kag9d0kag9d0.png"); ?>" alt="Capa do Perfil" class="cover_image">
+                    <img src="<?php echo htmlspecialchars($profile_user['cover_image_url']); ?>" class="cover_image <?php echo isset($profile_user['cover_image_url']) ? '' : 'd-none'; ?>">
                 </div>
                 <div class="profile_header">
                     <img src="<?php echo htmlspecialchars($profile_user['profile_image_url']); ?>" alt="Foto de Perfil" class="profile_image">
@@ -62,7 +61,7 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
                         <?php if ($profile_user_id == $_SESSION['user_id']): ?>
                             <div class="profile_options">
                                 <a href="edit_profile.php" class="btn btn-secondary">Editar Perfil</a>
-                            <button class="btn btn-secondary" onclick="configButton()">Configurações</button>
+                            <button onclick="configButton()"><i class="ri-settings-3-fill"></i></button>
 
                             <script>
                                 function configButton() {
