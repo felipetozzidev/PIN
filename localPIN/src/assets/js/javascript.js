@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
             navbar: document.querySelector(".navbar_container"),
             nav: document.querySelector("nav"),
             main: document.querySelector("main"),
+            main_perfil: document.querySelector("main[data-pagina='user_profile']"),
             footer: document.querySelector("footer.pag_footer"),
             body: document.querySelector("body"),
             community_cards_container: document.querySelector("div.community_cards_container"),
@@ -15,7 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
             tamanhoBody: function () { return this.body ? this.body.clientHeight : 0; },
             paddingCabecalho: function () { return this.main ? getComputedStyle(this.main).paddingTop : '0px'; },
             tamanhoFooter: function () { return this.footer ? this.footer.clientHeight : 0; },
-            dropdownItens: function () { return document.querySelectorAll(".dropdown_item"); }
+            dropdownItens: function () { return document.querySelectorAll(".dropdown_item"); },
+            tamanhoMain: function () { return this.main ? this.main.clientHeight : 0; }
         };
 
         // --- Ajustes de Layout ---
@@ -24,6 +26,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (objetos.footer) {
                 objetos.main.style.marginBottom = `${objetos.tamanhoFooter()}px`;
             }
+        }
+
+        console.log(objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain());
+        
+        if (objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() < objetos.tamanhoMain()) {
+            
         }
 
         if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {
@@ -305,5 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector("main.modal_container").style.top = window.scrollY + "px";
         document.querySelector("body").style.overflow = "hidden";
     });
+
+
 });
 
