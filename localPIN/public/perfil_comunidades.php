@@ -12,6 +12,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 }
 
 $community_id = intval($_GET['id']);
+$current_user_id = $_SESSION['user_id'] ?? 0;
 // Variável para a nav_bar saber qual comunidade marcar como ativa na lista.
 $currentCommunityId = $community_id;
 
@@ -35,14 +36,18 @@ try {
     }
 
     // 3. BUSCA OS POSTS DA COMUNIDADE - CORREÇÃO DE ESPAÇOS
-    $sql_posts = "SELECT p.*, u.full_name, u.profile_image_url 
-                  FROM posts p
-                  JOIN users u ON p.user_id = u.user_id
-                  JOIN community_posts cp ON p.post_id = cp.post_id
-                  WHERE cp.community_id = ?
-                  ORDER BY p.created_at DESC";
+    $sql_posts = "SELECT 
+                    p.*, 
+                    u.full_name, 
+                    u.profile_image_url,
+                    (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id AND l.user_id = ?) AS user_has_liked
+              FROM posts p
+              JOIN users u ON p.user_id = u.user_id
+              JOIN community_posts cp ON p.post_id = cp.post_id
+              WHERE cp.community_id = ?
+              ORDER BY p.created_at DESC";
     $stmt_posts = $pdo->prepare($sql_posts);
-    $stmt_posts->execute([$community_id]);
+    $stmt_posts->execute([$current_user_id, $community_id]);
     $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("Erro na página de perfil de comunidade: " . $e->getMessage());
@@ -122,12 +127,26 @@ require_once('../src/components/header.php');
                                         </a>
                                     </section>
                                     <footer class="post_footer">
-                                        <div>
-                                            <div><i class="ri-heart-line"></i> <span><?php echo $post['like_count']; ?></span></div>
-                                            <div><i class="ri-chat-3-line"></i> <span><?php echo $post['reply_count']; ?></span></div>
+                                        <?php $user_has_liked = $post['user_has_liked'] > 0; ?>
+                                        <div class="post-stats-left">
+                                            <button class="post-icon like-btn <?php echo $user_has_liked ? 'liked' : ''; ?>" data-post-id="<?php echo $post['post_id']; ?>">
+                                                <i class="ri-heart-<?php echo $user_has_liked ? 'fill' : 'line'; ?>"></i>
+                                                <span class="post-cont"><?php echo $post['like_count']; ?></span>
+                                            </button>
+                                            <div class="post-icon">
+                                                <i class="ri-chat-3-line"></i>
+                                                <span class="post-cont"><?php echo $post['reply_count']; ?></span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <button><i class="ri-bookmark-line"></i></button>
+                                        <div class="post-stats-right">
+                                            <div class="post-icon">
+                                                <i class="ri-repeat-line"></i>
+                                                <span class="post-cont"><?php echo $post['repost_count'] ?? 0; ?></span>
+                                            </div>
+                                            <div class="post-icon">
+                                                <i class="ri-chat-quote-line"></i>
+                                                <span class="post-cont"><?php echo $post['bookmark_count'] ?? 0; ?></span>
+                                            </div>
                                         </div>
                                     </footer>
                                 </div>

@@ -14,10 +14,10 @@ $admin_user_name = $_SESSION['full_name'] ?? 'Usuário';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Coleta os dados do formulário
     $user_id = $_SESSION['user_id'];
-    $content = trim($_POST['conteudo_post']);
-    $community_id = isset($_POST['id_com']) ? intval($_POST['id_com']) : 0;
+    $content = trim($_POST['content']);
+    $community_id = isset($_POST['community_id']) ? intval($_POST['community_id']) : 0;
     $tags_string = trim($_POST['tags']);
-    $content_warning = isset($_POST['aviso_conteudo']) ? 1 : 0;
+    $content_warning = isset($_POST['content_warning']) ? 1 : 0;
 
     // Validação: o conteúdo ou uma imagem são obrigatórios
     if (empty($content) && empty($_FILES['post_media']['name'][0])) {
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Se tudo deu certo, confirma as alterações e redireciona
             $pdo->commit();
             $_SESSION['feedback_message'] = "<p class='success-message'>Post publicado com sucesso!</p>";
-            header("Location: index.php");
+            header("Location: post_view.php?id=" . $post_id);
             exit();
         } catch (Exception $e) {
             $pdo->rollBack();
@@ -119,25 +119,27 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
 
 <main class="modal_container">
 
-    <form action="#" method="POST" class="modal_body" enctype="multipart/form-data" id="modal_body">
+    <form action="modal_postagem.php" method="POST" class="modal_body" enctype="multipart/form-data" id="modal_body">
         <i class="ri-close-fill" id="close_modal"></i>
         <div class="main_content">
             <img src="<?php
-            if (isset($_SESSION['profile_image_url'])) {
-                echo $_SESSION['profile_image_url'];
-            } else {
-                echo '../src/assets/img/default-user.png';
-            }
-            ?>" alt="">
+                        if (isset($_SESSION['profile_image_url'])) {
+                            echo $_SESSION['profile_image_url'];
+                        } else {
+                            echo '../src/assets/img/default-user.png';
+                        }
+                        ?>" alt="">
             <textarea name="content" id="content" rows="6" placeholder="No que você está pensando, <?php
-            if (isset($_SESSION['full_name'])) {
-                echo htmlspecialchars($_SESSION['full_name']);
-            } else {
-                echo 'Usuário';
-            }
-            ?>?"></textarea>
+                                                                                                    if (isset($_SESSION['full_name'])) {
+                                                                                                        echo htmlspecialchars($_SESSION['full_name']);
+                                                                                                    } else {
+                                                                                                        echo 'Usuário';
+                                                                                                    }
+                                                                                                    ?>?"></textarea>
         </div>
         <hr>
+
+        <div id="image-preview"></div>
 
         </div>
         <div class="post_footer">
@@ -175,8 +177,8 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
     </form>
 </main>
 
-<!-- <script>
-    document.addEventListener('DOMContentLoaded', function () {
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
         // --- Sistema de Tags ---
         const tagInput = document.getElementById('tag-input');
         const selectedTagsContainer = document.getElementById('selected-tags');
@@ -300,7 +302,7 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
             renderPreviews();
         }
     });
-</script> -->
+</script>
 
 <script>
     document.querySelector("#close_modal").addEventListener("click", () => {
