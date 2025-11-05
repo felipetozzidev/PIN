@@ -10,11 +10,11 @@ try {
     $sql_comunidades = "SELECT 
                             c.community_id, 
                             c.name, 
-                            c.profile_picture,
+                            c.image_url,
                             COUNT(uc.user_id) as total_members 
                         FROM communities c 
                         LEFT JOIN user_communities uc ON c.community_id = uc.community_id 
-                        GROUP BY c.community_id, c.name, c.profile_picture
+                        GROUP BY c.community_id, c.name, c.image_url
                         ORDER BY total_members DESC";
     $result_comunidades = $pdo->query($sql_comunidades);
 } catch (PDOException $e) {
@@ -24,7 +24,7 @@ try {
 }
 ?>
 
-<main class="index-container">
+<main class="index-container" style="margin-top: 88px; margin-bottom: 44px">
     <?php require_once("../src/components/nav_bar.php"); ?>
     <section class="main_container">
         <div class="main_content" data-pagina="comunidades">
@@ -36,7 +36,7 @@ try {
                 ?>
                         <a href="perfil_comunidades.php?id=<?php echo $comunidade['community_id']; ?>" class="community_card">
                             <div class="container_icon_text">
-                                <img src="<?php echo htmlspecialchars($comunidade['profile_picture'] ?? '../src/assets/img/default-user.png'); ?>" alt="Ícone da Comunidade" class="community_icon">
+                                <img src="<?php echo htmlspecialchars($comunidade['image_url'] ?? '../src/assets/img/default-user.png'); ?>" alt="Ícone da Comunidade" class="community_icon">
                                 <div class="text_card">
                                     <p class="community_name"><?php echo htmlspecialchars($comunidade['name']); ?></p>
                                     <span class="community_followers"><?php echo $comunidade['total_members']; ?> membros</span>

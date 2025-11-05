@@ -4,11 +4,13 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+date_default_timezone_set('America/Sao_Paulo');
+
 // --- CONFIGURAÇÕES DO BANCO DE DADOS LOCAL (XAMPP) ---
-$db_host = '127.0.0.1';                 // Host padrão do XAMPP
-$db_name = 'ifapoia';                   // O nome do seu banco de dados local
-$db_user = 'root';                      // Usuário padrão do XAMPP
-$db_pass = '';                          // Senha padrão do XAMPP (vazia)
+$db_host = '77.37.127.2';                 // Host padrão do XAMPP
+$db_name = 'u245002075_ifapoia2';                   // O nome do seu banco de dados local
+$db_user = 'u245002075_admin_ifapoia';                      // Usuário padrão do XAMPP
+$db_pass = 's|8WRsV@|v';                          // Senha padrão do XAMPP (vazia)
 $db_port = '3306';                      // Porta padrão do MySQL no XAMPP
 $charset = 'utf8';
 
@@ -25,6 +27,7 @@ $options = [
 try {
     // Tenta criar a instância do PDO (a conexão com o banco).
     $pdo = new PDO($dsn, $db_user, $db_pass, $options);
+    $pdo->exec("SET time_zone='-03:00'");
 } catch (\PDOException $e) {
     // Falha na conexão, exibe uma mensagem de erro detalhada (seguro para ambiente local).
     die("Erro de conexão com o banco de dados local: " . $e->getMessage());

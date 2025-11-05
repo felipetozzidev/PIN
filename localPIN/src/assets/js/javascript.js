@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
             navbar: document.querySelector(".navbar_container"),
             nav: document.querySelector("nav"),
             main: document.querySelector("main"),
-            main_perfil: document.querySelector("main[data-pagina='user_profile']"),
+            main_perfil: document.querySelector("main.main_perfil"),
+            modal_container: document.querySelector("main.modal_container"),
             footer: document.querySelector("footer.pag_footer"),
             body: document.querySelector("body"),
             community_cards_container: document.querySelector("div.community_cards_container"),
@@ -31,10 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // --- Correção do Erro do Console ---
-        // O erro acontecia aqui. objetos.main_perfil só existe na página de perfil.
-        // Precisamos verificar se ele não é nulo antes de usá-lo.
-        if (objetos.main_perfil) { // <-- MUDANÇA AQUI (Início do IF)
+        if (objetos.main_perfil) {
             console.log(objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain());
             
             if (objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain()) {
@@ -42,13 +40,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 objetos.main_perfil.querySelector("section.main_container > div.main_content").classList.add("fixo");
             }
-        } // <-- MUDANÇA AQUI (Fim do IF)
-
-
-        if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {
-            objetos.footer.style.position = "absolute";
-            objetos.footer.style.bottom = "0px";
         }
+
+
+        // if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {
+        //     objetos.footer.style.position = "relative";
+        //     objetos.footer.style.bottom = "0px";
+        // }
         if (objetos.community_cards_container && objetos.nav) {
             objetos.community_cards_container.style.top = `calc(${objetos.tamanhoCabecalho()}px + 20px)`;
         }

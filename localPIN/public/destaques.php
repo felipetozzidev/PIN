@@ -44,7 +44,7 @@ function getCardClass($index)
 ?>
 
 <body>
-    <main class="index-container">
+    <main class="index-container" style="margin-top: 88px; margin-bottom: 44px">
         <?php include_once("../src/components/nav_bar.php"); ?>
         <section class="main_container">
             <div class="main_content" data-pagina="destaques">

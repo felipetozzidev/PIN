@@ -3,6 +3,8 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+require_once(__DIR__ . '/../src/components/modal_postagem.php');
+
 // O header agora inicia a sessão e faz a conexão via PDO.
 // A utilização de __DIR__ torna o caminho mais robusto e à prova de erros.
 require_once(__DIR__ . '/../src/components/header.php');
@@ -50,7 +52,7 @@ if (!empty($where_clauses)) {
     $sql .= " WHERE " . implode(' AND ', $where_clauses);
 }
 
-$sql .= " GROUP BY p.post_id, ifapoia.c.name ORDER BY p.created_at DESC LIMIT 20";
+$sql .= " GROUP BY p.post_id ORDER BY p.created_at DESC LIMIT 20";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
@@ -71,7 +73,7 @@ $result_comunidades = $pdo->query($sql_comunidades);
 <!-- O restante do seu HTML continua aqui, sem alterações -->
 <body data-is-logged-in="<?php echo ($current_user_id > 0) ? 'true' : 'false'; ?>">
 
-    <main class="index-container">
+    <main class="index-container" style="margin-top: 88px; margin-bottom: 44px">
         <?php require_once(__DIR__ . '/../src/components/nav_bar.php'); ?>
 
         <section class="main_container">

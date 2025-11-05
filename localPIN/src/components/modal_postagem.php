@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $pdo->commit();
             $_SESSION['feedback_message'] = "<p class='success-message'>Post publicado com sucesso!</p>";
-            header("Location: post_view.php?id=" . $post_id);
+            header("Location: index.php");
             exit();
 
         } catch (Exception $e) {
@@ -103,7 +103,7 @@ $popular_tags = $pdo->query($popular_tags_query)->fetchAll(PDO::FETCH_ASSOC);
 
 <main class="modal_container">
 
-    <form action="modal_postagem.php" method="POST" class="modal_body" enctype="multipart/form-data" id="modal_body">
+    <form action="index.php" method="POST" class="modal_body" enctype="multipart/form-data" id="modal_body">
         <i class="ri-close-fill" id="close_modal"></i>
         <div class="main_content">
             <img src="<?php

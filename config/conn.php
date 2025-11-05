@@ -5,7 +5,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // --- CONFIGURAÇÕES DO BANCO DE DADOS LOCAL (XAMPP) ---
-$db_host = '127.0.0.1';                 // Host padrão do XAMPP
+$db_host = '77.37.127.2';                 // Host padrão do XAMPP
 $db_name = 'ifapoia';                   // O nome do seu banco de dados local
 $db_user = 'root';                      // Usuário padrão do XAMPP
 $db_pass = '';                          // Senha padrão do XAMPP (vazia)

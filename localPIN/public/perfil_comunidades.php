@@ -58,7 +58,7 @@ try {
 require_once('../src/components/header.php');
 ?>
 
-<main class="index-container">
+<main class="index-container" style="margin-top: 88px; margin-bottom: 44px">
     <?php require_once('../src/components/nav_bar.php'); ?>
 
     <section class="main_container">

@@ -39,7 +39,7 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
 <!-- Adiciona a folha de estilo específica para esta página -->
 
 <body>
-    <main class="index-container" data-pagina="user_profile">
+    <main class="index-container main_perfil" style="margin-top: 88px; margin-bottom: 44px" data-pagina="user_profile">
         <?php require_once(__DIR__ . '/../src/components/nav_bar.php'); ?>
 
         <section class="main_container">
@@ -101,6 +101,16 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
                                     </header>
                                     <section class="post_main">
                                         <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
+                                        <?php
+                                        $media_urls = !empty($post['media_urls']) ? explode(';', $post['media_urls']) : [];
+                                        $media_count = count($media_urls);
+                                        if ($media_count > 0): ?>
+                                            <div class="post-media-grid" data-count="<?php echo $media_count; ?>">
+                                                <?php foreach ($media_urls as $url): ?>
+                                                    <img src="<?php echo htmlspecialchars($url); ?>" alt="Imagem do Post">
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </section>
                                     <footer class="post_footer">
                                         <div class="post-stats-left">

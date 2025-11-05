@@ -73,100 +73,104 @@ $comments = $stmt_comments->fetchAll(PDO::FETCH_ASSOC);
 
 <main class="view-post-container" data-is-logged-in="<?php echo ($current_user_id > 0) ? 'true' : 'false'; ?>">
     <?php if ($post): ?>
-        <div class="post-card-full">
-            <header class="post-header">
-                <div class="user-info" data-user-id="<?php echo $post['user_id']; ?>">
-                    <div class="user-icon">
-                        <a href="perfil.php?id=<?php echo $post['user_id']; ?>"><img src="<?php echo htmlspecialchars($post['profile_image_url']); ?>" alt="Foto de Perfil"></a>
-                    </div>
-                    <div class="user-details">
-                        <a href="perfil.php?id=<?php echo $post['user_id']; ?>" class="user-name-link"><span class="user-name"><?php echo htmlspecialchars($post['full_name']); ?></span></a><br>
-                        <span class="user-tag">@<?php echo strtolower(explode(' ', $post['full_name'])[0]); ?></span>
-                    </div>
-                </div>
-                <div class="post-info">
-                    <div class="post-date">
-                        <div class="post-hour"><?php echo date("H:i", strtotime($post['created_at'])); ?></div>
-                        <div class="post-calendar"><?php echo date("d/m/Y", strtotime($post['created_at'])); ?></div>
-                    </div>
-                    <div class="post-views"><i class="ri-bar-chart-grouped-line"></i><span><?php echo $post['view_count']; ?></span></div>
-                </div>
-            </header>
-            <section class="post-main">
-                <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
-                <?php $media_urls = !empty($post['media_urls']) ? explode(';', $post['media_urls']) : []; ?>
-                <?php if (count($media_urls) > 0): ?>
-                    <div class="post-media-grid" data-count="<?php echo count($media_urls); ?>">
-                        <?php foreach ($media_urls as $url): ?>
-                            <div class="img_container"><img src="<?php echo htmlspecialchars($url); ?>" alt="Imagem do Post" class="img-fluid"></div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </section>
-            <footer class="post-footer">
-                <?php $user_has_liked_post = $post['user_has_liked'] > 0; ?>
-                <div class="post-stats-left">
-                    <button class="post-icon like-btn <?php echo $user_has_liked_post ? 'liked' : ''; ?>" data-post-id="<?php echo $post['post_id']; ?>">
-                        <i class="ri-heart-<?php echo $user_has_liked_post ? 'fill' : 'line'; ?>"></i>
-                        <span class="post-cont"><?php echo $post['like_count']; ?></span>
-                    </button>
-                    <div class="post-icon">
-                        <i class="ri-chat-3-line"></i>
-                        <span class="post-cont"><?php echo $post['reply_count']; ?></span>
-                    </div>
-                </div>
-                <div class="post-stats-right">
-                    <div class="post-icon">
-                        <i class="ri-repeat-line"></i>
-                        <span class="post-cont">0</span>
-                    </div>
-                    <div class="post-icon">
-                        <i class="ri-chat-quote-line"></i>
-                        <span class="post-cont">0</span>
-                    </div>
-                </div>
-            </footer>
-        </div>
-
-        <!-- Formulário para Comentar -->
-        <?php if ($current_user_id > 0): ?>
-            <div class="reply-form-container">
-                <form id="reply-form" action="api/api_reply_post.php" method="POST">
-                    <textarea name="content" id="reply-textarea" placeholder="Poste sua resposta" required></textarea>
-                    <input type="hidden" name="post_id" value="<?php echo $post_id; ?>">
-                    <button type="submit" class="btn btn-primary">Responder</button>
-                </form>
-            </div>
-        <?php else: ?>
-            <p class="login-prompt"><a href="login.php">Faça login</a> para responder a esta publicação.</p>
-        <?php endif; ?>
-
-        <!-- Seção de Comentários -->
-        <div class="comments-section" id="comments-section">
-            <?php if (count($comments) > 0): ?>
-                <?php foreach ($comments as $comment): ?>
-                    <div class="comment-card">
-                        <header class="post-header">
-                            <div class="user-info" data-user-id="<?php echo $comment['user_id']; ?>">
-                                <div class="user-icon">
-                                    <a href="perfil.php?id=<?php echo $comment['user_id']; ?>"><img src="<?php echo htmlspecialchars($comment['profile_image_url']); ?>" alt="Foto de Perfil"></a>
-                                </div>
-                                <div class="user-details">
-                                    <a href="perfil.php?id=<?php echo $comment['user_id']; ?>" class="user-name-link"><span class="user-name"><?php echo htmlspecialchars($comment['full_name']); ?></span></a><br>
-                                    <span class="user-tag">@<?php echo strtolower(explode(' ', $comment['full_name'])[0]); ?></span>
-                                </div>
+        <section class="main_container">
+            <div class="main_content">
+                <div class="post-card-full">
+                    <header class="post-header">
+                        <div class="user-info" data-user-id="<?php echo $post['user_id']; ?>">
+                            <div class="user-icon">
+                                <a href="perfil.php?id=<?php echo $post['user_id']; ?>"><img src="<?php echo htmlspecialchars($post['profile_image_url']); ?>" alt="Foto de Perfil"></a>
                             </div>
-                            <div class="post-date"><span><?php echo date("d/m/Y H:i", strtotime($comment['created_at'])); ?></span></div>
-                        </header>
-                        <section class="post-main">
-                            <p><?php echo nl2br(htmlspecialchars($comment['content'])); ?></p>
-                        </section>
+                            <div class="user-details">
+                                <a href="perfil.php?id=<?php echo $post['user_id']; ?>" class="user-name-link"><span class="user-name"><?php echo htmlspecialchars($post['full_name']); ?></span></a><br>
+                                <span class="user-tag">@<?php echo strtolower(explode(' ', $post['full_name'])[0]); ?></span>
+                            </div>
+                        </div>
+                        <div class="post-info">
+                            <div class="post-date">
+                                <div class="post-hour"><?php echo date("H:i", strtotime($post['created_at'])); ?></div>
+                                <div class="post-calendar"><?php echo date("d/m/Y", strtotime($post['created_at'])); ?></div>
+                            </div>
+                            <div class="post-views"><i class="ri-bar-chart-grouped-line"></i><span><?php echo $post['view_count']; ?></span></div>
+                        </div>
+                    </header>
+                    <section class="post-main">
+                        <p><?php echo nl2br(htmlspecialchars($post['content'])); ?></p>
+                        <?php $media_urls = !empty($post['media_urls']) ? explode(';', $post['media_urls']) : []; ?>
+                        <?php if (count($media_urls) > 0): ?>
+                            <div class="post-media-grid" data-count="<?php echo count($media_urls); ?>">
+                                <?php foreach ($media_urls as $url): ?>
+                                    <div class="img_container"><img src="<?php echo htmlspecialchars($url); ?>" alt="Imagem do Post" class="img-fluid"></div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </section>
+                    <footer class="post-footer">
+                        <?php $user_has_liked_post = $post['user_has_liked'] > 0; ?>
+                        <div class="post-stats-left">
+                            <button class="post-icon like-btn <?php echo $user_has_liked_post ? 'liked' : ''; ?>" data-post-id="<?php echo $post['post_id']; ?>">
+                                <i class="ri-heart-<?php echo $user_has_liked_post ? 'fill' : 'line'; ?>"></i>
+                                <span class="post-cont"><?php echo $post['like_count']; ?></span>
+                            </button>
+                            <div class="post-icon">
+                                <i class="ri-chat-3-line"></i>
+                                <span class="post-cont"><?php echo $post['reply_count']; ?></span>
+                            </div>
+                        </div>
+                        <div class="post-stats-right">
+                            <div class="post-icon">
+                                <i class="ri-repeat-line"></i>
+                                <span class="post-cont">0</span>
+                            </div>
+                            <div class="post-icon">
+                                <i class="ri-chat-quote-line"></i>
+                                <span class="post-cont">0</span>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+        
+                <!-- Formulário para Comentar -->
+                <?php if ($current_user_id > 0): ?>
+                    <div class="reply-form-container">
+                        <form id="reply-form" action="api/api_reply_post.php" method="POST">
+                            <textarea name="content" id="reply-textarea" placeholder="Poste sua resposta" required></textarea>
+                            <input type="hidden" name="post_id" value="<?php echo $post_id; ?>">
+                            <button type="submit" class="btn btn-primary">Responder</button>
+                        </form>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p id="no-comments-message">Ainda não há respostas. Seja o primeiro a comentar!</p>
-            <?php endif; ?>
-        </div>
+                <?php else: ?>
+                    <p class="login-prompt"><a href="login.php">Faça login</a> para responder a esta publicação.</p>
+                <?php endif; ?>
+        
+                <!-- Seção de Comentários -->
+                <div class="comments-section" id="comments-section">
+                    <?php if (count($comments) > 0): ?>
+                        <?php foreach ($comments as $comment): ?>
+                            <div class="comment-card">
+                                <header class="post-header">
+                                    <div class="user-info" data-user-id="<?php echo $comment['user_id']; ?>">
+                                        <div class="user-icon">
+                                            <a href="perfil.php?id=<?php echo $comment['user_id']; ?>"><img src="<?php echo htmlspecialchars($comment['profile_image_url']); ?>" alt="Foto de Perfil"></a>
+                                        </div>
+                                        <div class="user-details">
+                                            <a href="perfil.php?id=<?php echo $comment['user_id']; ?>" class="user-name-link"><span class="user-name"><?php echo htmlspecialchars($comment['full_name']); ?></span></a><br>
+                                            <span class="user-tag">@<?php echo strtolower(explode(' ', $comment['full_name'])[0]); ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="post-date"><span><?php echo date("d/m/Y H:i", strtotime($comment['created_at'])); ?></span></div>
+                                </header>
+                                <section class="post-main">
+                                    <p><?php echo nl2br(htmlspecialchars($comment['content'])); ?></p>
+                                </section>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p id="no-comments-message">Ainda não há respostas. Seja o primeiro a comentar!</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
     <?php else: ?>
         <p class="error-message">Post não encontrado. Ele pode ter sido removido.</p>
     <?php endif; ?>
