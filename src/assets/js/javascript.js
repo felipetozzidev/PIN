@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
             tamanhoFooter: function () { return this.footer ? this.footer.clientHeight : 0; },
             dropdownItens: function () { return document.querySelectorAll(".dropdown_item"); },
             tamanhoMain: function () { return this.main ? this.main.clientHeight : 0; },
+            ifcelular: function () { return window.screen.width < 768; },
             // --- Adicionando os seletores do modal aqui ---
             createPostButton: document.querySelector('#create_post'),
             modalContainer: document.querySelector('main.modal_container')
@@ -29,6 +30,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (objetos.footer) {
                 objetos.main.style.marginBottom = `${objetos.tamanhoFooter()}px`;
             }
+        }
+
+        if(objetos.ifcelular()) {
+            document.querySelector("body > main > section.main_container > div > div.profile_header > div > div.profile_options > a").innerHTML = "<i class='ri-edit-line'></i>";
         }
 
         // --- Correção do Erro do Console (Página de Perfil) ---

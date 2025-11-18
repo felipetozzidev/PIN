@@ -1,5 +1,6 @@
 <?php
 // O header.php já inicia a sessão e faz a conexão com o banco de dados.
+require_once(__DIR__ . '/../src/components/modal_postagem.php');
 require_once('../src/components/header.php');
 
 // Se o usuário não estiver logado, redireciona para o login.

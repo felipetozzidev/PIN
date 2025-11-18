@@ -1,5 +1,6 @@
 <?php
 // O header já inicia a sessão, faz a conexão e abre o <body>
+require_once(__DIR__ . '/../src/components/modal_postagem.php');
 require_once('../src/components/header.php');
 
 // Validação do ID do post a partir do parâmetro 'id' na URL

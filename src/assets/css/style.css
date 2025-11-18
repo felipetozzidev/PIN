@@ -268,8 +268,6 @@ main:not(.modal_container) {
     grid-template-areas: "navbar main";
     grid-template-columns: var(--tamanho_navbar) 1fr;
     padding: 24px;
-    margin-top: 88px !important;
-    margin-bottom: 44px !important;
     max-width: 100vw;
 }
 
@@ -1684,7 +1682,11 @@ nav.navbar_mobile {
 /* ==========================================================================
    7. RESPONSIVIDADE (MEDIA QUERIES)
    ========================================================================== */
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 768px) {
+    nav.navbar_mobile {
+        display: flex;
+    }
+
     #nav .nav-item {
         &.create_post {
             position: fixed;
@@ -1712,6 +1714,18 @@ nav.navbar_mobile {
             margin-top: 0;
         }
     }
+}
+
+body > main > section.main_container > div > div.user_bio > p{
+    display: none;
+}
+
+#modal_body > div.post_footer > div.footer_left > div.post_tag > div > label{
+    display: none;
+}
+
+#content{
+    width: 80%;
 }
 
     .main_container>.main_content[data-pagina="pagina principal"] {
@@ -1769,17 +1783,6 @@ nav.navbar_mobile {
             }
         }
     }
-}
-
-@media only screen and (max-width: 768px) {
-    /* #nav .nav-item {
-        &.create_post {
-            position: fixed;
-            bottom: 30;
-            z-index: 101;
-        }
-    } */
-
     main {
         display: block;
         padding: 80px 15px 75px 15px;
@@ -1797,12 +1800,21 @@ nav.navbar_mobile {
         display: none;
     }
 
-    body>main:not(.modal_container) {
-        grid-template-columns: 1fr;
+    body>main:not(.modal_container) and main:not(.main_perfil) {
+            flex-grow: 1;
+    --tamanho_navbar: 15%;
+    display: grid;
+    grid-template-areas: "navbar main";
+    grid-template-columns: var(--tamanho_navbar) 1fr;
+    padding: 24px;
+    max-width: 100vw;
+
     }
 
-    nav.navbar_mobile {
-        display: block;
+    body>main.main_perfil{
+        grid-template-columns: 1fr;
+        padding: 0;
+        grid-template-areas: "main";
     }
 
     .cardDestaque_container {
@@ -1822,24 +1834,28 @@ nav.navbar_mobile {
     main[data-pagina="user_profile"] {
         &>section.main_container {
             padding-inline: 0px;
-            max-width: 90vw !important;
+            width: 100vw;
+            max-width: 100vw !important;
 
 
             &>div.main_content {
+                width: 100vw;
                 &>div.profile_cover {
-                    height: 150px;
-
+                    height: 200px;
+                    width: 100%;
+                    border-radius: 0;
                 }
 
                 &>div.profile_header {
                     padding-inline: 0px;
                     flex-direction: column;
                     margin-bottom: 10px;
+                    margin-top: -145px;
 
                     &>img.profile_image {
                         width: 100px !important;
-                        margin-top: 55px;
-                        margin-left: 20px;
+                        
+                        margin-left: 30px;
 
                     }
 
@@ -1849,10 +1865,20 @@ nav.navbar_mobile {
                         margin-bottom: 10px;
                         width: 100%;
                         display: flex;
-                        flex-direction: column;
+                        flex-direction: row;
                         justify-content: space-between;
-                        align-items: center;
+                        align-items: flex-start;
                         gap: 20px;
+
+                        & > .profile_info{
+                            & > h2{
+                                max-width: 12ch; /* Ajuste conforme necessário */
+                                height: 2rem;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                            }
+                        }
 
                     }
                 }
