@@ -1,6 +1,5 @@
 <?php
 // Inclui apenas a conexão com o banco, que não gera saída de HTML.
-require_once(__DIR__ . '/../src/components/modal_postagem.php');
 require_once('../config/conn.php');
 
 // Define a página para a lógica da sidebar saber que estamos em uma sub-página de comunidade.

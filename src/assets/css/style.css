@@ -92,6 +92,10 @@ input:-webkit-autofill:focus {
     width: 100%;
     z-index: 1000;
     top: 0;
+
+    &>.container-fluid {
+        padding: 0;
+    }
 }
 
 #nav .navbar-brand {
@@ -104,8 +108,13 @@ input:-webkit-autofill:focus {
 }
 
 #nav .navbar-toggler {
-    padding: 0.5rem !important;
+    padding: 0 !important;
     transition: all 0.2s ease-out !important;
+    border: none;
+
+    &:focus {
+        box-shadow: none;
+    }
 }
 
 #nav .navbar-toggler-icon {
@@ -215,17 +224,22 @@ input:-webkit-autofill:focus {
 .offcanvas {
     justify-content: flex-end !important;
     flex-wrap: nowrap !important;
-    background-color: var(--primary);
+    background-color: var(--background);
     border-left: 1px solid var(--background);
     width: 300px;
 }
 
 .offcanvas-header {
-    background-color: var(--background);
+    background-color: var(--primary);
     padding: 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+  
+        color: var(--background);
+   
+
 }
 
 .offcanvas-body {
@@ -351,7 +365,7 @@ nav.navbar_lateral {
 
             &.select_item {
                 transition: all .2s ease-in-out;
-
+              
                 &:hover {
                     background-color: var(--secondary);
                 }
@@ -1623,7 +1637,7 @@ nav.navbar_mobile {
     right: 0;
     width: 100%;
     height: 60px;
-    z-index: 9000;
+    z-index: 100;
     background-color: var(--primary);
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
 
@@ -1673,40 +1687,38 @@ nav.navbar_mobile {
 @media only screen and (max-width: 992px) {
     #nav .nav-item {
         &.create_post {
+            position: fixed;
+            bottom: 15px;
+            z-index: 101;
+            margin: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 70px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+
+            &>div {
+                                
+                
+                &>span {
+                    display: none;
+                }
+            }
+        }
+    }
+    .main_container > .main_content[data-pagina="pagina principal"] {
+    & > .postagens_e_publicacoes {
+        &>.postagens {
+            margin-top: 0;
+        }
+    }
+}
+
+    .main_container>.main_content[data-pagina="pagina principal"] {
+        width: 80%;
+
+        &>.destaques {
             display: none;
-        }
-    }
-
-    section.modal_container {
-        &.active {
-            &>form.modal_body {
-                &>.post_footer {
-                    &>.footer_left {
-                        &>.post_tag {
-                            &>.form-group {
-                                & > tag-input {
-                                    display: none;
-                                }
-                                &>.tag-container {
-
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    section.modal_container {
-        &.active {
-            &>form.modal_body {
-                &>div.main_content {
-                    &>textarea {
-                        width: 80%;
-                    }
-                }
-            }
         }
     }
 
@@ -1760,50 +1772,13 @@ nav.navbar_mobile {
 }
 
 @media only screen and (max-width: 768px) {
-    #nav .nav-item {
+    /* #nav .nav-item {
         &.create_post {
-            display: none;
+            position: fixed;
+            bottom: 30;
+            z-index: 101;
         }
-    }
-
-    section.modal_container {
-        &.active {
-            &>form.modal_body {
-                &>div.main_content {
-                    &>textarea {
-                        width: 80%;
-                    }
-                }
-            }
-        }
-    }
-
-    #modal_body > div.post_footer > div.footer_left > div.post_tag > div > label{
-        display: none;
-    }
-
-    section.modal_container {
-        &.active {
-            &>form.modal_body {
-                &>.post_footer {
-                    &>.footer_left {
-                        &>.post_tag {
-                            &>.form-group {
-                                & > tag-input {
-                                    display: none;
-                                }
-                                &>.tag-container {
-
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
+    } */
 
     main {
         display: block;
@@ -1896,6 +1871,7 @@ nav.navbar_mobile {
             }
         }
     }
+    
 
     .main_container>.main_content[data-pagina="perfil-comunidade"] {
         &>.community-header {

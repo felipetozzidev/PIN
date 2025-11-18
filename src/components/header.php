@@ -102,19 +102,113 @@ $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            <h5 class="offcanvas-title " id="offcanvas-titulo">Menu</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <!-- <div class="search navbar-nav col-12 mb-3">
+        <nav class="navbar_lateral">
+        <ul>
+            <li class="select_item <?php echo ($currentPage === 'inicio') ? 'active' : ''; ?>">
+                <a href="index.php" class="nav-link">
+                    <i class="ri-home-2-line"></i>
+                    <p>Início</p>
+                </a>
+            </li>
+            <li class="select_item <?php echo ($currentPage === 'destaques') ? 'active' : ''; ?>">
+                <a href="destaques.php" class="nav-link">
+                    <i class="ri-fire-line"></i>
+                    <p>Destaques</p>
+                </a>
+            </li>
+           
+            <li class="nav_item <?php echo ($currentPage === 'comunidades') ? 'active' : ''; ?>">
+                <a href="comunidades.php" class="nav-link">
+                    <i class="ri-group-line"></i>
+                    <p>Comunidades</p>
+                </a>
+            </li>
+            <li class="separador">
+                <hr class="w-100">
+            </li>
+
+            <?php
+            $isUserLoggedIn = isset($_SESSION['user_id']);
+            // O dropdown estará "ativo" (aberto) se o usuário estiver em uma página de comunidade específica
+            $isDropdownActive = ($currentPage === 'comunidade_view');
+            ?>
+            <li class="dropdown_item <?php echo $isDropdownActive ? 'active' : ''; ?>">
+                <a class="nav-link">
+                    <p>Suas comunidades</p>
+                    <!-- O icone é controlado por css porra nenhuma, deixa do jeito que tava pq ta dando problema -->
+                </a>
+                <ul class="dropdown_list">
+                    <?php if ($isUserLoggedIn && isset($pdo)): ?>
+                        <?php
+                        try {
+                            $id_usuario_logado = $_SESSION['user_id'];
+                            // Corrigindo a consulta para usar os nomes de coluna do seu ifapoia.sql
+                            $sql_suas_comunidades = "SELECT c.community_id, c.name 
+                                                     FROM communities c 
+                                                     JOIN user_communities uc ON c.community_id = uc.community_id 
+                                                     WHERE uc.user_id = ? 
+                                                     LIMIT 5";
+                            $stmt = $pdo->prepare($sql_suas_comunidades);
+                            $stmt->execute([$id_usuario_logado]);
+                            $suas_comunidades = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            if ($suas_comunidades) {
+                                foreach ($suas_comunidades as $comunidade) {
+                                    echo '<li><a href="comunidade_view.php?id=' . $comunidade['community_id'] . '" class="nav-link"><p>' . htmlspecialchars($comunidade['name']) . '</p></a></li>';
+                                }
+                            } else {
+                                echo '<li><p class="no-communities">Você não segue nenhuma comunidade.</p></li>';
+                            }
+                        } catch (PDOException $e) {
+                            error_log("Erro ao buscar comunidades: " . $e->getMessage());
+                            echo '<li><p class="no-communities">Erro ao carregar.</p></li>';
+                        }
+                        ?>
+                    <?php else: ?>
+                        <li><a href="login.php" class="nav-link"><p>Faça login para ver suas comunidades.</p></a></li>
+                    <?php endif; ?>
+                </ul>
+            </li>
+               <li class="separador">
+                <hr class="w-100">
+            </li>
+
+                <li><a class="select_item" href="#">
+                    <i class="ri-settings-3-line"></i>
+                    <p>Configurações</p>
+                </a></li>
+                <?php if (isset($_SESSION['role_id']) && $_SESSION['role_id'] == 1): ?>
+                <li class="select_item ">
+                <a href="../modules/admin/admin.php" class="nav-link">
+                    <i class="ri-list-settings-line"></i>
+                    <p>Painel Admin</p>
+                </a>
+                </li>
+            <?php endif; ?>
+
+                <li><a class="dropdown-item" href="logout.php">
+                    <i class="ri-logout-box-line "></i>
+                    <p>Sair</p>
+                </a></li>
+        </ul>
+    </nav>    
+        
+        
+        
+        
+        
+        <!-- <div class="search navbar-nav col-12 mb-3">
                 <form class="d-flex" role="search" action="index.php" method="GET">
                     <i class="ri-search-line"></i>
                     <input class="me-2" type="search" name="search" placeholder="Buscar..." aria-label="Search">
                 </form>
             </div> -->
             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li class="nav-item"><a class="nav-link" href="post.php">Criar Post</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Notificações</a></li>
+                
                 <!-- <?php if (isset($_SESSION['user_id'])): ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="offcanvasUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

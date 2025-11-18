@@ -1,4 +1,7 @@
 <?php
+
+$currentPage = 'inicio';
+
 // Habilita a exibição de todos os erros para diagnóstico no ambiente local.
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -6,7 +9,6 @@ error_reporting(E_ALL);
 require_once(__DIR__ . '/../src/components/modal_postagem.php');
 
 // O header agora inicia a sessão e faz a conexão via PDO.
-// A utilização de __DIR__ torna o caminho mais robusto e à prova de erros.
 require_once(__DIR__ . '/../src/components/header.php');
 
 // Pega o ID do usuário logado, ou 0 se for um visitante
@@ -29,9 +31,9 @@ $sql = "SELECT
             u.full_name,
             u.profile_image_url,
             GROUP_CONCAT(DISTINCT pm.media_url SEPARATOR ';') as media_urls,
-            (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id AND l.user_id = :current_user_id) AS user_has_liked,
-            (SELECT COUNT(*) FROM reposts r WHERE r.post_id = p.post_id AND r.user_id = :current_user_id) AS user_has_reposted,
-            (SELECT COUNT(*) FROM bookmarks b WHERE b.post_id = p.post_id AND b.user_id = :current_user_id) AS user_has_bookmarked,
+            (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id AND l.user_id = :current_user_id_1) AS user_has_liked,
+            (SELECT COUNT(*) FROM reposts r WHERE r.post_id = p.post_id AND r.user_id = :current_user_id_2) AS user_has_reposted,
+            (SELECT COUNT(*) FROM bookmarks b WHERE b.post_id = p.post_id AND b.user_id = :current_user_id_3) AS user_has_bookmarked,
             c.name as community_name,
             GROUP_CONCAT(DISTINCT t.name SEPARATOR ', ') as tags
         FROM posts AS p
@@ -43,7 +45,13 @@ $sql = "SELECT
         LEFT JOIN tags t ON pt.tag_id = t.tag_id";
 
 $where_clauses = ["p.type = 'padrao'", "p.status = 'ativo'"];
-$params = [':current_user_id' => $current_user_id];
+
+// Parâmetros base (um para cada uso na subquery)
+$params = [
+    ':current_user_id_1' => $current_user_id,
+    ':current_user_id_2' => $current_user_id,
+    ':current_user_id_3' => $current_user_id
+];
 
 if (!empty($search_query)) {
     $where_clauses[] = "(p.content LIKE :search OR u.full_name LIKE :search OR c.name LIKE :search OR t.name LIKE :search)";

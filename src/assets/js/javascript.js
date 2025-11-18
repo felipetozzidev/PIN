@@ -8,9 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
             navbar: document.querySelector(".navbar_container"),
             nav: document.querySelector("nav"),
             main: document.querySelector("main"),
-            main_perfil: document.querySelector("main.main_perfil"),
+            main_perfil: document.querySelector("main[data-pagina='user_profile']"),
             footer: document.querySelector("footer.pag_footer"),
-            navbar_mobile: document.querySelector("nav.navbar_mobile"),
             body: document.querySelector("body"),
             community_cards_container: document.querySelector("div.community_cards_container"),
             tamanhoCabecalho: function () { return this.nav ? this.nav.clientHeight : 0; },
@@ -20,22 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
             dropdownItens: function () { return document.querySelectorAll(".dropdown_item"); },
             tamanhoMain: function () { return this.main ? this.main.clientHeight : 0; },
             // --- Adicionando os seletores do modal aqui ---
-            createPostButton: document.querySelector('#create_post'),     // <-- MUDANÇA AQUI
-            modalContainer: document.querySelector('section.modal_container') // <-- MUDANÇA AQUI
+            createPostButton: document.querySelector('#create_post'),
+            modalContainer: document.querySelector('main.modal_container')
         };
-
-        // --- código simples para centralização reponsiva do botao de criação de postagem ---
-
-
-        window.addEventListener('resize', function () {
-            if (objetos.navbar_mobile && objetos.createPostButton) {
-                let larguraNavbarMobile = objetos.navbar_mobile.offsetWidth;
-                let larguraBotao = objetos.createPostButton.offsetWidth;
-                objetos.createPostButton.style.left = `calc(${larguraNavbarMobile / 2}px - ${larguraBotao / 2}px)`;
-                objetos.createPostButton.style.transform = "translateX(0)";
-            }
-        });
-
 
         // --- Ajustes de Layout ---
         if (objetos.main && objetos.nav) {
@@ -45,19 +31,23 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        // --- Correção do Erro do Console (Página de Perfil) ---
         if (objetos.main_perfil) {
-            console.log(objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain());
-
-            if (objetos.footer && objetos.nav && objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho() > objetos.tamanhoMain()) {
-                console.log(objetos.main_perfil.querySelector("section.main_container > div.main_content"));
-
-                objetos.main_perfil.querySelector("section.main_container > div.main_content").classList.add("fixo");
+            // Verifica se footer e nav existem antes de calcular
+            if (objetos.footer && objetos.nav) {
+                const espacoDisponivel = objetos.tamanhoBody() - objetos.tamanhoFooter() - objetos.tamanhoCabecalho();
+                if (espacoDisponivel > objetos.tamanhoMain()) {
+                    const contentDiv = objetos.main_perfil.querySelector("section.main_container > div.main_content");
+                    if (contentDiv) {
+                        contentDiv.classList.add("fixo");
+                    }
+                }
             }
         }
 
 
         // if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {
-        //     objetos.footer.style.position = "relative";
+        //     objetos.footer.style.position = "absolute";
         //     objetos.footer.style.bottom = "0px";
         // }
         if (objetos.community_cards_container && objetos.nav) {
@@ -90,8 +80,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // --- LÓGICA DE ABERTURA DO MODAL (Agora no lugar certo) ---
-        if (objetos.createPostButton && objetos.modalContainer) { // <-- MUDANÇA AQUI
+        // --- LÓGICA DE ABERTURA DO MODAL ---
+        if (objetos.createPostButton && objetos.modalContainer) {
             objetos.createPostButton.addEventListener('click', function (event) {
                 event.preventDefault(); // Previne que o link <a> navegue
                 objetos.modalContainer.classList.add('active');
@@ -207,6 +197,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- LÓGICA DO LIGHTBOX PARA MÍDIAS ---
     const lightbox = document.getElementById('imageLightbox');
+    let openLightboxFunction = null; // Variável para guardar a função
+
     if (lightbox) {
         const lightboxImg = lightbox.querySelector('.lightbox-content');
         const lightboxClose = lightbox.querySelector('.lightbox-close');
@@ -229,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 nextBtn.style.display = 'none';
             }
         }
+        openLightboxFunction = openLightbox; // Exporta a função para uso global
 
         function closeLightbox() { lightbox.style.display = 'none'; }
         function updateLightboxImage() { lightboxImg.src = currentImages[currentIndex]; }
@@ -263,18 +256,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- GERENCIADOR DE CLIQUES GERAL (DELEGAÇÃO DE EVENTOS) ---
     document.body.addEventListener('click', function (event) {
         const target = event.target;
-        const likeButton = target.closest('.like-btn');
 
-        // --- LÓGICA DE LIKES ---
+        // 1. LÓGICA DE LIKES
+        const likeButton = target.closest('.like-btn');
         if (likeButton) {
             event.preventDefault();
             event.stopPropagation();
 
-            const isUserLoggedIn = document.body.dataset.isLoggedIn === 'true';
-            if (!isUserLoggedIn) {
-                window.location.href = 'login.php';
-                return;
-            }
+            // Verifica se há o atributo de login no body (opcional, mas boa prática)
+            // const isUserLoggedIn = document.body.dataset.isLoggedIn === 'true';
+            // if (!isUserLoggedIn) { window.location.href = 'login.php'; return; }
 
             const postId = likeButton.dataset.postId;
             const icon = likeButton.querySelector('i');
@@ -309,10 +300,105 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 })
                 .catch(error => console.error('Erro na requisição:', error));
-            return; // Encerra após a ação de like
+            return; // Encerra
         }
 
-        // --- LÓGICA DO LIGHTBOX ---
+        // 2. LÓGICA DE REPOSTS
+        const repostButton = target.closest('.repost-btn');
+        if (repostButton) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const postId = repostButton.dataset.postId;
+            const icon = repostButton.querySelector('i');
+            const countSpan = repostButton.querySelector('.post-cont');
+
+            fetch('api/api_repost_post.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `post_id=${postId}`
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        countSpan.textContent = data.new_count;
+                        if (data.reposted) {
+                            repostButton.classList.add('reposted');
+                            // Opcional: mudar cor ou ícone
+                        } else {
+                            repostButton.classList.remove('reposted');
+                        }
+                    } else {
+                        console.error('Erro ao repostar:', data.error);
+                    }
+                });
+            return;
+        }
+
+        // 3. LÓGICA DE SALVAR POSTS
+        const bookmarkButton = target.closest('.bookmark-btn');
+        if (bookmarkButton) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const postId = bookmarkButton.dataset.postId;
+            const icon = bookmarkButton.querySelector('i');
+            const countSpan = bookmarkButton.querySelector('.post-cont');
+
+            fetch('api/api_save_post.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `post_id=${postId}`
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        countSpan.textContent = data.new_count;
+                        if (data.bookmarked) {
+                            bookmarkButton.classList.add('bookmarked');
+                            icon.classList.remove('ri-bookmark-line');
+                            icon.classList.add('ri-bookmark-fill');
+                        } else {
+                            bookmarkButton.classList.remove('bookmarked');
+                            icon.classList.remove('ri-bookmark-fill');
+                            icon.classList.add('ri-bookmark-line');
+                        }
+                    } else {
+                        console.error('Erro ao salvar:', data.error);
+                    }
+                });
+            return;
+        }
+
+        // 4. LÓGICA DE DENÚNCIAS
+        const reportButton = target.closest('.report-btn');
+        if (reportButton) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const postId = reportButton.dataset.postId;
+            const motivo = prompt("Por favor, informe o motivo da denúncia:");
+
+            if (motivo && motivo.trim() !== "") {
+                fetch('api/api_report_post.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `post_id=${postId}&reason=${encodeURIComponent(motivo)}`
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Denúncia enviada com sucesso! Nossa equipe irá analisar.");
+                        } else {
+                            alert("Erro: " + data.error);
+                        }
+                    })
+                    .catch(err => console.error("Erro na denúncia:", err));
+            }
+            return;
+        }
+
+        // 5. LÓGICA DO LIGHTBOX
         const clickedImage = target.closest('.post-media-grid img');
         if (clickedImage) {
             const mediaGrid = clickedImage.closest('.post-media-grid');
@@ -321,16 +407,16 @@ document.addEventListener('DOMContentLoaded', function () {
             const startIndex = imagesSrc.indexOf(clickedImage.src);
 
             // Reutiliza a função openLightbox se ela existir
-            if (typeof openLightbox === 'function') {
-                openLightbox(imagesSrc, startIndex);
+            if (openLightboxFunction) {
+                openLightboxFunction(imagesSrc, startIndex);
             }
             return; // Encerra após abrir o lightbox
         }
 
-        // --- HIERARQUIA DE CLIQUES PARA NAVEGAÇÃO ---
+        // 6. HIERARQUIA DE CLIQUES PARA NAVEGAÇÃO (POST CARD)
         const postCard = target.closest('.post_container[data-post-url]');
         // A condição a seguir já previne o clique em botões, links, etc.
-        const isInteractive = target.closest('a, button');
+        const isInteractive = target.closest('a, button, .post-media-grid');
 
         if (postCard && !isInteractive) {
             const postUrl = postCard.dataset.postUrl;
@@ -340,9 +426,56 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // --- BLOCOS DE CÓDIGO DUPLICADOS REMOVIDOS ---
-    // Os blocos de código que estavam aqui (linhas 329-348 do seu arquivo original)
-    // foram removidos para evitar conflitos. A lógica correta foi movida
-    // para dentro do objeto 'objetos' e do 'if (isPublicPage)' no topo do arquivo.
+    // --- LÓGICA DE ENVIO DE COMENTÁRIOS (AJAX) ---
+    const replyForm = document.getElementById('reply-form');
+
+    if (replyForm) {
+        replyForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // IMPEDE o envio padrão do formulário (que mostra o JSON)
+
+            const submitButton = replyForm.querySelector('button[type="submit"]');
+            const contentInput = replyForm.querySelector('textarea[name="content"]');
+            const originalText = submitButton.innerText;
+
+            if (contentInput.value.trim() === "") {
+                alert("O comentário não pode ser vazio.");
+                return;
+            }
+
+            // 1. Feedback visual de carregamento
+            submitButton.disabled = true;
+            submitButton.innerText = "Enviando...";
+
+            const formData = new FormData(replyForm);
+
+            fetch('api/api_reply_post.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    // Verifica se a resposta foi bem-sucedida (status 200-299)
+                    if (!response.ok) {
+                        throw new Error('Erro na rede ou no servidor.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // 2. Se deu certo, recarrega a página para exibir o novo comentário
+                        window.location.reload();
+                    } else {
+                        alert("Erro ao comentar: " + (data.error || "Erro desconhecido"));
+                        submitButton.disabled = false;
+                        submitButton.innerText = originalText;
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro na requisição:", error);
+                    alert("Ocorreu um erro ao enviar o comentário. Tente novamente.");
+                    submitButton.disabled = false;
+                    submitButton.innerText = originalText;
+                });
+        });
+    }
 
 });

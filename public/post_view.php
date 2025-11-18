@@ -1,6 +1,5 @@
 <?php
 // O header já inicia a sessão, faz a conexão e abre o <body>
-require_once(__DIR__ . '/../src/components/modal_postagem.php');
 require_once('../src/components/header.php');
 
 // Validação do ID do post a partir do parâmetro 'id' na URL
@@ -48,7 +47,7 @@ $sql_post = "SELECT
              GROUP BY p.post_id";
 
 $stmt_post = $pdo->prepare($sql_post);
-$stmt_post->execute([$current_user_id, $post_id]);
+$stmt_post->execute([$current_user_id, $current_user_id, $current_user_id, $post_id]);
 $post = $stmt_post->fetch(PDO::FETCH_ASSOC);
 
 // Se o post não for encontrado, exibe uma mensagem de erro.
@@ -137,9 +136,9 @@ $comments = $stmt_comments->fetchAll(PDO::FETCH_ASSOC);
                 <?php if ($current_user_id > 0): ?>
                     <div class="reply-form-container">
                         <form id="reply-form" action="api/api_reply_post.php" method="POST">
-                            <textarea name="content" id="reply-textarea" placeholder="Poste sua resposta" required></textarea>
+                            <textarea name="content" id="reply-textarea" placeholder="Responder..." required></textarea>
                             <input type="hidden" name="post_id" value="<?php echo $post_id; ?>">
-                            <button type="submit" class="btn btn-primary">Responder</button>
+                            <button type="submit" class="btn btn-primary">Publicar resposta</button>
                         </form>
                     </div>
                 <?php else: ?>
