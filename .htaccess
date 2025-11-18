@@ -1,0 +1,11 @@
+# Ativa o motor de reescrita de URL
+RewriteEngine On
+
+# Define a base do Rewrite para a subpasta do seu projeto no XAMPP
+# Se o seu site está em localhost/PIN/localPIN/, a base é /PIN/localPIN/
+RewriteBase /PIN/localPIN/
+
+# Redireciona qualquer requisição que não seja para um ficheiro ou pasta existente para a pasta /public
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/$1 [L]
