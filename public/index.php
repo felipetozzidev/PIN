@@ -68,6 +68,10 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $posts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// --- BUSCA OS MOTIVOS DE DENÚNCIA (PARA O MODAL) ---
+$sql_reasons = "SELECT description FROM report_reasons ORDER BY description ASC";
+$report_reasons = $pdo->query($sql_reasons)->fetchAll(PDO::FETCH_ASSOC);
+
 // Busca as 5 comunidades mais populares (com mais membros)
 $sql_comunidades = "SELECT 
                         c.name as community_name,
@@ -214,12 +218,44 @@ $result_comunidades = $pdo->query($sql_comunidades);
     </main>
 
 
-
     <div id="imageLightbox" class="lightbox">
         <span class="lightbox-close">&times;</span>
         <a class="lightbox-nav prev">&#10094;</a>
         <img class="lightbox-content" id="lightboxImage">
         <a class="lightbox-nav next">&#10095;</a>
+    </div>
+
+    <div class="report-modal-overlay" id="reportModal">
+        <div class="report-modal-content">
+            <i class="ri-close-line modal-close-btn" id="closeReportModal"></i>
+            <h2 class="modal-title">Denunciar Publicação</h2>
+            <p class="modal-subtitle">Denúncias são anônimas e analisadas pela moderação.</p>
+
+            <form id="reportForm">
+                <input type="hidden" id="reportPostId" value="">
+
+                <div class="form-group">
+                    <label for="reportReason" class="form-label">Motivo Principal *</label>
+                    <select id="reportReason" class="form-select" required>
+                        <option value="">Selecione um motivo...</option>
+                        <?php if (!empty($report_reasons)): ?>
+                            <?php foreach ($report_reasons as $reason): ?>
+                                <option value="<?php echo htmlspecialchars($reason['description']); ?>">
+                                    <?php echo htmlspecialchars($reason['description']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="reportDetails" class="form-label">Detalhes (Opcional)</label>
+                    <textarea id="reportDetails" rows="3" class="form-textarea" placeholder="Descreva o problema..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-danger-primary mt-3 w-100" id="submitReportBtn">Enviar Denúncia</button>
+            </form>
+        </div>
     </div>
 
     <?php require_once(__DIR__ . '/../src/components/footer.php'); ?>
