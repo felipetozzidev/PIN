@@ -1978,7 +1978,7 @@
                             <img src="src\assets\img\parceiros\logo-1.png" alt="Logo 1">
                         </div>
                     </div> -->
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <div class="partner-card ">
                             <img src="src\assets\img\parceiros\Logo pequena.png" class="img-fluid w-75" alt="Guia Do Bixo">
                         </div>
