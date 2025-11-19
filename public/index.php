@@ -146,6 +146,15 @@ $result_comunidades = $pdo->query($sql_comunidades);
                                                 <?php endforeach; ?>
                                             </div>
                                         <?php endif; ?>
+                                        <?php if (!empty($post['tags'])): ?>
+                            <div class="post-tags">
+                                <?php
+                                $tags = explode(', ', $post['tags']);
+                                foreach ($tags as $tag): ?>
+                                    <span class="hashtag">#<?php echo htmlspecialchars($tag); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                                     </section>
                                     <footer class="post_footer">
                                         <div class="post-stats-left">

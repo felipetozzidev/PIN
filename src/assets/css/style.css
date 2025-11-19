@@ -636,46 +636,102 @@ footer.post_footer {
     }
 }
 
-/* Grid de Mídia (Mesclado) */
+/* Grid de Mídia (Restaurado e Aprimorado) */
 .post-media-grid {
     width: 100%;
     display: grid;
     overflow: hidden;
-    gap: 8px;
-    /* Aumentado o gap */
+    gap: 2px; /* Gap pequeno estilo Instagram/Whatsapp */
     margin-top: 12px;
     border-radius: 12px;
-    /* Ajustado */
     border: 1px solid var(--border-color);
+    position: relative; /* Necessário para o contador */
+    aspect-ratio: 16/9; /* Mantém uma proporção consistente para o grid */
 
-    &>img {
+    & > img {
         width: 100%;
-        height: auto;
-        /* Ajustado */
+        height: 100%;
         object-fit: cover;
         cursor: pointer;
         transition: opacity 0.2s ease;
+        display: block;
 
         &:hover {
             opacity: 0.95;
         }
     }
-}
 
-.post-media-grid[data-count="1"] {
-    grid-template-columns: 1fr;
-}
+    /* Layout para 1 Imagem */
+    &[data-count="1"] {
+        grid-template-columns: 1fr;
+        aspect-ratio: auto; /* Deixa a altura se ajustar à imagem única */
+        max-height: 500px;  /* Limite de altura para não dominar a tela */
+    }
 
-.post-media-grid[data-count="2"] {
-    grid-template-columns: 1fr 1fr;
-}
+    /* Layout para 2 Imagens */
+    &[data-count="2"] {
+        grid-template-columns: 1fr 1fr;
+    }
 
-.post-media-grid[data-count="3"] {
-    grid-template-columns: 1fr 1fr;
-}
+    /* Layout para 3 Imagens (1 Grande, 2 Pequenas) */
+    &[data-count="3"] {
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: 1fr 1fr;
 
-.post-media-grid[data-count="4"] {
-    grid-template-columns: 1fr 1fr;
+        & > img:nth-child(1) {
+            grid-row: span 2; /* A primeira imagem ocupa toda a altura */
+            height: 100%;
+        }
+    }
+
+    /* Layout para 4 ou mais Imagens (Grade 2x2) */
+    &[data-count="4"], 
+    &[data-count^="5"], &[data-count^="6"], &[data-count^="7"], &[data-count^="8"], &[data-count^="9"], &[data-count^="1"] {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+    }
+
+    /* Esconde imagens extras (da 5ª em diante) */
+    & > img:nth-child(n+5) {
+        display: none;
+    }
+
+    /* --- LÓGICA DO CONTADOR (+N) --- */
+    /* Aplica o overlay escuro e o número na última posição visível (canto inferior direito) */
+    
+    /* Define o estilo base do contador */
+    &[data-count="5"]::after, 
+    &[data-count="6"]::after, 
+    &[data-count="7"]::after, 
+    &[data-count="8"]::after,
+    &[data-count="9"]::after,
+    &[data-count="10"]::after {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 50%; /* Ocupa o espaço da 4ª imagem */
+        height: 50%;
+        background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro transparente */
+        color: white;
+        font-size: 2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none; /* Permite clicar na imagem abaixo para abrir o lightbox */
+        content: ""; /* Conteúdo padrão vazio */
+    }
+
+    /* Define o número específico para cada caso */
+    &[data-count="5"]::after { content: "+1"; }
+    &[data-count="6"]::after { content: "+2"; }
+    &[data-count="7"]::after { content: "+3"; }
+    &[data-count="8"]::after { content: "+4"; }
+    &[data-count="9"]::after { content: "+5"; }
+    &[data-count="10"]::after { content: "+6"; } /* E assim por diante... */
+    
+    /* Caso genérico para muitos posts (opcional) */
+    &[data-count="11"]::after, &[data-count="12"]::after { content: "9+"; } 
 }
 
 
@@ -2185,7 +2241,7 @@ nav.navbar_mobile {
                 }
 
                 &>i {
-                    font-size: 1.4rem;
+                    font-size: 1.5rem;
                     margin-bottom: 2px;
                     color: inherit;
                     /* Herda a cor do link */
