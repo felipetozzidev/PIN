@@ -1,4 +1,7 @@
 <?php
+
+$currentPage = 'perfil';
+
 require_once('../src/components/header.php');
 
 // Verifica login

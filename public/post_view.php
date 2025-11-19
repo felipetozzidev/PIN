@@ -1,7 +1,4 @@
 <?php
-
-$currentPage = '';
-
 // Habilita erros para facilitar debug se necessário
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -282,9 +279,51 @@ $report_reasons = $pdo->query($sql_reasons)->fetchAll(PDO::FETCH_ASSOC);
                 <textarea id="reportDetails" rows="3" class="form-textarea" placeholder="Descreva o problema..."></textarea>
             </div>
 
-            <button type="submit" class="btn btn-danger-primary mt-3 w-100" id="submitReportBtn">Enviar Denúncia</button>
+            <button type="submit" class="btn-danger-primary mt-3 w-100" id="submitReportBtn">Enviar Denúncia</button>
         </form>
     </div>
 </div>
+
+<script>
+    const replyForm = document.getElementById('reply-form');
+    if (replyForm) {
+        replyForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // IMPEDE O REDIRECIONAMENTO
+            
+            const submitButton = replyForm.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerText;
+            
+            if (replyForm.querySelector('textarea').value.trim() === "") {
+                alert("Escreva algo para comentar.");
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.innerText = "Enviando...";
+
+            const formData = new FormData(replyForm);
+            fetch('api/api_reply_post.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload(); // RECARREGA A PÁGINA COM O NOVO COMENTÁRIO
+                    } else {
+                        alert("Erro: " + (data.error || "Desconhecido"));
+                        submitButton.disabled = false;
+                        submitButton.innerText = originalText;
+                    }
+                })
+                .catch(e => {
+                    console.error(e);
+                    alert("Erro na conexão.");
+                    submitButton.disabled = false;
+                    submitButton.innerText = originalText;
+                });
+        });
+    }
+</script>
 
 <?php include("../src/components/footer.php"); ?>
