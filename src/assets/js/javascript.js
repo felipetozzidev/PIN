@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
             navbar: document.querySelector(".navbar_container"),
             nav: document.querySelector("nav"),
             main: document.querySelector("main"),
+            navbarMobile: document.querySelector("nav.navbar_mobile"),
             main_perfil: document.querySelector("main.main_perfil"), // Correção seletor perfil
             footer: document.querySelector("footer.pag_footer"),
             navbar_mobile: document.querySelector("nav.navbar_mobile"),
@@ -19,6 +20,8 @@ document.addEventListener('DOMContentLoaded', function () {
             tamanhoFooter: function () { return this.footer ? this.footer.clientHeight : 0; },
             dropdownItens: function () { return document.querySelectorAll(".dropdown_item"); },
             tamanhoMain: function () { return this.main ? this.main.clientHeight : 0; },
+            ifcelular: function () { return window.screen.width < 768; },
+            tamanhoNavbarCelular: function () { return window.screen.width < 768 ? this.navbarMobile.clientHeight : 0; },
             // --- Adicionando os seletores do modal aqui ---
             createPostButton: document.querySelector('#create_post'),
             modalContainer: document.querySelector('main.modal_container')
@@ -27,9 +30,15 @@ document.addEventListener('DOMContentLoaded', function () {
         // --- Ajustes de Layout ---
         if (objetos.main && objetos.nav) {
             objetos.main.style.marginTop = `${objetos.tamanhoCabecalho()}px`;
-            if (objetos.footer) {
+            if (objetos.tamanhoFooter() > 0) {
                 objetos.main.style.marginBottom = `${objetos.tamanhoFooter()}px`;
+            } else if (objetos.tamanhoNavbarCelular() > 0) {
+                objetos.main.style.marginBottom = `${objetos.tamanhoNavbarCelular() + 10}px`;
             }
+        }
+
+        if (objetos.ifcelular() && document.querySelector("main.main_perfil")) {
+            document.querySelector("body > main > section.main_container > div > div.profile_header > div > div.profile_options > a").innerHTML = "<i class='ri-edit-line'></i>";
         }
 
         // --- Correção do Erro do Console (Página de Perfil) ---
@@ -45,10 +54,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+
         // if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {
         //     objetos.footer.style.position = "absolute";
         //     objetos.footer.style.bottom = "0px";
         // }
+        if (objetos.ifcelular()) {
+            console.log(objetos.tamanhoNavbarCelular());
+
+            objetos.main.marginBottom = `${objetos.tamanhoNavbarCelular()}px`;
+        }
         if (objetos.community_cards_container && objetos.nav) {
             objetos.community_cards_container.style.top = `calc(${objetos.tamanhoCabecalho()}px + 20px)`;
         }

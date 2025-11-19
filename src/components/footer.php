@@ -10,38 +10,39 @@
         </div>
     </div>
 </footer>
- 
+
 <nav class="navbar_mobile">
-        <ul>
-            <li class="select_item">
-                <a href="index.php" class="nav-link">
-                    <i class="ri-home-2-line"></i>
-                   
-                </a>
-            </li>
-            <li class="select_item">
-                <a href="destaques.php" class="nav-link">
-                    <i class="ri-fire-line"></i>
-                    
-                </a>
-            </li>
-            <li class="select_item">
-                <a href="comunidades.php" class="nav-link">
-                    <i class=""></i>
-                </a>
-            </li>
-            <li class="select_item">
-                <a href="comunidades.php" class="nav-link">
-                    <i class="ri-group-line"></i>
-                    
-                </a>
-            </li>
-           <li class="select_item">
-               <a href="<?php if (isset($_SESSION['user_id'])):?>perfil.php<?php else: ?>login.php <?php endif; ?>" class="nav-link">
-                   <i class="ri-user-line"></i>
-               </a>
-           </li>
-    </nav>
+    <ul>
+        <li class="select_item">
+            <a href="index.php" class="nav-link">
+                <i class="ri-home-2-line"></i>
+
+            </a>
+        </li>
+        <li class="select_item">
+            <a href="destaques.php" class="nav-link">
+                <i class="ri-fire-line"></i>
+
+            </a>
+        </li>
+        <li class="select_item">
+            <div>
+
+            </div>
+        </li>
+        <li class="select_item">
+            <a href="comunidades.php" class="nav-link">
+                <i class="ri-group-line"></i>
+
+            </a>
+        </li>
+        <li class="select_item">
+            <a href="<?php if (isset($_SESSION['user_id'])): ?>perfil.php<?php else: ?>login.php <?php endif; ?>"
+                class="nav-link">
+                <i class="ri-user-line"></i>
+            </a>
+        </li>
+</nav>
 
 
 

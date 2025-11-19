@@ -2,6 +2,7 @@
 $currentPage = 'comunidades';
 // O header.php já inicia a sessão e faz a conexão via PDO
 require_once('../config/conn.php');
+require_once(__DIR__ . '/../src/components/modal_postagem.php');
 require_once("../src/components/header.php");
 
 // Lógica para buscar comunidades, incluindo a imagem de perfil

@@ -123,7 +123,7 @@ require_once('../src/components/header.php');
                                     </header>
                                     <section class="post_main">
                                         <a href="post_view.php?id=<?php echo $post['post_id']; ?>" class="post-link-content">
-                                            <p><?php echo nl2br(htmlspecialchars(mb_strimwidth($post['content'], 0, 300, "..."))); ?></p>
+                                            <!-- <p><?php echo nl2br(htmlspecialchars(mb_strimwidth($post['content'], 0, 300, "..."))); ?></p> -->
                                         </a>
                                     </section>
                                     <footer class="post_footer">

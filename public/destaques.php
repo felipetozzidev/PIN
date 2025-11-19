@@ -2,6 +2,7 @@
 $currentPage = 'destaques';
 // Inclui a conexão e o cabeçalho padrão da página
 require_once('../config/conn.php');
+require_once(__DIR__ . '/../src/components/modal_postagem.php');
 require_once('../src/components/header.php');
 
 // Busca os 10 posts mais populares, priorizando views e depois likes.
