@@ -894,6 +894,22 @@
             width: 40px;
         }
 
+        .bottom_text{
+            font-size: 30px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            width: 250px;
+            background-color: var(--background);
+            border: 1px solid var(--primary);
+
+            &:hover{
+                background-color: var(--primary);
+                color: var(--background);
+            }
+        }
+
 
 
         /* ==========================================================================
@@ -1949,6 +1965,33 @@
                     </div>
                 </div>
             </div>
+        </section>
+
+        <section id="parceiros" class="fade-in-section">
+            <div class="container text-center">
+                <h2 class="section-title">Parceiros</h2>
+                <p class="section-subtitle mb-2">Nossos parceiros ajudam a construir um ambiente de aprendizagem e
+                    desenvolvimento pessoal</p>
+                <div class="row g-4 mt-3 d-flex justify-content-center">
+                    <!-- <div class="col-md-4">
+                        <div class="partner-card">
+                            <img src="src\assets\img\parceiros\logo-1.png" alt="Logo 1">
+                        </div>
+                    </div> -->
+                    <div class="col-md-3">
+                        <div class="partner-card ">
+                            <img src="src\assets\img\parceiros\Logo pequena.png" class="img-fluid w-75" alt="Guia Do Bixo">
+                        </div>
+                        <div class="d-flex justify-content-center mt-4">
+                            <a href="https://guiadobixo.com.br" class="bottom_text btn">Guia do Bixo</a>
+                        </div>
+                    </div>
+                    <!-- <div class="col-md-4">
+                        <div class="partner-card">
+                            <img src="src\assets\img\parceiros\logo-3.png" alt="Logo 3">
+                        </div>
+                    </div> -->
+                </div>
         </section>
 
     </main>
