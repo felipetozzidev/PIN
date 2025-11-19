@@ -1,5 +1,10 @@
 <?php
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit; // Importante: impede que o restante da página seja carregado
+}
+
 $currentPage = 'inicio';
 
 // Habilita a exibição de todos os erros para diagnóstico no ambiente local.
