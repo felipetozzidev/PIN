@@ -1191,7 +1191,7 @@
 
                     <div class="col">
                         <div class="team-card">
-                            <img src="https://via.placeholder.com/130/305F2C/FFFFFF?text=LA" alt="Foto Lucas"
+                            <img src="src\assets\img\developers_images\Lucas_Alexandre.jpeg" alt="Foto Lucas"
                                 class="team-img">
                             <h5 class="team-name">Lucas Alexandre S. Soares</h5>
                             <span class="team-role">Informação</span>
@@ -1199,7 +1199,7 @@
                     </div>
                     <div class="col">
                         <div class="team-card">
-                            <img src="httpsa" alt="Foto Luiz Felipe" class="team-img">
+                            <img src="src\assets\img\developers_images\Luiz_Felipe.jpeg" alt="Foto Luiz Felipe" class="team-img">
                             <h5 class="team-name">Luiz Felipe F. Nascimento</h5>
                             <span class="team-role">Informação</span>
                         </div>
