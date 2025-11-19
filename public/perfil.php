@@ -2,6 +2,7 @@
 
 $currentPage = 'perfil';
 
+require_once(__DIR__ . '/../src/components/modal_postagem.php');
 require_once('../src/components/header.php');
 
 // Verifica login
@@ -549,4 +550,5 @@ if (!empty($sql)) {
     </script>
 <?php endif; ?>
 
+<?php require_once(__DIR__ . '/../src/components/modal_postagem_html.php'); ?>
 <?php require_once '../src/components/footer.php'; ?>

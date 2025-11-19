@@ -78,6 +78,8 @@ function getCardClass($index)
             </div>
         </section>
     </main>
+
+    <?php require_once(__DIR__ . '/../src/components/modal_postagem_html.php'); ?>
     <?php include_once("../src/components/footer.php"); ?>
 </body>
 

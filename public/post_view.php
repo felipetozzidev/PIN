@@ -326,4 +326,5 @@ $report_reasons = $pdo->query($sql_reasons)->fetchAll(PDO::FETCH_ASSOC);
     }
 </script>
 
+<?php require_once(__DIR__ . '/../src/components/modal_postagem_html.php'); ?>
 <?php include("../src/components/footer.php"); ?>

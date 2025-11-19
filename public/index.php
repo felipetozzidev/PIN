@@ -266,5 +266,6 @@ $result_comunidades = $pdo->query($sql_comunidades);
             </form>
         </div>
     </div>
-
+    
+    <?php require_once(__DIR__ . '/../src/components/modal_postagem_html.php'); ?>
     <?php require_once(__DIR__ . '/../src/components/footer.php'); ?>
