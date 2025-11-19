@@ -55,10 +55,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
-        if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {
-            objetos.footer.style.position = "absolute";
-            objetos.footer.style.bottom = "0px";
-        }
+        // if (objetos.footer && (objetos.tamanhoCabecalho() + objetos.tamanhoBody() < window.screen.height)) {
+        //     objetos.footer.style.position = "absolute";
+        //     objetos.footer.style.bottom = "0px";
+        // }
         if(objetos.ifcelular()) {
             console.log(objetos.tamanhoNavbarCelular());
             
