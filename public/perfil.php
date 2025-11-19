@@ -91,12 +91,12 @@ $posts = $stmt_posts->fetchAll(PDO::FETCH_ASSOC);
                                             </div>
                                             <div class="user-details">
                                                 <span
-                                                    class="user-name"><?php echo htmlspecialchars($post['full_name']); ?></span><br>
+                                                    class="user-name"><?php echo htmlspecialchars($post['full_name']); ?></span>
                                                 <span
                                                     class="user-tag">@<?php echo strtolower(explode(' ', $post['full_name'])[0]); ?></span>
                                             </div>
                                         </div>
-                                        <div class="post-date">
+                                        <div class="post-info">
                                             <span><?php echo date('d/m/Y H:i', strtotime($post['created_at'])); ?></span>
                                         </div>
                                     </header>

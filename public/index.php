@@ -110,7 +110,7 @@ $result_comunidades = $pdo->query($sql_comunidades);
                                             </div>
                                             <div class="user-details">
                                                 <span
-                                                    class="user-name"><a href="perfil.php?id=<?php echo $post['user_id']; ?>"><?php echo htmlspecialchars($post['full_name']); ?></a></span><br>
+                                                    class="user-name"><a href="perfil.php?id=<?php echo $post['user_id']; ?>"><?php echo htmlspecialchars($post['full_name']); ?></a></span>
                                                 <span
                                                     class="user-tag">@<?php echo strtolower(explode(' ', $post['full_name'])[0]); ?></span>
                                             </div>

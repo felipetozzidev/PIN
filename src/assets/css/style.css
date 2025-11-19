@@ -236,9 +236,9 @@ input:-webkit-autofill:focus {
     align-items: center;
     justify-content: space-between;
 
-  
-        color: var(--background);
-   
+
+    color: var(--background);
+
 
 }
 
@@ -363,7 +363,7 @@ nav.navbar_lateral {
 
             &.select_item {
                 transition: all .2s ease-in-out;
-              
+
                 &:hover {
                     background-color: var(--secondary);
                 }
@@ -834,9 +834,11 @@ footer.post_footer {
         &>.community_card {
             display: flex;
             border-radius: 5px;
+            text-decoration: none;
+            color: var(--text-color);
             align-items: center;
             justify-content: space-between;
-            padding: 16px 24px;
+            padding: 10px 18px;
             border: var(--secondary) 1px solid;
             transition: all .2s ease-in-out;
             background-color: transparent;
@@ -867,6 +869,10 @@ footer.post_footer {
                         font-size: 1.2em;
                         font-weight: 600;
                         margin: 0;
+                        display: block;
+                        max-width: 12ch;
+                        color: var(--text-color);
+                        text-decoration: none;
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
@@ -880,7 +886,7 @@ footer.post_footer {
             }
 
             &>.community_subscribe {
-                & a.button_follow {
+                & span.button_follow {
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -1700,33 +1706,69 @@ nav.navbar_mobile {
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 
             &>div {
-                                
-                
+
+
                 &>span {
                     display: none;
                 }
             }
         }
     }
-    .main_container > .main_content[data-pagina="pagina principal"] {
-    & > .postagens_e_publicacoes {
-        &>.postagens {
-            margin-top: 0;
+
+    .main_container>.main_content[data-pagina="pagina principal"] {
+        &>.postagens_e_publicacoes {
+            &>.postagens {
+                margin-top: 0;
+            }
         }
     }
-}
 
-body > main > section.main_container > div > div.user_bio > p{
-    display: none;
-}
+    .post_container {
+        &>.post_header {
+            &>.user_info {
+                &>.user-details {
+                    height: 3rem;
+                    display: flex;
+                    flex-direction: column;
 
-#modal_body > div.post_footer > div.footer_left > div.post_tag > div > label{
-    display: none;
-}
+                    &>.user-name {
+                        max-width: 12ch;
+                        /* Ajuste conforme necessário */
+                        height: 1.2rem;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
 
-#content{
-    width: 80%;
-}
+                        &>a {
+                            word-wrap: nowrap;
+                            display: block;
+                            text-decoration: none;
+                            color: var(--text-color);
+
+                            max-width: 12ch;
+                            /* Ajuste conforme necessário */
+                            height: 1.2rem;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    body>main>section.main_container>div>div.user_bio>p {
+        display: none;
+    }
+
+    #modal_body>div.post_footer>div.footer_left>div.post_tag>div>label {
+        display: none;
+    }
+
+    #content {
+        width: 80%;
+    }
 
     .main_container>.main_content[data-pagina="pagina principal"] {
         width: 80%;
@@ -1783,6 +1825,7 @@ body > main > section.main_container > div > div.user_bio > p{
             }
         }
     }
+
     main {
         display: block;
         padding: 80px 15px 75px 15px;
@@ -1801,17 +1844,17 @@ body > main > section.main_container > div > div.user_bio > p{
     }
 
     body>main:not(.modal_container) and main:not(.main_perfil) {
-            flex-grow: 1;
-    --tamanho_navbar: 15%;
-    display: grid;
-    grid-template-areas: "navbar main";
-    grid-template-columns: var(--tamanho_navbar) 1fr;
-    padding: 24px;
-    max-width: 100vw;
+        flex-grow: 1;
+        --tamanho_navbar: 15%;
+        display: grid;
+        grid-template-areas: "navbar main";
+        grid-template-columns: var(--tamanho_navbar) 1fr;
+        padding: 24px;
+        max-width: 100vw;
 
     }
 
-    body>main.main_perfil{
+    body>main.main_perfil {
         grid-template-columns: 1fr;
         padding: 0;
         grid-template-areas: "main";
@@ -1840,6 +1883,7 @@ body > main > section.main_container > div > div.user_bio > p{
 
             &>div.main_content {
                 width: 100vw;
+
                 &>div.profile_cover {
                     height: 200px;
                     width: 100%;
@@ -1854,7 +1898,7 @@ body > main > section.main_container > div > div.user_bio > p{
 
                     &>img.profile_image {
                         width: 100px !important;
-                        
+
                         margin-left: 30px;
 
                     }
@@ -1870,9 +1914,10 @@ body > main > section.main_container > div > div.user_bio > p{
                         align-items: flex-start;
                         gap: 20px;
 
-                        & > .profile_info{
-                            & > h2{
-                                max-width: 12ch; /* Ajuste conforme necessário */
+                        &>.profile_info {
+                            &>h2 {
+                                max-width: 12ch;
+                                /* Ajuste conforme necessário */
                                 height: 2rem;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
@@ -1897,7 +1942,7 @@ body > main > section.main_container > div > div.user_bio > p{
             }
         }
     }
-    
+
 
     .main_container>.main_content[data-pagina="perfil-comunidade"] {
         &>.community-header {
@@ -1921,4 +1966,8 @@ body > main > section.main_container > div > div.user_bio > p{
             }
         }
     }
+
+    /* ===== ESTILIZAÇÃO DA PÁGINA DE COMUNIDADES =====*/
+
+
 }

@@ -1,0 +1,51 @@
+# Nome do seu workflow
+name: 🚀 Deploy to FTP
+
+# Gatilho: este workflow roda sempre que houver um push na branch 'main'
+on:
+  push:
+    branches:
+      - main # Mude para 'master' se o nome da sua branch principal for outro
+
+jobs:
+  # Nome do "trabalho" a ser executado
+  ftp-deploy-job:
+    # O tipo de máquina que vai executar o trabalho
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Passo: Clona o seu repositório para a máquina virtual
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v4
+
+    # 2. Passo: Sincroniza os arquivos com o servidor FTP
+    - name: 📂 Sync files to FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        # Endereço do seu servidor FTP (ex: ftp.seusite.com.br)
+        # Use um Secret do GitHub para isso!
+        server: ${{ secrets.FTP_SERVER }}
+
+        # Nome de usuário do FTP
+        # Use um Secret do GitHub para isso!
+        username: ${{ secrets.FTP_USERNAME }}
+
+        # Senha do FTP
+        # Use um Secret do GitHub para isso!
+        password: ${{ secrets.FTP_PASSWORD }}
+
+        # Opcional: Porta do servidor (se não for a padrão 21)
+        # port: 21 
+
+        # Opcional: A pasta no seu repositório que você quer enviar.
+        # '.' significa a raiz do repositório.
+        # Se seus arquivos públicos estão em 'public/', use 'public/'
+        local-dir: ./ 
+
+        # Opcional: A pasta de destino no servidor FTP.
+        # '/' ou '.' geralmente significa a raiz do FTP (ex: public_html)
+        server-dir: public_html/
+
+        # Opcional: Se true, deleta arquivos do servidor que não existem mais no repositório.
+        # Cuidado ao usar esta opção!
+        # dangerous-clean-slate: false
