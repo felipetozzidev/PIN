@@ -4,10 +4,12 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 header('Content-Type: application/json');
-require_once('../../config/conn.php');
+
+// Caminhos absolutos seguros
+require_once __DIR__ . '/../../config/conn.php';
 
 if (!isset($_SESSION['user_id']) || !isset($_POST['post_id'])) {
-    echo json_encode(['success' => false, 'error' => 'Usuário não autenticado.']);
+    echo json_encode(['success' => false, 'error' => 'Não autorizado ou dados faltando.']);
     exit();
 }
 
@@ -17,46 +19,38 @@ $post_id = intval($_POST['post_id']);
 try {
     $pdo->beginTransaction();
 
-    // 1. Verifica se já existe o repost na tabela 'reposts' (do seu dump)
-    $stmt_check = $pdo->prepare("SELECT 1 FROM reposts WHERE user_id = :user_id AND post_id = :post_id");
-    $stmt_check->execute(['user_id' => $user_id, 'post_id' => $post_id]);
-    $exists = $stmt_check->fetch();
+    // Verifica se já existe (Tabela 'reposts')
+    $stmt_check = $pdo->prepare("SELECT 1 FROM reposts WHERE user_id = ? AND post_id = ?");
+    $stmt_check->execute([$user_id, $post_id]);
 
-    $is_reposted = false;
+    $reposted = false;
 
-    if ($exists) {
-        // SE JÁ REPOSTOU: Remove (Undo)
-        $stmt_delete = $pdo->prepare("DELETE FROM reposts WHERE user_id = :user_id AND post_id = :post_id");
-        $stmt_delete->execute(['user_id' => $user_id, 'post_id' => $post_id]);
+    if ($stmt_check->fetch()) {
+        // Remove
+        $stmt_del = $pdo->prepare("DELETE FROM reposts WHERE user_id = ? AND post_id = ?");
+        $stmt_del->execute([$user_id, $post_id]);
 
-        // Decrementa o contador na tabela 'posts'
-        $stmt_update = $pdo->prepare("UPDATE posts SET repost_count = GREATEST(0, repost_count - 1) WHERE post_id = :post_id");
-        $stmt_update->execute(['post_id' => $post_id]);
+        $stmt_upd = $pdo->prepare("UPDATE posts SET repost_count = GREATEST(0, repost_count - 1) WHERE post_id = ?");
+        $stmt_upd->execute([$post_id]);
     } else {
-        // SE NÃO REPOSTOU: Adiciona
-        $stmt_insert = $pdo->prepare("INSERT INTO reposts (user_id, post_id) VALUES (:user_id, :post_id)");
-        $stmt_insert->execute(['user_id' => $user_id, 'post_id' => $post_id]);
+        // Adiciona
+        $stmt_ins = $pdo->prepare("INSERT INTO reposts (user_id, post_id) VALUES (?, ?)");
+        $stmt_ins->execute([$user_id, $post_id]);
 
-        // Incrementa o contador na tabela 'posts'
-        $stmt_update = $pdo->prepare("UPDATE posts SET repost_count = repost_count + 1 WHERE post_id = :post_id");
-        $stmt_update->execute(['post_id' => $post_id]);
+        $stmt_upd = $pdo->prepare("UPDATE posts SET repost_count = repost_count + 1 WHERE post_id = ?");
+        $stmt_upd->execute([$post_id]);
 
-        $is_reposted = true;
+        $reposted = true;
     }
 
-    // Retorna a nova contagem
-    $stmt_count = $pdo->prepare("SELECT repost_count FROM posts WHERE post_id = :post_id");
-    $stmt_count->execute(['post_id' => $post_id]);
-    $new_count = $stmt_count->fetchColumn();
+    $stmt_cnt = $pdo->prepare("SELECT repost_count FROM posts WHERE post_id = ?");
+    $stmt_cnt->execute([$post_id]);
+    $new_count = $stmt_cnt->fetchColumn();
 
     $pdo->commit();
 
-    echo json_encode([
-        'success' => true,
-        'reposted' => $is_reposted,
-        'new_count' => $new_count
-    ]);
-} catch (PDOException $e) {
+    echo json_encode(['success' => true, 'reposted' => $reposted, 'new_count' => $new_count]);
+} catch (Exception $e) {
     $pdo->rollBack();
-    echo json_encode(['success' => false, 'error' => 'Erro no banco: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
