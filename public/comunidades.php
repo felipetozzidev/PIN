@@ -59,4 +59,6 @@ try {
         </div>
     </section>
 </main>
+
+<?php require_once(__DIR__ . '/../src/components/modal_postagem_html.php'); ?>
 <?php require_once("../src/components/footer.php"); ?>

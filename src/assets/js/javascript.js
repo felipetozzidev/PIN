@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
         //     objetos.footer.style.position = "absolute";
         //     objetos.footer.style.bottom = "0px";
         // }
-        if (objetos.ifcelular()) {
+        if(objetos.ifcelular()) {
             console.log(objetos.tamanhoNavbarCelular());
 
             objetos.main.marginBottom = `${objetos.tamanhoNavbarCelular()}px`;
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const tag_a_selection = element.querySelector("a");
                 if (tag_a_selection) {
                     const createIconDropdown = document.createElement("img");
-                    createIconDropdown.setAttribute("src", "../../src/assets/icons/arrow_down.svg");
+                    createIconDropdown.setAttribute("src", "../src/assets/icons/arrow_down.svg");
                     tag_a_selection.appendChild(createIconDropdown);
                     element.style.height = `${tag_a_selection.clientHeight}px`;
 

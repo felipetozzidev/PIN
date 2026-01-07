@@ -1,5 +1,15 @@
 <?php
 
+// Inicia a sessão se ainda não estiver iniciada
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit; // Importante: impede que o restante da página seja carregado
+}
+
 $currentPage = 'inicio';
 
 // Habilita a exibição de todos os erros para diagnóstico no ambiente local.
@@ -146,6 +156,15 @@ $result_comunidades = $pdo->query($sql_comunidades);
                                                 <?php endforeach; ?>
                                             </div>
                                         <?php endif; ?>
+                                        <?php if (!empty($post['tags'])): ?>
+                            <div class="post-tags">
+                                <?php
+                                $tags = explode(', ', $post['tags']);
+                                foreach ($tags as $tag): ?>
+                                    <span class="hashtag">#<?php echo htmlspecialchars($tag); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                                     </section>
                                     <footer class="post_footer">
                                         <div class="post-stats-left">
@@ -257,5 +276,6 @@ $result_comunidades = $pdo->query($sql_comunidades);
             </form>
         </div>
     </div>
-
+    
+    <?php require_once(__DIR__ . '/../src/components/modal_postagem_html.php'); ?>
     <?php require_once(__DIR__ . '/../src/components/footer.php'); ?>

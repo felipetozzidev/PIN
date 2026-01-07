@@ -1,28 +1,25 @@
 /* ==========================================================================
    ESTILOS DA PÁGINA DE VISUALIZAÇÃO DE POST (post_view.php)
-   Sintaxe SASS Aninhada
+   Sintaxe SASS Aninhada - Layout Estável e Contido
    ========================================================================== */
 
-/* -------------------- LAYOUT PRINCIPAL (GRID) -------------------- */
-/* Define o grid para acomodar a sidebar e o conteúdo */
+/* -------------------- LAYOUT PRINCIPAL (GRID DESKTOP) -------------------- */
 main.index-container {
     display: grid;
     grid-template-areas: "navbar main";
     grid-template-columns: 18% 1fr;
-    /* Sidebar ocupa 18%, resto é conteúdo */
     width: 100%;
     min-height: 100vh;
     background-color: var(--background);
     padding: 24px;
     margin-top: 88px;
-    /* Espaço para o Header Fixo */
     margin-bottom: 44px;
-    /* Espaço para o Footer */
     gap: 20px;
     box-sizing: border-box;
+    overflow-x: hidden;
 }
 
-/* Estilo da Sidebar dentro do grid */
+/* Sidebar (Desktop) */
 .navbar_container {
     grid-area: navbar;
     position: fixed;
@@ -38,14 +35,16 @@ main.index-container {
     width: 100%;
     display: flex;
     justify-content: center;
+    min-width: 0;
 }
 
 /* Conteúdo Específico do Post */
 .main_content[data-pagina="post_view"] {
     width: 100%;
-    max-width: 750px;
-    /* Largura otimizada para leitura */
+    max-width: 850px; /* Largura ajustada */
     padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* -------------------- CARD DO POST COMPLETO -------------------- */
@@ -53,74 +52,90 @@ main.index-container {
     background-color: var(--backgroundContrast);
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    padding: 24px;
+    padding: 30px;
     margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
 
     /* Header do Post */
-    &>.post-header {
+    & > .post-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 16px;
+        margin-bottom: 20px;
         padding: 0;
         height: fit-content;
 
-        &>.user-info {
+        & > .user-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
+            min-width: 0; /* Importante para flexbox */
 
-            &>.user-icon img {
+            & > .user-icon img {
                 width: 55px;
                 height: 55px;
                 border-radius: 50%;
                 object-fit: cover;
                 border: 2px solid var(--backgroundContrast);
+                flex-shrink: 0;
             }
 
-            &>.user-details {
+            & > .user-details {
                 line-height: 1.3;
                 display: flex;
                 flex-direction: column;
+                min-width: 0;
 
-                &>.user-name-link {
+                & > .user-name-link {
                     text-decoration: none;
-
-                    &>.user-name {
+                    
+                    & > .user-name {
                         font-weight: 700;
                         color: var(--text-color);
-                        font-size: 1.05rem;
+                        font-size: 1.1rem;
                         transition: color 0.2s ease;
+                        /* Truncar texto longo */
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: block;
                     }
 
-                    &:hover>.user-name {
+                    &:hover > .user-name {
                         color: var(--primary);
                         text-decoration: underline;
                     }
                 }
 
-                &>.user-tag {
+                & > .user-tag {
                     color: var(--text-muted);
-                    font-size: 0.9rem;
+                    font-size: 0.95rem;
                     opacity: 1;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
             }
         }
 
-        &>.post-info {
-            font-size: 0.8em;
+        & > .post-info {
+            font-size: 0.9rem;
             opacity: 0.85;
             display: flex;
             align-items: center;
+            flex-shrink: 0;
+            margin-left: 10px;
 
-            &>.post-date {
+            & > .post-date {
                 text-align: right;
+                white-space: nowrap;
             }
 
-            &>.post-views {
+            & > .post-views {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -129,8 +144,8 @@ main.index-container {
                 margin-top: 4px;
                 margin-left: 15px;
 
-                &>i {
-                    font-size: 1.2rem;
+                & > i {
+                    font-size: 1.3rem;
                     margin: -6px;
                 }
             }
@@ -138,76 +153,124 @@ main.index-container {
     }
 
     /* Corpo do Post */
-    &>.post-main {
+    & > .post-main {
         padding: 0;
 
-        &>.post-text {
+        & > .post-text {
             font-size: 1.15rem;
             line-height: 1.6;
             color: var(--text-color);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             white-space: pre-line;
+            word-wrap: break-word;
         }
 
-        /* Grid de Mídia */
-        &>.post-media-grid {
+        /* Grid de Mídia (SASS Aninhado) */
+        & > .post-media-grid {
             width: 100%;
             display: grid;
             overflow: hidden;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 2px; /* Gap reduzido para estilo mosaico */
+            margin-top: 15px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            position: relative; /* Necessário para o contador */
+            aspect-ratio: 16/9; /* Mantém proporção consistente da grade */
 
-            &>img {
+            & > img {
                 width: 100%;
-                height: auto;
+                height: 100%;
                 object-fit: cover;
                 cursor: pointer;
                 transition: opacity 0.2s ease;
+                display: block;
 
                 &:hover {
                     opacity: 0.95;
                 }
             }
 
+            /* Layout: 1 Imagem */
             &[data-count="1"] {
                 grid-template-columns: 1fr;
+                aspect-ratio: auto; /* Deixa altura livre para imagem única */
+                max-height: 600px;  /* Trava altura máxima para não dominar a tela */
             }
 
+            /* Layout: 2 Imagens */
             &[data-count="2"] {
                 grid-template-columns: 1fr 1fr;
             }
 
+            /* Layout: 3 Imagens */
             &[data-count="3"] {
                 grid-template-columns: 2fr 1fr;
                 grid-template-rows: 1fr 1fr;
 
-                &>img:first-child {
-                    grid-row: span 2;
+                & > img:nth-child(1) {
+                    grid-row: span 2; /* Primeira imagem ocupa altura total */
+                    height: 100%;
                 }
             }
 
-            &[data-count="4"] {
+            /* Layout: 4 ou mais Imagens (Grade 2x2) */
+            &[data-count="4"],
+            &[data-count^="5"], &[data-count^="6"], &[data-count^="7"],
+            &[data-count^="8"], &[data-count^="9"], &[data-count^="1"] {
                 grid-template-columns: 1fr 1fr;
                 grid-template-rows: 1fr 1fr;
             }
+
+            /* Oculta imagens excedentes (da 5ª em diante) */
+            & > img:nth-child(n+5) {
+                display: none;
+            }
+
+            /* --- CONTADOR (+N) NA ÚLTIMA FOTO --- */
+            /* Aplica overlay na posição da 4ª foto */
+            &[data-count="5"]::after, &[data-count="6"]::after, &[data-count="7"]::after,
+            &[data-count="8"]::after, &[data-count="9"]::after, &[data-count="10"]::after,
+            &[data-count^="1"]::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 50%; /* Cobre exatamente a 4ª célula da grade */
+                height: 50%;
+                background-color: rgba(0, 0, 0, 0.5); /* Overlay escuro */
+                color: white;
+                font-size: 2rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                pointer-events: none; /* Permite clicar na imagem abaixo */
+            }
+
+            /* Define o número exibido */
+            &[data-count="5"]::after { content: "+1"; }
+            &[data-count="6"]::after { content: "+2"; }
+            &[data-count="7"]::after { content: "+3"; }
+            &[data-count="8"]::after { content: "+4"; }
+            &[data-count="9"]::after { content: "+5"; }
+            &[data-count="10"]::after { content: "+6"; }
+            &[data-count="11"]::after, &[data-count="12"]::after { content: "9+"; }
         }
 
         /* Tags */
-        &>.post-tags {
+        & > .post-tags {
             margin-bottom: 20px;
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
 
-            &>.hashtag {
+            & > .hashtag {
                 color: var(--primary);
                 font-weight: 600;
                 font-size: 0.95rem;
                 background-color: var(--backgroundContrast);
-                padding: 4px 10px;
+                padding: 6px 12px;
                 border-radius: 20px;
                 transition: background-color 0.2s;
 
@@ -221,32 +284,32 @@ main.index-container {
     }
 
     /* Footer do Post (Botões) */
-    &>.post-footer {
+    & > .post-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-top: 1px solid var(--border-color);
-        padding-top: 15px;
+        padding-top: 20px;
         margin-top: 10px;
 
-        &>.post-stats-left,
-        &>.post-stats-right {
+        & > .post-stats-left,
+        & > .post-stats-right {
             display: flex;
             gap: 5px;
             align-items: center;
 
-            &>button,
-            &>div,
-            &>a {
+            & > button, 
+            & > div,
+            & > a {
                 background: none;
                 border: none;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
-                gap: 6px;
+                gap: 8px;
                 color: var(--text-muted);
-                font-size: 1.6rem;
-                padding: 6px;
+                font-size: 1.5rem;
+                padding: 8px;
                 border-radius: 50%;
                 transition: all 0.2s ease;
 
@@ -255,44 +318,16 @@ main.index-container {
                     color: var(--primary);
                 }
 
-                &>.post-cont {
-                    font-size: 0.95rem;
+                & > .post-cont {
+                    font-size: 1rem;
                     font-weight: 600;
                 }
 
-                &.liked {
-                    color: #e91e63;
-                    opacity: 1;
-                }
-
-                &.liked i {
-                    color: #e91e63;
-                }
-
-                &.liked:hover {
-                    background-color: rgba(233, 30, 99, 0.1);
-                }
-
-                &.reposted {
-                    color: var(--primary);
-                }
-
-                &.reposted:hover {
-                    background-color: var(--backgroundContrast);
-                }
-
-                &.bookmarked {
-                    color: #f59e0b;
-                }
-
-                &.bookmarked:hover {
-                    background-color: rgba(245, 158, 11, 0.1);
-                }
-
-                &.report-btn:hover {
-                    color: #ef4444;
-                    background-color: rgba(239, 68, 68, 0.1);
-                }
+                &.liked { color: #e91e63; opacity: 1; }
+                &.liked i { color: #e91e63; }
+                &.reposted { color: var(--primary); }
+                &.bookmarked { color: var(--primary); }
+                &.report-btn:hover { color: #ef4444; background-color: rgba(239, 68, 68, 0.1); }
             }
         }
     }
@@ -300,51 +335,56 @@ main.index-container {
 
 /* -------------------- ÁREA DE COMENTÁRIOS -------------------- */
 .comments-wrapper {
-    margin-top: 30px;
+    margin-top: 40px;
+    width: 100%;
+    box-sizing: border-box;
 
-    &>h3 {
-        font-size: 1.3rem;
-        margin-bottom: 20px;
+    & > h3 {
+        font-size: 1.4rem;
+        margin-bottom: 25px;
         color: var(--text-color);
         font-weight: 700;
-        border-left: 4px solid var(--primary);
-        padding-left: 12px;
+        border-left: 5px solid var(--primary);
+        padding-left: 15px;
     }
 }
 
 /* Formulário de Resposta */
 .reply-form-container {
     background: var(--backgroundContrast);
-    padding: 20px;
+    padding: 25px;
     border-radius: 16px;
     border: 1px solid var(--border-color);
-    margin-bottom: 30px;
+    margin-bottom: 40px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    box-sizing: border-box;
 
-    &>#reply-form {
-        &>.reply-input-group {
+    & > #reply-form {
+        & > .reply-input-group {
             display: flex;
             gap: 15px;
             margin-bottom: 15px;
 
-            &>.user-avatar-small img {
-                width: 45px;
-                height: 45px;
+            & > .user-avatar-small img {
+                width: 50px;
+                height: 50px;
                 border-radius: 50%;
                 object-fit: cover;
                 border: 1px solid var(--border-color);
+                flex-shrink: 0;
             }
 
-            &>#reply-textarea {
+            & > #reply-textarea {
                 width: 100%;
                 background-color: var(--white) !important;
                 border: 1px solid var(--border-color);
                 border-radius: 12px;
                 resize: none;
                 font-family: inherit;
-                font-size: 1rem;
-                padding: 12px;
-                min-height: 60px;
+                font-size: 1.1rem;
+                padding: 15px;
+                min-height: 80px;
                 transition: all 0.2s ease;
 
                 &:focus {
@@ -355,29 +395,20 @@ main.index-container {
             }
         }
 
-        &>.form-actions {
+        & > .form-actions {
             display: flex;
             justify-content: flex-end;
 
-            &>.btn-reply-submit {
+            & > .btn-reply-submit {
                 background-color: var(--primary);
                 color: var(--white);
                 border: none;
-                padding: 10px 24px;
-                border-radius: 24px;
+                padding: 12px 30px;
+                border-radius: 30px;
                 font-weight: 600;
                 cursor: pointer;
                 transition: background-color 0.2s;
-
-                &:hover {
-                    background-color: var(--secondaryButton);
-                }
-
-                &:disabled {
-                    background-color: var(--secondary);
-                    cursor: not-allowed;
-                    opacity: 0.7;
-                }
+                font-size: 1rem;
             }
         }
     }
@@ -387,179 +418,188 @@ main.index-container {
 .comments-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
+    width: 100%;
 }
 
 .comment-card {
     display: flex;
     gap: 15px;
-    padding: 15px;
+    padding: 20px;
     background-color: var(--backgroundContrast);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    box-sizing: border-box;
 
-    &>.comment-avatar img {
-        width: 40px;
-        height: 40px;
+    & > .comment-avatar img {
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
         object-fit: cover;
+        flex-shrink: 0;
     }
 
-    &>.comment-body {
+    & > .comment-body {
         flex-grow: 1;
+        min-width: 0;
 
-        &>.comment-header {
+        & > .comment-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            gap: 1px;
             align-items: baseline;
+            flex-wrap: wrap;
 
-            &>.comment-author {
+            & > .comment-author {
                 font-weight: 700;
-                font-size: 0.95rem;
+                font-size: 1rem;
                 color: var(--text-color);
                 text-decoration: none;
 
-                &:hover {
-                    color: var(--primary);
-                    text-decoration: underline;
-                }
+                &:hover { color: var(--primary); text-decoration: underline; }
             }
 
-            &>.comment-date {
-                font-size: 0.8rem;
+            & > .comment-date {
+                font-size: 0.85rem;
                 color: var(--text-muted);
             }
         }
 
-        &>.comment-text {
-            font-size: 0.95rem;
+        & > .comment-text {
+            font-size: 1rem;
             color: var(--text-color);
             line-height: 1.5;
+            word-wrap: break-word;
         }
     }
 }
 
-/* Estados de Vazio e Login */
 .no-comments,
 .login-prompt {
     text-align: center;
-    padding: 30px;
+    padding: 40px;
     color: var(--text-muted);
-    background-color: var(--background);
+    background-color: var(--backgroundContrast);
     border-radius: 12px;
     border: 1px dashed var(--secondary);
+    width: 100%;
+    box-sizing: border-box;
+}
 
-    &>a {
-        color: var(--primary);
-        font-weight: 700;
-        text-decoration: none;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
+.login-prompt a {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
 }
 
 /* ==========================================================================
    RESPONSIVIDADE (MEDIA QUERIES)
-   Trazida do style.css para garantir comportamento mobile correto
+   Correção dos "cortes" e alinhamento no mobile
    ========================================================================== */
 
-/* Tablet (max-width: 992px) */
 @media only screen and (max-width: 992px) {
     main.index-container {
         display: block;
-        /* Remove o grid layout */
-        --tamanho_navbar: 0;
         padding: 24px;
     }
+    .navbar_container { display: none; }
+    .main_container { width: 100%; padding: 0; }
+}
 
-    .navbar_container {
-        display: none;
-        /* Esconde a sidebar no tablet */
+@media only screen and (max-width: 768px) {
+    main.index-container {
+        display: block;
+        padding: 80px 15px 75px 15px; /* Espaço de segurança lateral (15px) */
+        width: 100%;
+        overflow-x: hidden;
     }
 
     .main_container {
         width: 100%;
-        max-width: 100% !important;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Ajuste do Container de Conteúdo */
+    .main_content[data-pagina="post_view"] {
+        width: 100%;
         padding: 0;
     }
-}
 
-/* Mobile (max-width: 720px) */
-@media only screen and (max-width: 720px) {
-    main.index-container {
-        display: block;
-        padding: 80px 15px 75px 15px;
-        /* Espaço para header e navbar mobile */
-    }
-
-    .navbar_container {
-        display: none;
-        /* Esconde a sidebar no mobile */
-    }
-
-    /* Ajuste do Card Principal no Mobile */
+    /* CARD DO POST NO MOBILE - CONTIDO */
     .post-card-full {
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        padding: 15px;
-        margin-bottom: 10px;
-        box-shadow: none;
-        border-top: 1px solid var(--border-color);
-        border-bottom: 1px solid var(--border-color);
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        border-radius: 12px; /* Mantém bordas arredondadas */
+        padding: 15px; /* Padding interno seguro */
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color); /* Borda visível */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
 
-        &>.post-header {
-            margin-bottom: 12px;
+    /* Ajustes internos do Header */
+    .post-card-full > .post-header {
+        margin-bottom: 15px;
 
-            &>.user-info>.user-icon img {
-                width: 45px;
-                height: 45px;
-            }
+        & > .user-info {
+            gap: 5px;
+            & > .user-icon img { width: 45px; height: 45px; }
+            & > .user-details > .user-name { font-size: 1rem; }
+            & > .user-details > .user-tag { font-size: 0.85rem; }
         }
 
-        &>.post-footer {
-            padding-top: 12px;
+        & > .post-info {
+            align-items: flex-end;
+            & > .post-date { font-size: 0.75rem; }
+            & > .post-views { font-size: 0.75rem; margin-left: 12px; }
+        }
+    }
 
-            &>.post-stats-left,
-            &>.post-stats-right {
-                gap: 12px;
-                /* Menor espaçamento entre ícones */
+    /* Texto e Mídia */
+    .post-card-full > .post-main > .post-text {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
 
-                &>button .post-cont,
-                &>div .post-cont {
-                    font-size: 0.85rem;
-                }
+    /* Footer/Botões */
+    .post-card-full > .post-footer {
+        padding-top: 15px;
+        
+        & > .post-stats-left, 
+        & > .post-stats-right {
+            gap: 5px; /* Ícones mais próximos */
+            
+            & > button, & > div, & > a {
+                font-size: 1.3rem;
+                padding: 5px;
+                & > .post-cont { font-size: 0.8rem; }
             }
         }
     }
 
-    /* Ajuste dos Comentários no Mobile */
+    /* COMENTÁRIOS - CONTIDOS */
     .comments-wrapper {
-        padding: 0;
         margin-top: 20px;
+        padding: 0;
     }
 
     .reply-form-container {
+        width: 100%;
+        margin-left: 0;
         padding: 15px;
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
+        border-radius: 12px;
     }
 
     .comment-card {
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        padding: 12px;
+        width: 100%;
+        padding: 15px;
         gap: 10px;
-
-        &>.comment-avatar img {
-            width: 32px;
-            height: 32px;
-        }
+        
+        & > .comment-avatar img { width: 35px; height: 35px; }
+        & > .comment-body > .comment-text { font-size: 0.9rem; }
     }
 }

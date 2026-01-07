@@ -1,0 +1,125 @@
+/* ==========================================================================
+   WIDGET DE ACESSIBILIDADE
+   ========================================================================== */
+
+/* Container do Widget */
+.accessibility-widget {
+    position: fixed;
+    bottom: 20px; /* Acima do rodapé ou alinhado com ele */
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column-reverse; /* Menu abre para cima */
+    align-items: center;
+    gap: 10px;
+}
+
+/* Botões Gerais */
+.accessibility-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--primary);
+    color: var(--white);
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.accessibility-btn:hover {
+    transform: scale(1.1);
+    background-color: var(--secondary);
+}
+
+/* Botão Principal (Destaque) */
+.accessibility-btn.main-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 1.8rem;
+    z-index: 10000;
+}
+
+/* Menu (Escondido por padrão) */
+.accessibility-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+/* Estado Ativo (Menu Aberto) */
+.accessibility-widget.active .accessibility-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.accessibility-widget.active .main-btn {
+    background-color: var(--secondary);
+    transform: rotate(90deg);
+}
+
+/* ==========================================================================
+   MODO ALTO CONTRASTE (Override de Variáveis)
+   ========================================================================== */
+body.high-contrast {
+    /* Cores de Alto Contraste (Preto e Amarelo/Branco) */
+    --background: #000000 !important;
+    --backgroundContrast: #1a1a1a !important;
+    --primary: #ffff00 !important; /* Amarelo vivo */
+    --secondary: #000000 !important;
+    --secondaryButton: #ffcc00 !important;
+    --accent: #ffffff !important;
+    --border-color: #ffff00 !important;
+    --text-color: #ffffff !important;
+    --text-muted: #dddddd !important;
+    --white: #000000 !important; /* Inverte fundos brancos para preto */
+}
+
+/* Ajustes específicos para Alto Contraste */
+body.high-contrast .post_container,
+body.high-contrast .post-card-full,
+body.high-contrast .reply-form-container,
+body.high-contrast .comment-card,
+body.high-contrast .main_content,
+body.high-contrast header.navbar_container,
+body.high-contrast .community_cards_container {
+    border: 2px solid var(--primary) !important;
+    background-color: #000 !important;
+    color: #fff !important;
+}
+
+body.high-contrast a {
+    color: #ffff00 !important;
+    text-decoration: underline !important;
+}
+
+body.high-contrast .btn-primary,
+body.high-contrast button {
+    background: #000 !important;
+    border: 2px solid #ffff00 !important;
+    color: #ffff00 !important;
+    font-weight: bold;
+}
+
+body.high-contrast img {
+    filter: grayscale(100%) contrast(120%); /* Opcional: ajuda na visualização */
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE
+   ========================================================================== */
+@media (max-width: 768px) {
+    .accessibility-widget {
+        bottom: 80px; /* Sobe para não ficar em cima da navbar mobile */
+        right: 15px;
+    }
+}
