@@ -1,6 +1,9 @@
 <?php
 
+<<<<<<< HEAD
 // Inicia a sessão se ainda não estiver iniciada
+=======
+>>>>>>> 5a31709329bed4f2cc0efdc88be0982686876cbc
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }

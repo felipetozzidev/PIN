@@ -994,7 +994,11 @@
                     informações acadêmicas e institucionais.</p>
                 <div class="btn-group mt-4" role="group">
                     <a href="#sobre-projeto" class="btn btn-primary mx-2">Saiba Mais</a>
+<<<<<<< HEAD
                     <a href="./public/index.php" class="btn btn-outline-light">Acessar a Plataforma</a>
+=======
+                    <a href=public/" class="btn btn-outline-light">Acessar a Plataforma</a>
+>>>>>>> 5a31709329bed4f2cc0efdc88be0982686876cbc
                 </div>
             </div>
         </section>
